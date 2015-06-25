@@ -32,3 +32,13 @@ int Transmitter::getPositionData()
     std::cout << "Transmitter getPositionData" << std::endl;
     return 0;
 }
+
+void Transmitter::setWaypoint(double lat, double lon)
+{
+    std::cout << "SetWaypoint" << std::endl;
+}
+
+void Transmitter::setTargetSpeed(double speed)
+{
+    std::cout << "SetSpeed" << std::endl;
+}

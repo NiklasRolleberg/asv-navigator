@@ -32,6 +32,11 @@ public:
     /**Get position data since last time*/
     //std::vector<double[2]> getPositionData();
     int getPositionData();
+
+    /**Set waypoint for the boat*/
+    void setWaypoint(double lat, double lon);
+
+    void setTargetSpeed(double speed);
 };
 
 #endif
