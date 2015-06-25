@@ -2,17 +2,32 @@
 #ifndef DATA_H
 #define DATA_H
 
+#include <thread>   // std::thread
+#include "transmitter.hpp"
+
 class Data
 {
 private:
-    //void run();
+    double boat_xpos;
+    double boat_ypos;
+    double boat_heading;
+    double boat_speed;
+    double boat_depth;
+
+    bool data_stop = false;
+    int data_delay = 500000; //0.5s
+    Transmitter* data_transmitterptr;
+    std::thread *data_threadptr = nullptr;
+
+    /**collects data, calculates new coordinates*/
+    void threadLoop();
 
 public:
 
     Data(){};
 
     /**Constructor*/
-    Data(int arg1, int arg2, int arg3);
+    Data(Transmitter* transmitter, int delay, int arg3);
 
     /**Destructor*/
     ~Data();
@@ -32,9 +47,14 @@ public:
     /**Get boat heading*/
     double getHeading();
 
+    /**Get boat speed*/
+    double getSpeed();
+
     /**Get Depth*/
     double getDepth();
 };
+
+
 
 
 #endif // DATA_H

@@ -3,19 +3,23 @@
 #define NAVIGATOR_H
 
 #include "data.hpp"
+#include "transmitter.hpp"
 
 class Navigator
 {
 private:
-    Data data;
-
+    Data* data = nullptr;
+    Transmitter* tr_ptr = nullptr;
 public:
     Navigator(){};
     /**Constructor*/
-    Navigator(int arg1, int arg2, int arg3);
+    Navigator(Transmitter* transmitter, int arg2, int arg3);
 
     /**Destructor*/
     ~Navigator();
+
+    /**Start scanning*/
+    void start();
 
     /**Set polygon*/
     void setPolygon(int arg1);
@@ -24,4 +28,5 @@ public:
     void abort();
 
 };
+
 #endif
