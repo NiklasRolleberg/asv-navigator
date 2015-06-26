@@ -76,7 +76,7 @@ double Data::getDepth()
 void Data::threadLoop()
 {
     std::cout << "Data loop started" << std::endl;
-    int i=0;
+    //int i=0;
     while(!data_stop)
     {
         /*
@@ -85,10 +85,9 @@ void Data::threadLoop()
         std::cout << "Check depth" << std::endl;
         std::cout << "Check speed" << std::endl;
         */
-        std::cout << "varv: " << i++ << std::endl;
+        //std::cout << "varv: " << i++ << std::endl;
         data_transmitterptr->getDepthData();
         usleep(data_delay);
     }
     std::cout << "Data loop done" << std::endl;
-
 }
