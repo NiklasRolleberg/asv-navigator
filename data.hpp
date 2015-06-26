@@ -38,6 +38,26 @@ public:
     /**Stop collecting data*/
     void stop();
 
+
+    /**Get boat x-position*/
+    double getLat();
+
+    /**Get boat y-position*/
+    double getLon();
+
+    /**Get boat heading*/
+    double getLatLongHeading();
+
+
+    /**create a local coordinateSystem*/
+    void setLocalCoordinateSystem(int polygon);
+
+    /**create a local coordinateSystem*/
+    void removeLocalCoordinateSystem();
+
+    /**get the polygon in local coordinates*/
+    int getLocalPolygon();
+
     /**Get boat x-position*/
     double getX();
 
@@ -46,6 +66,7 @@ public:
 
     /**Get boat heading*/
     double getHeading();
+
 
     /**Get boat speed*/
     double getSpeed();

@@ -31,9 +31,11 @@ public:
     /**cancel mission*/
     void abort();
 
-    /**Carry out a task from the mission. e.g. transport from
-     one place to another or scan a polygon*/
-    void executeTask();
+    /**Goes to the coordinates specified in the task*/
+    void goToCoordinates(Task* task);
+
+    /**scans the polygon specified in the task*/
+    void scanPolygon(Task* task);
 };
 
 #endif

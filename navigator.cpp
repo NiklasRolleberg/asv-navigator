@@ -10,7 +10,7 @@ Navigator::Navigator(Transmitter* transmitter, int arg2, int arg3)
 {
     tr_ptr = transmitter;
     std::cout << "Navigator: constructor" << std::endl;
-    data = new Data(transmitter,500000,0);
+    data = new Data(transmitter,1000000,0); // för lång delay
 }
 
 Navigator::~Navigator()
@@ -32,11 +32,30 @@ void Navigator::start()
     data->start();
 
 
-    //execute tasks
-    Task* t = mission_ptr->getNextTask();
-    if(t->getType() == 1)
+    Task* t = nullptr;
+    while((t = mission_ptr->getNextTask()) != nullptr)
     {
-        usleep(t->getSleepTime());
+        int type = t->getType();
+        switch (type)
+        {
+            case 1:
+                std::cout << "New task type = 1 (sleep)" << std::endl;
+                usleep(t->getSleepTime());
+                break;
+            case 2:
+                std::cout << "New task type = 2 (go to coordinates)" << std::endl;
+                goToCoordinates(t);
+                //TODO Do something
+                break;
+            case 3:
+                std::cout << "New task type = 3 (scan polygon)" << std::endl;
+                scanPolygon(t);
+                //TODO Do something
+                break;
+            default:
+                std::cout << "Unknown task type " << type << std::endl;
+        }
+        delete t;
     }
 
 
@@ -51,8 +70,22 @@ void Navigator::abort()
     data->stop();
 }
 
-void Navigator::executeTask()
+/**Execute task of type 2*/
+void Navigator::goToCoordinates(Task* task)
 {
-    std::cout << "Navigator: execute task" << std::endl;
+    std::cout << "Navigator: execute go to coordinates task" << std::endl;
+    usleep(2000000);
+}
+
+/**Execute task of type 3*/
+void Navigator::scanPolygon(Task* task)
+{
+    std::cout << "Navigator: execute scan polygon task" << std::endl;
+    data->setLocalCoordinateSystem(0);
+
+    std::cout << "start scanning" << std::endl;
+    usleep(2000000);
+    std::cout << "scanning completed" << std::endl;
+    data->removeLocalCoordinateSystem();
 }
 

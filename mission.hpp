@@ -3,6 +3,7 @@
 #define MISSION_H
 
 #include "task.hpp"
+#include <queue>          // std::queue
 
 
 /**The mission class contains tasks for the navigation object
@@ -11,8 +12,7 @@
 class Mission
 {
 private:
-    int QUEUE = 0; // queue with tasks
-    Task* task = nullptr;
+    std::queue<Task*> taskQueue; // queue with tasks
 
 public:
     /**Constructor*/

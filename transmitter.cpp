@@ -23,7 +23,7 @@ void Transmitter::abort()
 
 int Transmitter::getDepthData()
 {
-    std::cout << "Transmitter getDepthData" << std::endl;
+    //std::cout << "Transmitter getDepthData" << std::endl;
     return 0;
 }
 

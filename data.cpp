@@ -48,6 +48,38 @@ void Data::stop()
             data_threadptr->join();
 }
 
+double Data::getLat()
+{
+    std::cout << "Data get latitude" << std::endl;
+}
+
+double Data::getLon()
+{
+    std::cout << "Data get longitude" << std::endl;
+}
+
+double Data::getLatLongHeading()
+{
+    std::cout << "Data getHeading (Lat,Long)" << std::endl;
+}
+
+
+void Data::setLocalCoordinateSystem(int polygon)
+{
+    std::cout << "Polygon added, starting creation of local coordinate system" << std::endl;
+}
+
+void Data::removeLocalCoordinateSystem()
+{
+    std::cout << "remove local coordinate system" << std::endl;
+}
+
+int Data::getLocalPolygon()
+{
+    std::cout << "get polygon in local coordinates" << std::endl;
+}
+
+
 double Data::getX()
 {
     std::cout << "Data getX" << std::endl;

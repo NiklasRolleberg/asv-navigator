@@ -1,6 +1,7 @@
 #include "task.hpp"
 #include <iostream>
 #include <unistd.h>
+#include "polygon.hpp"
 
 Task::Task()
 {
@@ -21,15 +22,18 @@ Task::Task(double coordinate1, double coordinate2)
     type = 2;
 }
 
-Task::Task(int polygon)
+Task::Task(Polygon* polygon)
 {
     std::cout << "Task: scan polygon constructor" << std::endl;
     type = 3;
+    polygon_ptr = polygon;
 }
 
 
 Task::~Task()
 {
+    if(polygon_ptr != nullptr)
+        delete polygon_ptr;
     std::cout << "Task destructor" << std::endl;
 }
 
