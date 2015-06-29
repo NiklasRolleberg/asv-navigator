@@ -5,6 +5,7 @@
 #include "transmitter.hpp"
 #include "mission.hpp"
 #include "task.hpp"
+#include "singlebeamscanner.hpp"
 
 Navigator::Navigator(Transmitter* transmitter, int arg2, int arg3)
 {
@@ -81,10 +82,11 @@ void Navigator::goToCoordinates(Task* task)
 void Navigator::scanPolygon(Task* task)
 {
     std::cout << "Navigator: execute scan polygon task" << std::endl;
-    data->setLocalCoordinateSystem(0);
-
+    data->setLocalCoordinateSystem(task->getPolygon());
+    SingleBeamScanner scanner = SingleBeamScanner(data, task->getPolygon());
     std::cout << "start scanning" << std::endl;
-    usleep(2000000);
+    scanner.startScan();
+    //usleep(2000000);
     std::cout << "scanning completed" << std::endl;
     data->removeLocalCoordinateSystem();
 }

@@ -48,3 +48,8 @@ int Task::getSleepTime()
     return delay;
 }
 
+Polygon* Task::getPolygon()
+{
+    return polygon_ptr;
+}
+

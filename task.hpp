@@ -32,6 +32,8 @@ public:
     int getType();
 
     int getSleepTime();
+
+    Polygon* getPolygon();
 };
 
 #endif //TASK_H

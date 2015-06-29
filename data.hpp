@@ -4,13 +4,18 @@
 
 #include <thread>   // std::thread
 #include "transmitter.hpp"
+#include "polygon.hpp"
 
 class Data
 {
 private:
+    double boat_latitude;
+    double boat_longitude;
+    double boat_heading_real;
+
     double boat_xpos;
     double boat_ypos;
-    double boat_heading;
+    double boat_heading_local;
     double boat_speed;
     double boat_depth;
 
@@ -18,6 +23,7 @@ private:
     int data_delay = 500000; //0.5s
     Transmitter* data_transmitterptr;
     std::thread *data_threadptr = nullptr;
+    Polygon* localPolygon = nullptr;
 
     /**collects data, calculates new coordinates*/
     void threadLoop();
@@ -50,13 +56,13 @@ public:
 
 
     /**create a local coordinateSystem*/
-    void setLocalCoordinateSystem(int polygon);
+    void setLocalCoordinateSystem(Polygon* polygon);
 
     /**create a local coordinateSystem*/
     void removeLocalCoordinateSystem();
 
     /**get the polygon in local coordinates*/
-    int getLocalPolygon();
+    Polygon* getLocalPolygon();
 
     /**Get boat x-position*/
     double getX();
@@ -73,6 +79,18 @@ public:
 
     /**Get Depth*/
     double getDepth();
+
+
+    /**Set waypoint for the boat*/
+    void setBoatWaypoint_real(double lat, double lon);
+
+    /**Set waypoint for the boat*/
+    void setBoatWaypoint_local(double x, double y);
+
+
+    /**Set waypoint for the boat*/
+    void setBoatSpeed(double speed);
+
 };
 
 
