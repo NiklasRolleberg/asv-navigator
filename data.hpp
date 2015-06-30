@@ -1,6 +1,7 @@
 //Header
 #ifndef DATA_H
 #define DATA_H
+# define M_PI           3.14159265358979323846  /* (ta bort sen) */
 
 #include <thread>   // std::thread
 #include "transmitter.hpp"
@@ -90,6 +91,9 @@ public:
 
     /**Set waypoint for the boat*/
     void setBoatSpeed(double speed);
+
+    /**Calculate distance between two coordinates*/
+    double calculateDistance(double lat0,double lon0, double lat1, double lon1);
 
 };
 

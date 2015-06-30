@@ -33,11 +33,12 @@ void SingleBeamScanner::startScan()
     //1) find closest node.
     int index = -1;
     double minimum = std::numeric_limits<double>::max();
-    std::cout << minimum << std::endl;
+    //std::cout << minimum << std::endl;
     double d = 0;
-    for(int i=0;i<lat->size();i++)
+    for(int i=0;i< lat->size();i++)
     {
-        d = 3; //calculate distance between boat and node
+        d = data->calculateDistance(boatLat,boatLon,lat->at(i), lon->at(i));
+        std::cout << d << std::endl;
         if(d<minimum)
         {
             index = i;
@@ -56,11 +57,13 @@ void SingleBeamScanner::startScan()
 
     //std::cout << targetLat << " " << targetLon << std::endl;
 
-    int lap = 0;
+    int lap = 10; //0
     double threshold = 30;
     while(lap < 2)
     {
-        d = 3;//distance between boat and waypoint (targetlat,targetlon);
+        usleep(300);
+        d = data->calculateDistance(data->getLat(),data->getLon(),targetLat, targetLon);
+        //std::cout << "distance to target " << d << std::endl;
         if(d < threshold)
         {
             std::cout << "waypoint reached, picking the next one" << std::endl;

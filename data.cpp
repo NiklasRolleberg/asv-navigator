@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include "transmitter.hpp"
 #include "polygon.hpp"
+#include <cmath>
 
 Data::Data(Transmitter* transmitter,int delay, int arg3)
 {
@@ -12,8 +13,9 @@ Data::Data(Transmitter* transmitter,int delay, int arg3)
     data_delay = delay;
     //Get initial values for variables
 
-    boat_latitude = 0;
-    boat_longitude = 0;
+    //59.352884, 18.073585
+    boat_latitude = 59.352884;
+    boat_longitude = 18.073585;
     boat_heading_real = 0;
 
     boat_xpos = 0;
@@ -64,7 +66,7 @@ double Data::getLat()
 double Data::getLon()
 {
     std::cout << "Data get longitude" << std::endl;
-    boat_longitude;
+    return boat_longitude;
 }
 
 double Data::getLatLongHeading()
@@ -152,4 +154,22 @@ void Data::setBoatSpeed(double speed)
 {
     std::cout << "Data: Set speed" << std::endl;
     data_transmitterptr->setTargetSpeed(speed);
+}
+
+double Data::calculateDistance(double lat1,double lon1,double lat2,double lon2)
+{
+    double R = 6371000; // metres
+    double phi1 = lat1 * M_PI / 180;// .toRadians();
+    double phi2 = lat2 * M_PI / 180;// .toRadians();
+    double dphi = (lat2-lat1) * M_PI / 180;// .toRadians();
+    double dlambda = (lon2-lon1) * M_PI / 180;// .toRadians();
+
+    double a = sin(dphi/2) * sin(dphi/2) +
+            cos(phi1) * cos(phi2) *
+            sin(dlambda/2) * sin(dlambda/2);
+    double c = 2 * atan2(sqrt(a), sqrt(1-a));
+
+    return R * c;
+
+
 }

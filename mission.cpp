@@ -18,6 +18,34 @@ Mission::Mission(int arg0)
     std::vector<double> *lat = new std::vector<double>();
     std::vector<double> *lon = new std::vector<double>();
 
+//59.353086, 18.073589
+    lat->push_back(59.353086);
+    lon->push_back(18.073589);
+
+
+//59.353077, 18.073817
+    lat->push_back(59.353077);
+    lon->push_back(18.073817);
+
+
+//59.353061, 18.074006
+    lat->push_back(59.353061);
+    lon->push_back(18.074006);
+
+//59.352913, 18.074006
+    lat->push_back(59.352913);
+    lon->push_back(18.074006);
+
+//59.352708, 18.074095
+    lat->push_back(59.352708);
+    lon->push_back(18.074095);
+
+
+//59.352668, 18.073518
+    lat->push_back(59.352668);
+    lon->push_back(18.073518);
+
+    /*
     lat->push_back(1.23);
     lat->push_back(2.31);
     lat->push_back(3.21);
@@ -25,7 +53,7 @@ Mission::Mission(int arg0)
     lon->push_back(4.56);
     lon->push_back(5.64);
     lon->push_back(6.54);
-
+    */
     taskQueue.push(new Task(new Polygon(3,lat,lon)));
 
 }
