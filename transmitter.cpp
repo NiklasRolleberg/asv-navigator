@@ -30,17 +30,19 @@ void Transmitter::start()
     listen = true;
 
     listenThread = new std::thread(&Transmitter::listenToSerialPort, this , 0);
-
+    usleep(100000); // let the thread start
 }
 
 void Transmitter::listenToSerialPort(int serialport)
 {
+    std::cout << "Listen to serial port loop started" << std::endl; 
     while(listen)
     {
         //Loopen funkar
         //std::cout << "Listening to serial port" << std::endl;
         usleep(50000);
     }
+    std::cout << "Listen to serial port loop ended" << std::endl;
 }
 
 void Transmitter::abort()
