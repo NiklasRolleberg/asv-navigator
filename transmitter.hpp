@@ -2,12 +2,20 @@
 #ifndef TRANSMITTER_H
 #define TRANSMITTER_H
 
-#include <cstdlib>
 #include <vector>
+#include <string>
+#include <thread>
 
 class Transmitter
 {
 private:
+
+    //pthread_mutex_t lock;
+    bool lock = false;
+    bool listen = false;
+    std::thread* listenThread;
+    void writeToSerial(std::string message);
+    void listenToSerialPort(int serialPort);
 
 
 public:

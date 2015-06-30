@@ -30,6 +30,7 @@ Data::~Data()
     if(data_threadptr != nullptr)
         if(data_threadptr->joinable())
             data_threadptr->join();
+    delete data_threadptr;
 }
 
 void Data::start()

@@ -10,6 +10,7 @@ int main()
 
   // (1) Create a transmitter and a mission
   Transmitter* transmitter = new Transmitter(2);
+  transmitter->start();
   Mission* mission = new Mission(0);
 
   // (2) Create the navigator, and pass the transmitter to it
@@ -20,7 +21,10 @@ int main()
 
   // (4) start navigator
   navigator->start();
+
+
   //navigator.abort();
+  //transmitter->abort();
 
   delete navigator;
   delete mission;
