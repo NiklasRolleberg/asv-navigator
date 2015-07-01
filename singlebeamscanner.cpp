@@ -61,7 +61,7 @@ void SingleBeamScanner::startScan()
     double threshold = 30;
     while(lap < 2)
     {
-        usleep(300);
+        usleep(300000);
         d = data->calculateDistance(data->getLat(),data->getLon(),targetLat, targetLon);
         //std::cout << "distance to target " << d << std::endl;
         if(d < threshold)

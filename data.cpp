@@ -59,19 +59,19 @@ void Data::stop()
 
 double Data::getLat()
 {
-    std::cout << "Data get latitude" << std::endl;
+    //std::cout << "Data get latitude" << std::endl;
     return boat_latitude;
 }
 
 double Data::getLon()
 {
-    std::cout << "Data get longitude" << std::endl;
+    //std::cout << "Data get longitude" << std::endl;
     return boat_longitude;
 }
 
 double Data::getLatLongHeading()
 {
-    std::cout << "Data getHeading (Lat,Long)" << std::endl;
+    //std::cout << "Data getHeading (Lat,Long)" << std::endl;
     return boat_heading_real;
 }
 

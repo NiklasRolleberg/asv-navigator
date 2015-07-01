@@ -10,12 +10,14 @@ class Transmitter
 {
 private:
 
-    //pthread_mutex_t lock;
+    int serialPort;
+    //char* buff, *buffer, *buffptr;
+  
     bool lock = false;
     bool listen = false;
     std::thread* listenThread;
     void writeToSerial(std::string message);
-    void listenToSerialPort(int serialPort);
+    void listenToSerialPort();
 
 
 public:
