@@ -5,15 +5,17 @@
 #include <vector>
 #include <string>
 #include <thread>
+#include <termios.h>
+#include <boost/asio.hpp>
+
 
 class Transmitter
 {
 private:
-
-    int serialPort;
-    //char* buff, *buffer, *buffptr;
   
-    bool lock = false;
+    boost::asio::io_service *io = nullptr;
+    boost::asio::serial_port *serial = nullptr;
+  
     bool listen = false;
     std::thread* listenThread;
     void writeToSerial(std::string message);

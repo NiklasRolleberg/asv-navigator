@@ -1,3 +1,4 @@
 # asv-navigator
-compilera: g++ main.cpp navigator.cpp data.cpp transmitter.cpp -std=c++11
-
+compilera:
+	//path to boost header       //path to boost libs
+g++ -I /home/niklas/lib/include/ -L /home/niklas/lib/lib/ *.cpp -std=c++0x -pthread -lboost_system -Wl,-rpath,/home/niklas/lib/lib

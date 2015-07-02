@@ -10,22 +10,33 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <termios.h>
+#include <boost/asio.hpp>
 
 Transmitter::Transmitter(int arg0)
 {
     std::cout << "Transmitter constructor" << std::endl;
     std::cout << "Opening serial port..";
-    serialPort=open("/dev/ttyUSB0", O_RDWR | O_NOCTTY | O_NDELAY);
-    if(serialPort == -1)
-      std::cout << "failed" << std::endl;
-    else
-      std::cout << "sucsess" << std::endl;
-    fcntl(serialPort, F_SETFL,0);
+
+    std::string port = "/dev/ttyUSB0";
+    unsigned int baud_rate = 9600;
+
+
+    //funkar
+    /*
+    bost::asio::io_service io();
+    boost::asio::serial_port serial(io,port);
+    */
+    
+    io = new boost::asio::io_service();
+    serial = new boost::asio::serial_port((*io),port);
+      //serial->set_option(boost::asio::serial_port_base::baud_rate(baud_rate));
+    
 }
 
 Transmitter::~Transmitter()
 {
     listen = false;
+    serial->cancel();
     if(listenThread != nullptr)
     {
         if(listenThread->joinable())
@@ -36,15 +47,10 @@ Transmitter::~Transmitter()
     }
     delete listenThread;
 
-    //delete[] buff;
-    //delete[] buffer;
-    //delete[] buffptr;
     
-
-
-    std::cout << "Closong serial port " << std::endl;
-    close(serialPort);
-      
+    //std::cout << "Closong serial port " << std::endl;
+    // TODO close serial port
+    
     std::cout << "Transmitter destructor" << std::endl;
 }
 void Transmitter::start()
@@ -59,51 +65,10 @@ void Transmitter::start()
 void Transmitter::listenToSerialPort()
 {
     std::cout << "Listen to serial port loop started" << std::endl;
-    char* buff = new char[8];
-    std::string message = "";
     while(listen)
     {
-        usleep(1000);
-	if(lock)
-	  continue;
-        //Loopen funkar
-        //std::cout << "Listening to serial port" << std::endl;
-        int rd = read(serialPort,buff,1);
-
-	if(rd == -1)
-	{
-	  char*buffer;
-	  char * errorMessage = strerror_r( errno, buffer, 256 ); // get string message
-	  printf("ERROR: ");
-	  printf(errorMessage);
-	  printf("\n");
-	  delete[] buffer;
-	  continue; 
-	}
-
-        //one char in buffer
-	char ch = buff[0];
-	message += ch;
-	if(ch == '\n')
-        {
-	  std::cout << "Message: " << message  << std::endl;
-	  message = "";
-	}
-	
-	/*
-	//print message
-	printf("incoming message:");
-	for(int i=0;i<rd;i++)
-	{
-	  printf(&buff[i]);
-	}
-	printf("\n");
-	*/
-
-	
-	
+      break;
     }
-    delete[] buff;
     std::cout << "Listen to serial port loop ended" << std::endl;
 }
 
@@ -120,13 +85,13 @@ void Transmitter::abort()
 int Transmitter::getDepthData()
 {
     //std::cout << "Transmitter getDepthData" << std::endl;
-    //writeToSerial("$I want data,checksum\n");
+    writeToSerial("$I want data,checksum");
     return 0;
 }
 
 int Transmitter::getPositionData()
 {
-    std::cout << "Transmitter getPositionData" << std::endl;
+    //std::cout << "Transmitter getPositionData" << std::endl;
     //writeToSerial("$I want position data,checksum");
     return 0;
 }
@@ -149,22 +114,10 @@ void Transmitter::setTargetSpeed(double speed)
 
 void Transmitter::writeToSerial(std::string message)
 {
-    srand((unsigned)time(0));
-    while(true)
-    {
-        if(!lock)
-        {
-            lock = true;
-            std::cout << "Transmitter: write to serial port: " << message << std::endl;
-            //Write stuff to serial port
-	    message += '\n';
-	    std::cout << "Transmitter: bytes to send: " << message.size() << std::endl;
-	    int wr=write(serialPort,message.c_str(),message.size());
-	    //usleep(10000);
-            lock = false;
-            return;
-        }
-        usleep(3 + (rand()%15));
-    }
+  std::cout << "Write to serial port: " << message << std::endl;
+  message+='\n';
+  boost::asio::write((*serial),boost::asio::buffer(message.c_str(),message.size()));
+
+  //boost::asio::write((*serial),boost::asio::buffer('\n',1));
 }
 
