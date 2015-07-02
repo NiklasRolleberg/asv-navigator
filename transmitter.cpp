@@ -28,9 +28,7 @@ Transmitter::Transmitter(int arg0)
     */
     
     io = new boost::asio::io_service();
-    serial = new boost::asio::serial_port((*io),port);
-      //serial->set_option(boost::asio::serial_port_base::baud_rate(baud_rate));
-    
+    serial = new boost::asio::serial_port((*io),port);    
 }
 
 Transmitter::~Transmitter()
@@ -56,7 +54,7 @@ Transmitter::~Transmitter()
 void Transmitter::start()
 {
     std::cout << "Transmitter start, start listening to serial port" << std::endl;
-    listen = false; //true
+    listen = true; //true
 
     listenThread = new std::thread(&Transmitter::listenToSerialPort, this);
     usleep(100000); // let the thread start
@@ -67,7 +65,23 @@ void Transmitter::listenToSerialPort()
     std::cout << "Listen to serial port loop started" << std::endl;
     while(listen)
     {
-      break;
+      char c;
+      std::string message;
+      for(;;)
+      {
+	  boost::asio::read((*serial),boost::asio::buffer(&c,1));
+          switch(c)
+          {
+              case '\r':
+                  break;
+              case '\n':
+		  std::cout << "Message rescieved: " << message  << std::endl;
+		  message = "";
+		  break;
+              default:
+                  message+=c;
+	  }
+      }
     }
     std::cout << "Listen to serial port loop ended" << std::endl;
 }
@@ -116,8 +130,8 @@ void Transmitter::writeToSerial(std::string message)
 {
   std::cout << "Write to serial port: " << message << std::endl;
   message+='\n';
+  //boost::asio::async_write((*serial),boost::asio::buffer(message.c_str(),message.size()));
   boost::asio::write((*serial),boost::asio::buffer(message.c_str(),message.size()));
 
-  //boost::asio::write((*serial),boost::asio::buffer('\n',1));
 }
 
