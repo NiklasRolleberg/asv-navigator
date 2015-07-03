@@ -2,6 +2,7 @@
 #define TASK_H
 
 #include "polygon.hpp"
+#include <string>
 
 /** A task could be to go to some coordinates, scan a polygon, wait
     or something else*/
@@ -11,6 +12,7 @@ private:
     int type;
     int delay = 0;
     Polygon* polygon_ptr = nullptr;
+    std::string message = "";
 
 public:
     /**Default constructor (type 0)*/
@@ -25,6 +27,9 @@ public:
     /** Constructor for scanning a polygon (type 3)*/
     Task(Polygon* polygon);
 
+    /** Constructor for sending a message  (type 4)*/
+    Task(std::string message);
+
     /**Destructor*/
     ~Task();
 
@@ -34,6 +39,8 @@ public:
     int getSleepTime();
 
     Polygon* getPolygon();
+
+    std::string getMessage();
 };
 
 #endif //TASK_H

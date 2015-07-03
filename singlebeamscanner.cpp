@@ -58,7 +58,7 @@ void SingleBeamScanner::startScan()
     //std::cout << targetLat << " " << targetLon << std::endl;
 
     int lap = 1; //0
-    double threshold = 30;
+    double threshold = 3;
     while(lap < 2)
     {
         usleep(300000);

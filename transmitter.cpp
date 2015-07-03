@@ -11,6 +11,7 @@
 #include <errno.h>
 #include <termios.h>
 #include <boost/asio.hpp>
+#include <boost/lockfree/queue.hpp>
 
 Transmitter::Transmitter(int arg0)
 {
@@ -18,7 +19,7 @@ Transmitter::Transmitter(int arg0)
     std::cout << "Opening serial port..";
 
     std::string port = "/dev/ttyUSB0";
-    unsigned int baud_rate = 9600;
+    unsigned int baud_rate = 115200;//9600;
 
 
     //funkar
@@ -47,6 +48,7 @@ Transmitter::~Transmitter()
 
     
     //std::cout << "Closong serial port " << std::endl;
+    delete serial;
     // TODO close serial port
     
     std::cout << "Transmitter destructor" << std::endl;
@@ -63,24 +65,24 @@ void Transmitter::start()
 void Transmitter::listenToSerialPort()
 {
     std::cout << "Listen to serial port loop started" << std::endl;
+
+    char c;
+    std::string message;
+
+    
     while(listen)
     {
-      char c;
-      std::string message;
-      for(;;)
+      boost::asio::read((*serial),boost::asio::buffer(&c,1));
+      switch(c)
       {
-	  boost::asio::read((*serial),boost::asio::buffer(&c,1));
-          switch(c)
-          {
-              case '\r':
-                  break;
-              case '\n':
-		  std::cout << "Message rescieved: " << message  << std::endl;
-		  message = "";
-		  break;
-              default:
-                  message+=c;
-	  }
+      case '\r':
+	break;
+      case '\n':
+	std::cout << "Message rescieved: " << message  << std::endl;
+	message = "";
+	break;
+      default:
+	message+=c;
       }
     }
     std::cout << "Listen to serial port loop ended" << std::endl;
@@ -91,38 +93,30 @@ void Transmitter::abort()
     std::cout << "Transmitter abort" << std::endl;
     
     listen = false;
+    serial->cancel();
     if(listenThread != nullptr)
         if(listenThread->joinable())
             listenThread->join();
 }
 
-int Transmitter::getDepthData()
+
+void Transmitter::requestData()
 {
-    //std::cout << "Transmitter getDepthData" << std::endl;
-    writeToSerial("$I want data,checksum");
-    return 0;
+  std::cout << "Transmitter:: requestData" << std::endl;
+  std::string s = "$MSGPO,*00";
+  writeToSerial(s);
 }
 
-int Transmitter::getPositionData()
+void Transmitter::sendMessage(std::string s)
 {
-    //std::cout << "Transmitter getPositionData" << std::endl;
-    //writeToSerial("$I want position data,checksum");
-    return 0;
+  writeToSerial(s);
 }
+  
 
-void Transmitter::setWaypoint(double lat, double lon)
+int Transmitter::getMessages()
 {
-    //std::cout << "SetWaypoint" << std::endl;
-    std::stringstream s;
-    s << "$MSSCP," << lat << "," << lon << ",checksum";
-    writeToSerial(s.str());
-}
-
-void Transmitter::setTargetSpeed(double speed)
-{
-    std::stringstream s;
-    s << "$MSSTS," << speed << ",checksum";
-    writeToSerial(s.str());
+  std::cout << "Transmitter getmessages" << std::endl;
+  return 0;
 }
 
 
@@ -130,8 +124,18 @@ void Transmitter::writeToSerial(std::string message)
 {
   std::cout << "Write to serial port: " << message << std::endl;
   message+='\n';
-  //boost::asio::async_write((*serial),boost::asio::buffer(message.c_str(),message.size()));
-  boost::asio::write((*serial),boost::asio::buffer(message.c_str(),message.size()));
+  //boost::asio::async_write((*serial),boost::asio::buffer(message.c_str(),message.size()),message.size());
 
+  while(lock){
+    std::cout << "locked" << std::endl;
+    usleep(100);
+  }
+  
+      
+  lock = true;
+  boost::asio::write((*serial),boost::asio::buffer(message.c_str(),message.size()));
+  lock = false;
+  std::cout << "Write complete" << std::endl;
+  //is the message coming back? turn off echo in stty..
 }
 

@@ -121,17 +121,21 @@ double Data::getDepth()
 void Data::threadLoop()
 {
     std::cout << "Data loop started" << std::endl;
-    //int i=0;
+    int i=0;
     while(!data_stop)
     {
-        /*
-        std::cout << "Check latitude" << std::endl;
-        std::cout << "Check longitude" << std::endl;
-        std::cout << "Check depth" << std::endl;
-        std::cout << "Check speed" << std::endl;
-        */
-        //std::cout << "varv: " << i++ << std::endl;
-        data_transmitterptr->getDepthData();
+        //int a = data_transmitterptr->getMessages();
+        //exempel: $MSGPS,1.3,LAT,0.3154,LON,0.900,SOG,0.0,COG,*4A
+        //               latitude,longitude,   speed ,  course, checksum
+	//TODO read the messages and to stuff..
+	
+        //data_transmitterptr->requestData();
+
+        std::stringstream s;
+        s << "$MSSTS," << i << ",*00";
+        data_transmitterptr->sendMessage(s.str());
+	i++;
+	
         usleep(data_delay);
     }
     std::cout << "Data loop done" << std::endl;
@@ -142,7 +146,11 @@ void Data::threadLoop()
 void Data::setBoatWaypoint_real(double lat, double lon)
 {
     std::cout << "Data: Set real waypoint" << std::endl;
-    data_transmitterptr->setWaypoint(lat,lon);
+
+    std::stringstream s;
+    s << "$MSSTS," << lat << "," << lon << ",checksum";
+    data_transmitterptr->sendMessage(s.str());
+    
 }
 
 void Data::setBoatWaypoint_local(double x, double y)
@@ -153,7 +161,10 @@ void Data::setBoatWaypoint_local(double x, double y)
 void Data::setBoatSpeed(double speed)
 {
     std::cout << "Data: Set speed" << std::endl;
-    data_transmitterptr->setTargetSpeed(speed);
+
+    std::stringstream s;
+    s << "$MSSTS," << speed << ",checksum";
+    data_transmitterptr->sendMessage(s.str());
 }
 
 double Data::calculateDistance(double lat1,double lon1,double lat2,double lon2)

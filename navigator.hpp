@@ -36,6 +36,9 @@ public:
 
     /**scans the polygon specified in the task*/
     void scanPolygon(Task* task);
+
+    /**Sends a message*/
+    void sendMessage(Task* task);
 };
 
 #endif

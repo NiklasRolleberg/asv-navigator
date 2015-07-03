@@ -6,12 +6,13 @@
 #include "mission.hpp"
 #include "task.hpp"
 #include "singlebeamscanner.hpp"
+#include <string>
 
 Navigator::Navigator(Transmitter* transmitter, int arg2, int arg3)
 {
     tr_ptr = transmitter;
     std::cout << "Navigator: constructor" << std::endl;
-    data = new Data(transmitter,1000000,0); // för lång delay
+    data = new Data(transmitter,100000,0); // 1000000 1s
 }
 
 Navigator::~Navigator()
@@ -53,6 +54,10 @@ void Navigator::start()
                 scanPolygon(t);
                 //TODO Do something
                 break;
+	   case 4:
+                std::cout << "New task type 4 (send a message)" << std::endl;
+		sendMessage(t);
+		break;
             default:
                 std::cout << "Unknown task type " << type << std::endl;
         }
@@ -75,6 +80,7 @@ void Navigator::abort()
 void Navigator::goToCoordinates(Task* task)
 {
     std::cout << "Navigator: execute go to coordinates task" << std::endl;
+    
     usleep(2000000);
 }
 
@@ -89,5 +95,11 @@ void Navigator::scanPolygon(Task* task)
     //usleep(2000000);
     std::cout << "scanning completed" << std::endl;
     data->removeLocalCoordinateSystem();
+}
+
+/**Execute task of type 4*/
+void Navigator::sendMessage(Task* task)
+{
+    tr_ptr->sendMessage(task->getMessage());
 }
 

@@ -2,6 +2,7 @@
 #include <iostream>
 #include <unistd.h>
 #include "polygon.hpp"
+//#include <string>
 
 Task::Task()
 {
@@ -29,6 +30,13 @@ Task::Task(Polygon* polygon)
     polygon_ptr = polygon;
 }
 
+Task::Task(std::string incMessage)
+{
+    std::cout << "Task: send message contructor" << std::endl;
+    type = 4;
+    message = incMessage;
+}
+
 
 Task::~Task()
 {
@@ -51,5 +59,10 @@ int Task::getSleepTime()
 Polygon* Task::getPolygon()
 {
     return polygon_ptr;
+}
+
+std::string Task::getMessage()
+{
+    return message;
 }
 

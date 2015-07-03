@@ -15,6 +15,14 @@ Mission::Mission(int arg0)
     //taskQueue.push(new Task(new Polygon(5)));
     //taskQueue.push(new Task(2000000,false));
     //taskQueue.push(new Task(1000000,false));
+    /*
+    taskQueue.push(new Task(5000000,false));
+    taskQueue.push(new Task("$MSGPO,*00"));
+    taskQueue.push(new Task("TestMessage02"));
+    taskQueue.push(new Task(5000000,false));
+    */
+
+    //taskQueue.push(new Task("$MSSDL,3,*00"));
     std::vector<double> *lat = new std::vector<double>();
     std::vector<double> *lon = new std::vector<double>();
 

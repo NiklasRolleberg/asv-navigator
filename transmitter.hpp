@@ -7,6 +7,7 @@
 #include <thread>
 #include <termios.h>
 #include <boost/asio.hpp>
+#include <iostream>
 
 
 class Transmitter
@@ -20,6 +21,7 @@ private:
     std::thread* listenThread;
     void writeToSerial(std::string message);
     void listenToSerialPort();
+    bool lock = false;
 
 
 public:
@@ -39,17 +41,27 @@ public:
 
     /**Get depth data since last time*/
     //std::vector<double> getDepthData();
-    int getDepthData();
+    void requestData();
 
-    /**Get position data since last time*/
-    //std::vector<double[2]> getPositionData();
-    int getPositionData();
+    //Send a message on the serial port*/
+    void sendMessage(std::string s);
+       
+    /** Get all new messages*/
+    int getMessages();
 
-    /**Set waypoint for the boat*/
-    void setWaypoint(double lat, double lon);
+  //TEST
 
-    void setTargetSpeed(double speed);
+  void handler(const boost::system::error_code& error, std::size_t bytes_transferred)
+  {
+    std::cout << "Message sent" << std::endl;
+  }
+  
 };
 
 #endif
 
+/*
+ std::stringstream s;
+    s << "$MSSTS," << speed << ",checksum";
+    writeToSerial(s.str());
+*/
