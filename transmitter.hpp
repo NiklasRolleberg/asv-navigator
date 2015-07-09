@@ -6,16 +6,23 @@
 #include <string>
 #include <thread>
 #include <termios.h>
-#include <boost/asio.hpp>
+//#include <boost/asio.hpp>BOOST
 #include <iostream>
 
 
 class Transmitter
 {
 private:
-  
+
+    /* BOOST
     boost::asio::io_service *io = nullptr;
     boost::asio::serial_port *serial = nullptr;
+    */
+
+    /*NO BOOST*/
+    int serialPort;
+
+
   
     bool listen = false;
     std::thread* listenThread;
@@ -48,13 +55,6 @@ public:
        
     /** Get all new messages*/
     int getMessages();
-
-  //TEST
-
-  void handler(const boost::system::error_code& error, std::size_t bytes_transferred)
-  {
-    std::cout << "Message sent" << std::endl;
-  }
   
 };
 

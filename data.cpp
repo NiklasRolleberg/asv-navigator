@@ -5,6 +5,7 @@
 #include "transmitter.hpp"
 #include "polygon.hpp"
 #include <cmath>
+#include <sstream>
 
 Data::Data(Transmitter* transmitter,int delay, int arg3)
 {
