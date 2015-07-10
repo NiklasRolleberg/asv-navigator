@@ -29,11 +29,35 @@ Transmitter::Transmitter(int arg0)
 
     fcntl(serialPort, F_SETFL ,0);
 
-    struct termios options;
+    struct termios options = {0};
+    /*
     tcgetattr(serialPort, &options);
-    cfsetispeed(&options, B115200);
-    cfsetospeed(&options, B115200);
+    cfsetispeed(&options, B9600);
+    cfsetospeed(&options, B9600);
+    cfmakeraw(&options);
     tcsetattr(serialPort, TCSANOW, &options);
+    */
+
+    options.c_cflag &= ~CRTSCTS;    
+    options.c_cflag |= (CLOCAL | CREAD);                   
+    options.c_iflag |= (IGNPAR | IGNCR);                  
+    options.c_iflag &= ~(IXON | IXOFF | IXANY);          
+    options.c_oflag &= ~OPOST;
+
+    options.c_cflag &= ~CSIZE;            
+    options.c_cflag |= CS8;              
+    options.c_cflag &= ~PARENB;         
+    options.c_iflag &= ~INPCK;         
+    options.c_iflag &= ~(ICRNL|IGNCR);
+    options.c_cflag &= ~CSTOPB;      
+    options.c_iflag |= INPCK;       
+    options.c_cc[VTIME] = 0.001;  //  1s=10   0.1s=1 *
+    options.c_cc[VMIN] = 1;
+    cfsetispeed(&options, B230400);
+    cfsetospeed(&options, B230400);
+    //cfmakeraw(&options);
+    tcsetattr(serialPort, TCSANOW, &options);
+
     
     /* BOOST
     std::string port = "/dev/ttyACM0";//"/dev/ttyUSB0";
@@ -168,7 +192,7 @@ void Transmitter::writeToSerial(std::string message)
   message+='\n';
   
   while(lock){
-    std::cout << "locked" << std::endl;
+    std::cout << "-serial port locked-" << std::endl;;
     usleep(100);
   }
   
@@ -177,12 +201,15 @@ void Transmitter::writeToSerial(std::string message)
   
   //NO BOOST
   int wr=write(serialPort,message.c_str(),message.size());
-  tcdrain(serialPort);
-  usleep(100);
+  std::cout << "tcDrain" << std::endl;
+  int tc = tcdrain(serialPort);
+  std::cout << "Write complete: " << tc <<  std::endl;
+  //usleep(100);
   // BOOST
   //boost::asio::write((*serial),boost::asio::buffer(message.c_str(),message.size()));
   lock = false;
-  //std::cout << "Write complete" << std::endl;
+  
   //is the message coming back? turn off echo in stty..
+  // turn off conversion of characters with -icrnl
 }
 
