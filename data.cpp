@@ -131,7 +131,7 @@ void Data::threadLoop()
 	//TODO read the messages and to stuff..
 	
         //data_transmitterptr->requestData();
-        std::cout << "Data: threadLoop requestData" << std::endl;
+        //std::cout << "Data: threadLoop requestData" << std::endl;
         std::stringstream s;
         s << "$MSSTS," << i << ",*00";
         data_transmitterptr->sendMessage(s.str());

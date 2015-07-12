@@ -30,32 +30,60 @@ Transmitter::Transmitter(int arg0)
     fcntl(serialPort, F_SETFL ,0);
 
     struct termios options = {0};
-    /*
-    tcgetattr(serialPort, &options);
-    cfsetispeed(&options, B9600);
-    cfsetospeed(&options, B9600);
-    cfmakeraw(&options);
-    tcsetattr(serialPort, TCSANOW, &options);
+    //tcgetattr(serialPort,&options);
+        
+    /* 
+    CRTSCTS : output hardware flow control (if possible)
+    CS8     : 8n1 (8bit,no parity,1 stopbit)
+    CLOCAL  : local connection, no modem contol
+    CREAD   : enable receiving characters
     */
-
-    options.c_cflag &= ~CRTSCTS;    
-    options.c_cflag |= (CLOCAL | CREAD);                   
-    options.c_iflag |= (IGNPAR | IGNCR);                  
-    options.c_iflag &= ~(IXON | IXOFF | IXANY);          
-    options.c_oflag &= ~OPOST;
-
-    options.c_cflag &= ~CSIZE;            
-    options.c_cflag |= CS8;              
-    options.c_cflag &= ~PARENB;         
-    options.c_iflag &= ~INPCK;         
-    options.c_iflag &= ~(ICRNL|IGNCR);
-    options.c_cflag &= ~CSTOPB;      
-    options.c_iflag |= INPCK;       
-    options.c_cc[VTIME] = 0.001;  //  1s=10   0.1s=1 *
-    options.c_cc[VMIN] = 1;
-    cfsetispeed(&options, B230400);
-    cfsetospeed(&options, B230400);
+    options.c_cflag = CRTSCTS | CS8 | CLOCAL | CREAD;
+        
+    /*
+    IGNPAR  : ignore bytes with parity errors
+    IXON    : enable flow control
+    */
+    options.c_iflag = IGNPAR | IXON;
+       
+    /*
+    Raw output.
+    */
+    options.c_oflag = 0;
+         
+    /*
+    ICANON  : enable canonical input
+    */
+    options.c_lflag = ISIG | ICANON | FLUSHO;
+         
+    /* 
+    control characters 
+    */
+    options.c_cc[VINTR]    =       3; //CTRL-C; 
+    //options.c_cc[VQUIT]    =       CTRL-\;
+    options.c_cc[VERASE]   =       127; // DEL;
+    options.c_cc[VKILL]    =       64; //@; 
+    options.c_cc[VEOF]     =       4; //Ctrl-d;
+    options.c_cc[VSWTC]    =       '\0'; 
+    options.c_cc[VSTART]   =       17; //Ctrl-q; 
+    options.c_cc[VSTOP]    =       19; //Ctrl-s;
+    options.c_cc[VSUSP]    =       26; //Ctrl-z;
+    options.c_cc[VEOL]     =       '\0';
+    options.c_cc[VREPRINT] =       18; //Ctrl-r;
+    options.c_cc[VDISCARD] =       21; //Ctrl-u;
+    options.c_cc[VWERASE]  =       23; //Ctrl-w;
+    options.c_cc[VLNEXT]   =       22; //Ctrl-v;
+    options.c_cc[VEOL2]    =       '\0';
+   
+    
+    
+    options.c_cc[VTIME] = 0.01;  //  1s=10   0.1s=1 *
+    options.c_cc[VMIN] = 0;
+    cfsetispeed(&options, B115200);
+    cfsetospeed(&options, B115200);
     //cfmakeraw(&options);
+    
+    tcflush(serialPort, TCIFLUSH);
     tcsetattr(serialPort, TCSANOW, &options);
 
     
@@ -123,34 +151,61 @@ void Transmitter::listenToSerialPort()
     std::string message;
 
     //NO BOOST
-    char* d = new char;
+    char* d = new char[128];
+
     
+    //int i=0;
     while(listen)
     {
+      usleep(1000);
+      /*
+      if(rand()%100 < 50)
+      {
+	std::stringstream s;
+	s << "$MSSTS," << i << ",*00";
+	i++;
+	writeToSerial(s.str());
+	continue;
+      }
+      */
+
+      if(lock)
+	continue;
+      
       //BOOST
       //boost::asio::read((*serial),boost::asio::buffer(&c,1));
 
       // NO BOOST
-      int rd = read(serialPort,d,1);
+      int rd = read(serialPort,d,128);
       if(rd == -1) {
 	std::cout << "read failed" << std::endl;
 	usleep(1000000);
       }
-      c = (*d);
 
-
-      switch(c)
+      if(rd == 0)
       {
-      case '\r':
-	break;
-      case '\n':
-	std::cout << "Message rescieved: " << message  << std::endl;
-	message = "";
-	break;
-      default:
-	message+=c;
+	//Nothing to read
+	continue;
+      }
+	  
+      
+      for(int i=0;i<rd;i++)
+      {
+	c = d[i];
+	switch(c)
+	{
+	case '\r':
+	    break;
+	case '\n':
+	    std::cout << "Message rescieved: " << message  << "  rd = " << rd << std::endl;
+	    message = "";
+	    break;
+	default:
+	    message+=c;
+	}
       }
     }
+    delete[] d;
     std::cout << "Listen to serial port loop ended" << std::endl;
 }
 

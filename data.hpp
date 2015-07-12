@@ -20,7 +20,7 @@ private:
     double boat_speed;
     double boat_depth;
 
-    bool data_stop = false;
+    bool data_stop = false; //false
     int data_delay = 500000; //0.5s
     Transmitter* data_transmitterptr;
     std::thread *data_threadptr = nullptr;

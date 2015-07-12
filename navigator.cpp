@@ -12,7 +12,7 @@ Navigator::Navigator(Transmitter* transmitter, int arg2, int arg3)
 {
     tr_ptr = transmitter;
     std::cout << "Navigator: constructor" << std::endl;
-    data = new Data(transmitter,50000,0); // 1000000 1s
+    data = new Data(transmitter,100000,0); // 1000000 1s
 }
 
 Navigator::~Navigator()
