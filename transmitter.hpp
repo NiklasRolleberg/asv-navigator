@@ -21,14 +21,14 @@ private:
 
     /*NO BOOST*/
     int serialPort;
-
-
   
-    bool listen = false;
+    bool listen; // = false;
+    bool lock;// = false;
+
     std::thread* listenThread;
     void writeToSerial(std::string message);
     void listenToSerialPort();
-    bool lock = false;
+    
 
 
 public:

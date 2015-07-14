@@ -10,9 +10,9 @@ class Task
 {
 private:
     int type;
-    int delay = 0;
-    Polygon* polygon_ptr = nullptr;
-    std::string message = "";
+    int delay;// = 0;
+    Polygon* polygon_ptr;// = nullptr;
+    std::string message;// = "";
 
 public:
     /**Default constructor (type 0)*/

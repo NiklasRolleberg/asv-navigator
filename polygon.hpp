@@ -10,10 +10,10 @@
 class Polygon
 {
 private:
-    int maxxyminxyskafinnasmed = 0;
+    //int maxxyminxyskafinnasmed = 0;
 
-    std::vector<double>* latitude = nullptr;
-    std::vector<double>* longitude = nullptr;
+    std::vector<double>* latitude;// = nullptr;
+    std::vector<double>* longitude;// = nullptr;
 
 public:
     /**Constructor*/

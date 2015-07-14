@@ -20,11 +20,11 @@ private:
     double boat_speed;
     double boat_depth;
 
-    bool data_stop = false; //false
-    int data_delay = 500000; //0.5s
+    bool data_stop; //= false; //false
+    int data_delay; //= 500000; //0.5s
     Transmitter* data_transmitterptr;
-    std::thread *data_threadptr = nullptr;
-    Polygon* localPolygon = nullptr;
+    std::thread *data_threadptr;// = nullptr;
+    Polygon* localPolygon;// = nullptr;
 
     /**collects data, calculates new coordinates*/
     void threadLoop();

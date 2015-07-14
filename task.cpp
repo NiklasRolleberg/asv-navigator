@@ -8,6 +8,7 @@ Task::Task()
 {
     std::cout << "Task: Default constructor" << std::endl;
     type = 0;
+    message = "";
 }
 
 Task::Task(int sleepTime, bool drift)

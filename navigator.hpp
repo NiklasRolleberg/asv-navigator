@@ -9,9 +9,9 @@
 class Navigator
 {
 private:
-    Data* data = nullptr;
-    Transmitter* tr_ptr = nullptr;
-    Mission* mission_ptr = nullptr;
+    Data* data;// = nullptr;
+    Transmitter* tr_ptr;// = nullptr;
+    Mission* mission_ptr;// = nullptr;
 
 public:
     Navigator(){};

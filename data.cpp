@@ -39,6 +39,7 @@ Data::~Data()
 void Data::start()
 {
     std::cout << "Data start" << std::endl;
+    data_stop = false;
     if(data_threadptr != nullptr)
         std::cerr << "Memory leak incoming.." << std::endl;
         //data_threadptr->terminate();
