@@ -1,0 +1,29 @@
+# <- this line will be ignored
+# tamplate:
+#TASK:(number) specify the type if task
+#DATA:(data requied for the task, e.g time to sleep/ coordinates)
+
+# -------- examples --------
+
+#example1: create a task that waits for 5s
+#TASK:1
+#DATA:TIM:5000000
+
+#example2: create a go to coordinates task
+#TASK:2
+#DATA:LAT:59.234
+#DATA:LON:18.245
+
+#example3: scan a polygon
+#TASK:3
+#DATA:LAT:51.234,53.234,59.254,59.214
+#DATA:LON:19.235,18.253,17,316,18.937
+
+#example3: send a message
+#TASK:3
+#DATA:MES:"$SEND,THIS,MESSAGE,*00"
+
+# -------- mission --------
+
+TASK:1
+DATA:TIM:5000000
