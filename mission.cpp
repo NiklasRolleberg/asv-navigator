@@ -26,6 +26,10 @@ Mission::Mission(int arg0)
     std::vector<double> *lat = new std::vector<double>();
     std::vector<double> *lon = new std::vector<double>();
 
+    lat->push_back(59.349204);
+    lon->push_back(18.070359);
+
+    /*
 //59.353086, 18.073589
     lat->push_back(59.353086);
     lon->push_back(18.073589);
@@ -52,7 +56,7 @@ Mission::Mission(int arg0)
 //59.352668, 18.073518
     lat->push_back(59.352668);
     lon->push_back(18.073518);
-
+    */
     /*
     lat->push_back(1.23);
     lat->push_back(2.31);
@@ -63,8 +67,53 @@ Mission::Mission(int arg0)
     lon->push_back(6.54);
     */
     taskQueue.push(new Task(new Polygon(3,lat,lon)));
-
 }
+
+
+Mission::Mission(std::vector<std::string> plan)
+{
+  std::cout << "Mission: constructor" << std::endl;
+
+  int type = -1;
+  int delay = -1;
+  std::vector<double> *lat = nullptr; //new std::vector<double>();
+  std::vector<double> *lon = nullptr; //new std::vector<double>();
+  std::string message = "no message";
+  
+  for(int i=0;i<plan.size();i++)
+  {
+    std::cout << "Looking at line: " << plan[i] <<" ";
+    std::string line = plan[i];
+    if(line[0] == '#' || line.length() < 6)
+    {
+      std::cout << "....no task or data found" << std::endl;
+      continue;
+    }
+    
+    if(line.substr(0,3) == "TASK") {
+      //new task encountered? create the old one
+      std::cout << "..its a task!" << std::endl;
+      if(type != -1)
+      {
+	if(type == 1 && delay != -1)
+	  taskQueue.push(new Task(delay,false));
+	// TODO the rest
+	//if(type == 2 && lat != nullptr && lon != nullptr)
+	  
+      }
+      
+    }
+  }
+
+  if(type /= -1)
+  {
+    if(type == 1 && delay != -1)
+      taskQueue.push(new Task(delay,false));
+    //TODO the rest
+  }
+  
+}
+
 
 Mission::~Mission()
 {

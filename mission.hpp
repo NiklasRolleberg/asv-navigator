@@ -4,6 +4,8 @@
 
 #include "task.hpp"
 #include <queue>          // std::queue
+#include <vector>         // std::vecor
+#include <string>         // std::string
 
 
 /**The mission class contains tasks for the navigation object
@@ -15,8 +17,11 @@ private:
     std::queue<Task*> taskQueue; // queue with tasks
 
 public:
-    /**Constructor*/
+    /**Constructor 1*/
     Mission(int arg0);
+
+    /**Constructor 2*/
+    Mission(std::vector<std::string> plan);  
 
     /**Destructor*/
     ~Mission();

@@ -29,6 +29,9 @@ private:
     /**collects data, calculates new coordinates*/
     void threadLoop();
 
+    /**Determine the  type of message andstore data from message */
+    void processMessage(std::string m);
+
 public:
 
     Data(){};

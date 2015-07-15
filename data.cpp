@@ -6,6 +6,9 @@
 #include "polygon.hpp"
 #include <cmath>
 #include <sstream>
+#include <string>
+#include <queue>
+#include <stdlib.h>
 
 Data::Data(Transmitter* transmitter,int delay, int arg3)
 {
@@ -126,21 +129,101 @@ void Data::threadLoop()
     int i=0;
     while(!data_stop)
     {
-        //int a = data_transmitterptr->getMessages();
-        //exempel: $MSGPS,1.3,LAT,0.3154,LON,0.900,SOG,0.0,COG,*4A
-        //               latitude,longitude,   speed ,  course, checksum
-	//TODO read the messages and to stuff..
-	
-        //data_transmitterptr->requestData();
+        data_transmitterptr->requestData();
+
         //std::cout << "Data: threadLoop requestData" << std::endl;
-        std::stringstream s;
-        s << "$MSSTS," << i << ",*00";
-        data_transmitterptr->sendMessage(s.str());
-	i++;
+        //std::stringstream s;
+        //s << "$MSSTS," << i << ",*00";
+        //data_transmitterptr->sendMessage(s.str());
+	//i++;
 	
         usleep(data_delay);
+
+	std::queue<std::string>* messages = data_transmitterptr->getMessages();
+
+	for(int i=0;i< messages->size();i++)
+	{
+	  //std::cout << "DATA: "<< messages->front() << std::endl;
+	  processMessage(messages->front());
+	  messages->pop();
+	}
+	
     }
     std::cout << "Data loop done" << std::endl;
+}
+
+
+void Data::processMessage(std::string m)
+{
+
+    //TODO GÖR OM ALLT!
+
+    //std::cout << "processMessage" << std::endl;
+    int startIndex = -1;
+    for(int i=0;i<m.length();i++)
+    {
+      if(m[i] == '$')
+      {
+	startIndex = i;
+	break;
+      }
+    }
+
+    
+    if(startIndex != -1 && (m.length() - startIndex) > 6)
+    {
+      //std::cout << "first if" << std::endl;
+      if(m[startIndex+1] == 'M' &&
+	 m[startIndex+2] == 'S' &&
+	 m[startIndex+3] == 'G' &&
+	 m[startIndex+4] == 'P' &&
+	 m[startIndex+5] == 'S')
+      {
+	//std::cout << "Its a position message!" << std::endl;
+	std::cout << m << std::endl;
+
+	//find latitude
+
+	//first ','
+	int firstIndex = startIndex+6;
+	int lastIndex;
+	std::string latitude = "";
+	for(int i=firstIndex+1; i<m.length() ;i++)
+	{
+	  if(m[i] == ',')
+	  {
+	    lastIndex = i;
+	    break;
+	  }
+	  latitude += m[i];	  
+	}
+
+	//find longitude
+	
+	firstIndex = lastIndex;
+	std::string longitude = "";
+	for(int i=firstIndex+1; i<m.length() ;i++)
+	{
+	  if(m[i] == ',')
+	  {
+	    lastIndex = i;
+	    break;
+	  }
+	  longitude += m[i];	  
+	}
+	
+	//std::cout << "LATITUDE: " << latitude  << "\n" << "LONGITUDE: " << longitude << std::endl;
+
+	boat_latitude = strtod(latitude.c_str(),NULL);
+	boat_longitude = strtod(longitude.c_str(),NULL);
+
+	//std::cout << "boat LATITUDE: " << boat_latitude  << "\n" << "boat LONGITUDE: " << boat_longitude << std::endl;
+	
+	return;
+      }
+      
+    }
+    std::cout << "Unknown message: " << m << std::endl;
 }
 
 
@@ -150,7 +233,7 @@ void Data::setBoatWaypoint_real(double lat, double lon)
     std::cout << "Data: Set real waypoint" << std::endl;
 
     std::stringstream s;
-    s << "$MSSTS," << lat << "," << lon << ",checksum";
+    s << "$MSSTS,0,0,0," << lat << "," << lon << ",0,*00";
     data_transmitterptr->sendMessage(s.str());
     
 }
@@ -158,20 +241,24 @@ void Data::setBoatWaypoint_real(double lat, double lon)
 void Data::setBoatWaypoint_local(double x, double y)
 {
     std::cout << "Data: Set local waypoint" << std::endl;
+
+    //calculate the real waypoint and send it to the boat
+    
 }
 
 void Data::setBoatSpeed(double speed)
 {
     std::cout << "Data: Set speed" << std::endl;
-
+    /*
     std::stringstream s;
     s << "$MSSTS," << speed << ",checksum";
     data_transmitterptr->sendMessage(s.str());
+    */
 }
 
 double Data::calculateDistance(double lat1,double lon1,double lat2,double lon2)
 {
-    double R = 6371000; // metres
+    double R = 6378127; // metres
     double phi1 = lat1 * M_PI / 180;// .toRadians();
     double phi2 = lat2 * M_PI / 180;// .toRadians();
     double dphi = (lat2-lat1) * M_PI / 180;// .toRadians();

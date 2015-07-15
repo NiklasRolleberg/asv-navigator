@@ -10,6 +10,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <termios.h>
+#include <queue>
 /*
 #include <boost/asio.hpp>
 #include <boost/lockfree/queue.hpp>
@@ -17,10 +18,12 @@
 
 Transmitter::Transmitter(int arg0)
 {
+  
     std::cout << "Transmitter constructor" << std::endl;
     std::cout << "Opening serial port..";
     listen = false;
     lock = false;
+    messageQueue = new std::queue<std::string>();
     
     // NO BOOST
     serialPort = open("/dev/ttyUSB0", O_RDWR | O_NOCTTY | O_NDELAY);
@@ -128,7 +131,9 @@ void Transmitter::listenToSerialPort()
 	case '\r':
 	    break;
 	case '\n':
-	    std::cout << "Message rescieved: " << message  << "  rd = " << rd << std::endl;
+	  messageQueue->push(message);	    
+	  //std::cout << "Message rescieved: " << message  << "  rd = " << rd << " queue size: " << messageQueue->size() << std::endl;
+	  
 	    message = "";
 	    break;
 	default:
@@ -165,16 +170,16 @@ void Transmitter::sendMessage(std::string s)
 }
   
 
-int Transmitter::getMessages()
+std::queue<std::string>* Transmitter::getMessages()
 {
-  std::cout << "Transmitter getmessages" << std::endl;
-  return 0;
+  //std::cout << "Transmitter getmessages" << std::endl;
+  return messageQueue;
 }
 
 
 void Transmitter::writeToSerial(std::string message)
 {
-  std::cout << "Write to serial port: " << message << std::endl;
+  //std::cout << "Write to serial port: " << message << std::endl;
   //printf("Write to serial port\n");
   message+='\n';
   
@@ -194,9 +199,9 @@ void Transmitter::writeToSerial(std::string message)
       std::cout << "Writing error" << std::endl;
   }
   
-  std::cout << "tcDrain" << std::endl;
+  //std::cout << "tcDrain" << std::endl;
   int tc = tcdrain(serialPort);
-  std::cout << "Write complete: " << std::endl;//tc <<  std::endl;
+  //std::cout << "Write complete: " << std::endl;//tc <<  std::endl;
   
   // BOOST
   //boost::asio::write((*serial),boost::asio::buffer(message.c_str(),message.size()));

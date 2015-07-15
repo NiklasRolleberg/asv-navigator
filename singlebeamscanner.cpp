@@ -52,8 +52,9 @@ void SingleBeamScanner::startScan()
     double targetLat = lat->at(index);
     double targetLon = lon->at(index);
     double targetSpeed = 3;
-    data->setBoatWaypoint_real(targetLat, targetLon);
-    data->setBoatSpeed(targetSpeed);
+
+    //data->setBoatWaypoint_real(targetLat, targetLon);
+    //data->setBoatSpeed(targetSpeed);
 
     //std::cout << targetLat << " " << targetLon << std::endl;
 
@@ -61,9 +62,9 @@ void SingleBeamScanner::startScan()
     double threshold = 3;
     while(lap < 2)
     {
-        usleep(300000);
+        usleep(3000000);
         d = data->calculateDistance(data->getLat(),data->getLon(),targetLat, targetLon);
-        //std::cout << "distance to target " << d << std::endl;
+        std::cout << "distance to target " << d << std::endl;
         if(d < threshold)
         {
             std::cout << "waypoint reached, picking the next one" << std::endl;

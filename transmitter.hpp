@@ -8,11 +8,13 @@
 #include <termios.h>
 //#include <boost/asio.hpp>BOOST
 #include <iostream>
-
+#include <queue>
 
 class Transmitter
 {
 private:
+
+    std::queue<std::string>* messageQueue;
 
     /* BOOST
     boost::asio::io_service *io = nullptr;
@@ -54,7 +56,7 @@ public:
     void sendMessage(std::string s);
        
     /** Get all new messages*/
-    int getMessages();
+    std::queue<std::string>* getMessages();
   
 };
 
