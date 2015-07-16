@@ -21,14 +21,33 @@ Mission::Mission(int arg0)
     taskQueue.push(new Task("TestMessage02"));
     taskQueue.push(new Task(5000000,false));
     */
-
+    
     //taskQueue.push(new Task("$MSSDL,3,*00"));
+
+    //sleep
+    taskQueue.push(new Task(10000000,false));
+    
+    
     std::vector<double> *lat = new std::vector<double>();
     std::vector<double> *lon = new std::vector<double>();
 
-    lat->push_back(59.349204);
-    lon->push_back(18.070359);
+    lat->push_back(59.346779);
+    lon->push_back(18.079781);
 
+    lat->push_back(59.346512);
+    lon->push_back(18.080666);
+
+    lat->push_back(59.346266);
+    lon->push_back(18.080523);
+
+    //lat->push_back(59.3464928);
+    //lon->push_back(18.0798550);
+
+    /*
+    //59.3493423,18.720005
+    lat->push_back(59.3493423);
+    lon->push_back(18.720005);
+    */
     /*
 //59.353086, 18.073589
     lat->push_back(59.353086);
@@ -78,11 +97,11 @@ Mission::Mission(std::vector<std::string> plan)
   int delay = -1;
   std::vector<double> *lat = nullptr; //new std::vector<double>();
   std::vector<double> *lon = nullptr; //new std::vector<double>();
-  std::string message = "no message";
+  std::string message = "";
   
   for(int i=0;i<plan.size();i++)
   {
-    std::cout << "Looking at line: " << plan[i] <<" ";
+    std::cout << "Looking at line: " << plan[i] << std::endl;
     std::string line = plan[i];
     if(line[0] == '#' || line.length() < 6)
     {
@@ -90,28 +109,77 @@ Mission::Mission(std::vector<std::string> plan)
       continue;
     }
     
-    if(line.substr(0,3) == "TASK") {
-      //new task encountered? create the old one
+    if(line.substr(0,4) == "TASK")
+    {
+      //new task encountered? save the old one
       std::cout << "..its a task!" << std::endl;
       if(type != -1)
       {
+	std::cout << "Saving last task" << std::endl;
 	if(type == 1 && delay != -1)
 	  taskQueue.push(new Task(delay,false));
-	// TODO the rest
-	//if(type == 2 && lat != nullptr && lon != nullptr)
-	  
+	else if(type == 2 && lat != nullptr && lon != nullptr)
+	{
+	  if(lat->size() > 0 && lon->size() > 0)
+	  {
+	    double dlat = (*lat)[0];
+    	    double dlon = (*lon)[0];
+	    taskQueue.push(new Task(dlat,dlon));
+	    lat = nullptr;
+	    lon = nullptr;
+	  }
+	}
+	else if(type == 3 && lat != nullptr && lon != nullptr)
+	{
+	  if(lat->size() > 0 && lon->size() > 0 && lat->size() == lon->size())
+	  {
+	    taskQueue.push(new Task(new Polygon(0,lat,lon)));
+	    lat = nullptr;
+	    lon = nullptr;
+	  }
+	}
+	else if(type == 4)
+	{
+	  taskQueue.push(new Task(message));
+	}  
+
+	delete lat;
+	delete lon;
+	lat = nullptr;
+	lon = nullptr;
+	type = -1;
+	message = "";
+
+	
       }
+      //Find the type of the new task
+      char t = line[5];
+      type = t - '0';
+      std::cout << "new Task type: " << type << std::endl;
+    }
+
+    else if(line.substr(0,4) == "DATA")
+    {
+      std::cout << "it's a data Line, type: " << line.substr(5,4)  << std::endl;
       
+      if(line.substr(5,4) == "TIM:")
+      {
+	std::cout << "time: " << line.substr(9,line.length()) << " " << line.length() - 9 << std::endl;
+	
+      }
+
     }
   }
 
+  
+  /*save the last task
   if(type /= -1)
   {
     if(type == 1 && delay != -1)
       taskQueue.push(new Task(delay,false));
     //TODO the rest
   }
-  
+  */
 }
 
 

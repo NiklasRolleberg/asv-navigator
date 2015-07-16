@@ -7,7 +7,7 @@
 
 SingleBeamScanner::SingleBeamScanner(Data* dataptr, Polygon* polygonptr)
 {
-    std::cout << "SingleBeamScanner constructor" << std::endl;
+    std::cout << "scanner:SingleBeamScanner constructor" << std::endl;
     data = dataptr;
     polygon = polygonptr;
 }
@@ -15,13 +15,13 @@ SingleBeamScanner::SingleBeamScanner(Data* dataptr, Polygon* polygonptr)
 
 SingleBeamScanner::~SingleBeamScanner()
 {
-    std::cout << "SingleBeamScanner destructor" << std::endl;
+    std::cout << "scanner:SingleBeamScanner destructor" << std::endl;
 }
 
 
 void SingleBeamScanner::startScan()
 {
-    std::cout << "SingleBeamScanner: starting scan" << std::endl;
+    std::cout << "scanner:SingleBeamScanner: starting scan" << std::endl;
 
     //first test: make the boat run on the edges of the polygon
     std::vector<double>* lat = polygon->getLatBoundaries();
@@ -46,14 +46,14 @@ void SingleBeamScanner::startScan()
         }
     }
 
-    std::cout << "minimum found: " << minimum << " at index " << index << std::endl;
+    std::cout << "scanner:minimum found: " << minimum << " at index " << index << std::endl;
 
     //
     double targetLat = lat->at(index);
     double targetLon = lon->at(index);
     double targetSpeed = 3;
 
-    //data->setBoatWaypoint_real(targetLat, targetLon);
+    data->setBoatWaypoint_real(targetLat, targetLon);
     //data->setBoatSpeed(targetSpeed);
 
     //std::cout << targetLat << " " << targetLon << std::endl;
@@ -62,12 +62,12 @@ void SingleBeamScanner::startScan()
     double threshold = 3;
     while(lap < 2)
     {
-        usleep(3000000);
+        usleep(2000000);
         d = data->calculateDistance(data->getLat(),data->getLon(),targetLat, targetLon);
-        std::cout << "distance to target " << d << std::endl;
+        std::cout << "scanner:distance to target " << d << std::endl;
         if(d < threshold)
         {
-            std::cout << "waypoint reached, picking the next one" << std::endl;
+            std::cout << "scanner:waypoint reached, picking the next one" << std::endl;
             index++;
             if(index >= lat->size())
             {
@@ -78,7 +78,7 @@ void SingleBeamScanner::startScan()
             targetLat = lat->at(index);
             targetLon = lon->at(index);
             data->setBoatWaypoint_real(targetLat, targetLon);
-            data->setBoatSpeed(targetSpeed);
+            //data->setBoatSpeed(targetSpeed);
         }
     }
 
@@ -87,5 +87,5 @@ void SingleBeamScanner::startScan()
 
 void SingleBeamScanner::abortScan()
 {
-    std::cout << "SingleBeamScanner: abort scan" << std::endl;
+    std::cout << "scanner:SingleBeamScanner: abort scan" << std::endl;
 }
