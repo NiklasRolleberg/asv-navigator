@@ -10,7 +10,6 @@
 class Polygon
 {
 private:
-    //int maxxyminxyskafinnasmed = 0;
 
     std::vector<double>* latitude;// = nullptr;
     std::vector<double>* longitude;// = nullptr;
@@ -22,8 +21,29 @@ public:
     /**Destructor*/
     ~Polygon();
 
+    //for global coordinates
     std::vector<double>* getLonBoundaries();
     std::vector<double>* getLatBoundaries();
+
+    /** set boundaries for the local coorinate system */
+    void setLocalboundaries(std::vector<double>xPoints,std::vector<double>yPoints);
+    /**set the grid resolution*/
+    void setGridResolution(double delta);
+
+    /**Calculate min,max values for area and creates the grid matrix
+       and creates the first polygonsegment (searchCell i kexet)*/ 
+    void initialize();
+
+  /* more functions to be implemented
+     get segmentList <vector kanske>
+     get matrix
+     bool insidePolygon
+     get max,min of x and y
+     get delta? 
+     
+  */
+     
+     
 
 };
 

@@ -13,6 +13,7 @@ Navigator::Navigator(Transmitter* transmitter, int arg2, int arg3)
     tr_ptr = transmitter;
     std::cout << "Navigator: constructor" << std::endl;
     data = new Data(transmitter,1000000,0); // 1000000 1s
+    delta = 1.0;
 }
 
 Navigator::~Navigator()
@@ -88,8 +89,8 @@ void Navigator::goToCoordinates(Task* task)
 void Navigator::scanPolygon(Task* task)
 {
     std::cout << "Navigator: execute scan polygon task" << std::endl;
-    data->setLocalCoordinateSystem(task->getPolygon());
-    SingleBeamScanner scanner = SingleBeamScanner(data, task->getPolygon());
+    data->setLocalCoordinateSystem(task->getPolygon(),delta);
+    SingleBeamScanner scanner = SingleBeamScanner(data, task->getPolygon(),delta);
     std::cout << "start scanning" << std::endl;
     scanner.startScan();
     //usleep(2000000);

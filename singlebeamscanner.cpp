@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include <limits>
 
-SingleBeamScanner::SingleBeamScanner(Data* dataptr, Polygon* polygonptr)
+SingleBeamScanner::SingleBeamScanner(Data* dataptr, Polygon* polygonptr, double delta)
 {
     std::cout << "scanner:SingleBeamScanner constructor" << std::endl;
     data = dataptr;

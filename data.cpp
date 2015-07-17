@@ -9,6 +9,7 @@
 #include <string>
 #include <queue>
 #include <stdlib.h>
+#include <vector>
 
 Data::Data(Transmitter* transmitter,int delay, int arg3)
 {
@@ -81,22 +82,118 @@ double Data::getLatLongHeading()
 }
 
 
-void Data::setLocalCoordinateSystem(Polygon* polygon)
+void Data::setLocalCoordinateSystem(Polygon* polygon, double delta)
 {
-    std::cout << "Polygon added, starting creation of local coordinate system" << std::endl;
+    std::cout << "Polygon added, starting creation of local coordinate system, and initializes the polygon" << std::endl;
+
+    //polygon.get..
+    //calculate max min lat long
+    minLat = std::numeric_limits<double>::max();
+    maxLat = std::numeric_limits<double>::min();
+    dLat = 1;
+
+    minLon = std::numeric_limits<double>::max();
+    maxLon = std::numeric_limits<double>::min();
+    dLon = 1;    
+
+
+    std::vector<double> *latitude = polygon->getLatBoundaries();
+    for(int i=0; i < latitude->size();i++)
+    {
+      double d = (*latitude)[i]; 
+      if(d<minLat)
+	minLat = d;
+      if(d>maxLat)
+	maxLat = d;
+    }
+    dLat = maxLat-minLat;
+    
+    std::vector<double> *longitude = polygon->getLonBoundaries();
+    for(int i=0; i < longitude->size();i++)
+    {
+      double d = (*longitude)[i];
+      if(d<minLon)
+	minLon = d;
+      if(d>maxLon)
+	maxLon = d;
+    }
+    dLon = maxLon-minLon;
+
+    dx = calculateDistance(minLat,minLon,minLat,maxLon);
+
+    dy = calculateDistance(minLat,minLon,maxLat,minLon);
+    
+    std::cout << "minLat : " << minLat << std::endl;
+    std::cout << "maxLat : " << maxLat << std::endl;  
+    std::cout << "dLat : " << dLat << std::endl;
+    std::cout << "minLon : " << minLon << std::endl;
+    std::cout << "maxLon : " << maxLon << std::endl;
+    std::cout << "dLon : " << dLon << std::endl;  
+    std::cout << "dx: " << dx << std::endl;
+    std::cout << "dy: " << dy << std::endl;
+
+    
+    localEnabled = true;
+
+    //calculate the polygon points in local coordinates
+    std::vector<double>* localX = new std::vector<double>(); //TODO delete
+    std::vector<double>* localY = new std::vector<double>();
+
+    for(int i=0;i<latitude->size();i++)
+    {
+      localX->push_back(lonTOx((*longitude)[i]));
+      localY->push_back(latTOy((*latitude)[i]));
+    }
+
+
+    std::cout << "Polygon in local coordinates" << std::endl;
+
+    for(int i=0;i<localX->size();i++)
+    {
+      std::cout << "(" << (*localX)[i] << "," << (*localY)[i] << ")" << std::endl;
+    }
+    
+    //polygon.set..
+    //polygon->initialize()
+    
+    
+}
+
+//TODO kanske lite inline
+
+double Data::lonTOx(double lon)
+{
+  return ((lon-minLon)/dLon)*dx;
+}
+
+double Data::xTOlon(double x)
+{
+  return 0;
+}
+
+double Data::latTOy(double lat)
+{
+  return ((lat-minLat)/dLat)*dy;
+}
+
+double Data::yTOlat(double y)
+{
+  return 0;
 }
 
 void Data::removeLocalCoordinateSystem()
 {
     std::cout << "remove local coordinate system" << std::endl;
+    localEnabled = false;
+    minLat = 0;
+    maxLat = 0;
+    dLat = 0;
+    minLon = 0;
+    maxLon = 0;
+    dLon = 0;
+    dx = 0;
+    dy = 0;
 }
-
-Polygon* Data::getLocalPolygon()
-{
-    std::cout << "get polygon in local coordinates" << std::endl;
-    return localPolygon;
-}
-
 
 double Data::getX()
 {
@@ -155,6 +252,7 @@ void Data::threadLoop()
 
 void Data::processMessage(std::string m)
 {
+     std::cout << "message rescieved: " << m << std::endl;
 
     //TODO GÖR OM ALLT!
 
@@ -180,7 +278,7 @@ void Data::processMessage(std::string m)
 	 m[startIndex+5] == 'S')
       {
 	//std::cout << "Its a position message!" << std::endl;
-	std::cout << m << std::endl;
+	//std::cout << m << std::endl;
 
 	//find latitude
 
@@ -223,7 +321,7 @@ void Data::processMessage(std::string m)
       }
       
     }
-    std::cout << "Unknown message: " << m << std::endl;
+    //std::cout << "Unknown message: " << m << std::endl;
 }
 
 
@@ -269,6 +367,4 @@ double Data::calculateDistance(double lat1,double lon1,double lat2,double lon2)
     double c = 2 * atan2(sqrt(a), sqrt(1-a));
 
     return R * c;
-
-
 }

@@ -31,6 +31,25 @@ Mission::Mission(int arg0)
     std::vector<double> *lat = new std::vector<double>();
     std::vector<double> *lon = new std::vector<double>();
 
+    //    59.326,18.071
+    lat->push_back(59.326);
+    lon->push_back(18.071);
+
+    //    59.329,18.075
+    lat->push_back(59.329);
+    lon->push_back(18.075);
+
+    //    59.325,18.082
+    lat->push_back(59.325);
+    lon->push_back(18.082);
+
+    /*
+    //59.347717, 18.074659
+    lat->push_back(59.347717);
+    lon->push_back(18.074659);
+    */
+    
+    /*
     lat->push_back(59.346779);
     lon->push_back(18.079781);
 
@@ -39,7 +58,7 @@ Mission::Mission(int arg0)
 
     lat->push_back(59.346266);
     lon->push_back(18.080523);
-
+    */
     //lat->push_back(59.3464928);
     //lon->push_back(18.0798550);
 

@@ -1,11 +1,12 @@
 //Header
 #ifndef DATA_H
 #define DATA_H
-# define M_PI           3.14159265358979323846  /* (ta bort sen) */
+#define M_PI 3.14159265358979323846
 
 #include <thread>   // std::thread
 #include "transmitter.hpp"
 #include "polygon.hpp"
+#include <limits>
 
 class Data
 {
@@ -26,12 +27,31 @@ private:
     std::thread *data_threadptr;// = nullptr;
     Polygon* localPolygon;// = nullptr;
 
+    //for coordinate system
+    bool localEnabled;
+    double minLat;
+    double maxLat;
+    double dLat;
+    double minLon;
+    double maxLon;
+    double dLon;
+
+    double dx;
+    double dy;
+  
+
     /**collects data, calculates new coordinates*/
     void threadLoop();
 
     /**Determine the  type of message andstore data from message */
     void processMessage(std::string m);
-
+  
+    //Conversions between local and global coordinates
+    double lonTOx(double lon);
+    double xTOlon(double x);
+    double latTOy(double lat);
+    double yTOlat(double y);
+  
 public:
 
     Data(){};
@@ -60,13 +80,10 @@ public:
 
 
     /**create a local coordinateSystem*/
-    void setLocalCoordinateSystem(Polygon* polygon);
+    void setLocalCoordinateSystem(Polygon* polygon, double delta);
 
     /**create a local coordinateSystem*/
     void removeLocalCoordinateSystem();
-
-    /**get the polygon in local coordinates*/
-    Polygon* getLocalPolygon();
 
     /**Get boat x-position*/
     double getX();

@@ -11,9 +11,10 @@ class SingleBeamScanner
 private:
     Data* data;
     Polygon* polygon;
+    double delta;
 public:
     /**Constructor*/
-    SingleBeamScanner(Data* data, Polygon* polygon);
+  SingleBeamScanner(Data* data, Polygon* polygon,double delta);
 
     /**Destructor*/
     ~SingleBeamScanner();

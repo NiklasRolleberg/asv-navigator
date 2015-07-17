@@ -206,6 +206,8 @@ void Transmitter::writeToSerial(std::string message)
   // BOOST
   //boost::asio::write((*serial),boost::asio::buffer(message.c_str(),message.size()));
   lock = false;
+
+  std::cout << "message sent: " << message;
   
   //is the message coming back? turn off echo in stty..
   // turn off conversion of characters with -icrnl

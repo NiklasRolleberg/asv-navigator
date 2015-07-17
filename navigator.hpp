@@ -12,7 +12,8 @@ private:
     Data* data;// = nullptr;
     Transmitter* tr_ptr;// = nullptr;
     Mission* mission_ptr;// = nullptr;
-
+    double delta;
+  
 public:
     Navigator(){};
 

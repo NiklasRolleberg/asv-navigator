@@ -32,3 +32,18 @@ std::vector<double>* Polygon::getLatBoundaries()
 {
     return latitude;
 }
+
+void Polygon::setLocalboundaries(std::vector<double>xPoints,std::vector<double>yPoints)
+{
+  std::cout << "Polygon set local boundaries" << std::endl;
+}
+
+void Polygon::setGridResolution(double delta)
+{
+  std::cout << "polygon setGridRes" << std::endl;
+}
+
+void Polygon::initialize()
+{
+  
+}
