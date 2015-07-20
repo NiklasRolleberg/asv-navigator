@@ -14,6 +14,9 @@ private:
     std::vector<double>* latitude;// = nullptr;
     std::vector<double>* longitude;// = nullptr;
 
+    std::vector<double>* xPoints;// = nullptr;
+    std::vector<double>* yPoints;// = nullptr;
+
 public:
     /**Constructor*/
     Polygon(int points, std::vector<double> *lat, std::vector<double> *lon);
@@ -26,7 +29,8 @@ public:
     std::vector<double>* getLatBoundaries();
 
     /** set boundaries for the local coorinate system */
-    void setLocalboundaries(std::vector<double>xPoints,std::vector<double>yPoints);
+    void setLocalBoundaries(std::vector<double>*x,std::vector<double>*y);
+  
     /**set the grid resolution*/
     void setGridResolution(double delta);
 
@@ -34,6 +38,9 @@ public:
        and creates the first polygonsegment (searchCell i kexet)*/ 
     void initialize();
 
+    std::vector<double>* getXBoundaries();
+    std::vector<double>* getYBoundaries();
+  
   /* more functions to be implemented
      get segmentList <vector kanske>
      get matrix

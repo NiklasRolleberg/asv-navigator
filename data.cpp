@@ -135,6 +135,9 @@ void Data::setLocalCoordinateSystem(Polygon* polygon, double delta)
     
     localEnabled = true;
 
+    boat_xpos = lonTOx(boat_longitude);
+    boat_ypos = latTOy(boat_latitude);
+
     //calculate the polygon points in local coordinates
     std::vector<double>* localX = new std::vector<double>(); //TODO delete
     std::vector<double>* localY = new std::vector<double>();
@@ -153,7 +156,7 @@ void Data::setLocalCoordinateSystem(Polygon* polygon, double delta)
       std::cout << "(" << (*localX)[i] << "," << (*localY)[i] << ")" << std::endl;
     }
     
-    //polygon.set..
+    polygon->setLocalBoundaries(localX,localY);
     //polygon->initialize()
     
     
@@ -163,21 +166,29 @@ void Data::setLocalCoordinateSystem(Polygon* polygon, double delta)
 
 double Data::lonTOx(double lon)
 {
-  return ((lon-minLon)/dLon)*dx;
+  if(localEnabled)
+    return ((lon-minLon)/dLon)*dx;
+  return 0;
 }
 
 double Data::xTOlon(double x)
 {
+  if(localEnabled)
+    return minLon + x*(dLon/dx);
   return 0;
 }
 
 double Data::latTOy(double lat)
 {
-  return ((lat-minLat)/dLat)*dy;
+  if(localEnabled) 
+    return ((lat-minLat)/dLat)*dy;
+  return 0;
 }
 
 double Data::yTOlat(double y)
 {
+  if(localEnabled)
+    return  minLat + y*(dLat/dy);
   return 0;
 }
 
@@ -197,27 +208,32 @@ void Data::removeLocalCoordinateSystem()
 
 double Data::getX()
 {
-    std::cout << "Data getX" << std::endl;
+    //std::cout << "Data getX" << std::endl;
+    return boat_xpos;
 }
 
 double Data::getY()
 {
-    std::cout << "Data getY" << std::endl;
+    //std::cout << "Data getY" << std::endl;
+    return boat_ypos;
 }
 
 double Data::getHeading()
 {
-    std::cout << "Data getHeading" << std::endl;
+    //std::cout << "Data getHeading" << std::endl;
+    return boat_heading_local;
 }
 
 double Data::getSpeed()
 {
-    std::cout << "Data getSpeed" << std::endl;
+    //std::cout << "Data getSpeed" << std::endl;
+    return boat_speed;
 }
 
 double Data::getDepth()
 {
-    std::cout << "Data getDepth" << std::endl;
+    //std::cout << "Data getDepth" << std::endl;
+    return boat_depth;
 }
 
 void Data::threadLoop()
@@ -314,6 +330,13 @@ void Data::processMessage(std::string m)
 
 	boat_latitude = strtod(latitude.c_str(),NULL);
 	boat_longitude = strtod(longitude.c_str(),NULL);
+
+	if(localEnabled)
+	{
+	  boat_xpos = lonTOx(boat_longitude);
+	  boat_ypos = latTOy(boat_latitude);
+	  //std::cout << "Local coordinates: (" << boat_xpos << "," << boat_ypos << ")" <<std::endl;
+	}
 
 	//std::cout << "boat LATITUDE: " << boat_latitude  << "\n" << "boat LONGITUDE: " << boat_longitude << std::endl;
 	
