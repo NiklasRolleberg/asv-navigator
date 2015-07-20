@@ -1,3 +1,4 @@
+
 #include <iostream>
 #include "mission.hpp"
 #include "polygon.hpp"
@@ -111,7 +112,7 @@ Mission::Mission(int arg0)
 Mission::Mission(std::vector<std::string> plan)
 {
   std::cout << "Mission: constructor" << std::endl;
-
+  
   int type = -1;
   int delay = -1;
   std::vector<double> *lat = nullptr; //new std::vector<double>();
@@ -120,21 +121,21 @@ Mission::Mission(std::vector<std::string> plan)
   
   for(int i=0;i<plan.size();i++)
   {
-    std::cout << "Looking at line: " << plan[i] << std::endl;
+    //std::cout << "Looking at line: " << plan[i] << std::endl;
     std::string line = plan[i];
     if(line[0] == '#' || line.length() < 6)
     {
-      std::cout << "....no task or data found" << std::endl;
+      //std::cout << "....no task or data found" << std::endl;
       continue;
     }
     
     if(line.substr(0,4) == "TASK")
     {
       //new task encountered? save the old one
-      std::cout << "..its a task!" << std::endl;
+      //std::cout << "..its a task!" << std::endl;
       if(type != -1)
       {
-	std::cout << "Saving last task" << std::endl;
+	//std::cout << "Saving last task" << std::endl;
 	if(type == 1 && delay != -1)
 	  taskQueue.push(new Task(delay,false));
 	else if(type == 2 && lat != nullptr && lon != nullptr)
@@ -144,6 +145,8 @@ Mission::Mission(std::vector<std::string> plan)
 	    double dlat = (*lat)[0];
     	    double dlon = (*lon)[0];
 	    taskQueue.push(new Task(dlat,dlon));
+	    delete lat;
+	    delete lon;
 	    lat = nullptr;
 	    lon = nullptr;
 	  }
@@ -162,43 +165,126 @@ Mission::Mission(std::vector<std::string> plan)
 	  taskQueue.push(new Task(message));
 	}  
 
-	delete lat;
-	delete lon;
-	lat = nullptr;
-	lon = nullptr;
-	type = -1;
-	message = "";
-
-	
+      	type = -1;
+	message = "";	
       }
+
+      
       //Find the type of the new task
       char t = line[5];
       type = t - '0';
       std::cout << "new Task type: " << type << std::endl;
     }
 
+    //Line contains data, save the data
     else if(line.substr(0,4) == "DATA")
     {
       std::cout << "it's a data Line, type: " << line.substr(5,4)  << std::endl;
-      
+
+      //TIME
       if(line.substr(5,4) == "TIM:")
       {
-	std::cout << "time: " << line.substr(9,line.length()) << " " << line.length() - 9 << std::endl;
-	
+	//std::cout << "time: " << line.substr(9,line.length()) << " " << line.length() - 9 << std::endl;
+	delay = atoi(line.substr(9,line.length()).c_str()); //value = 45
+	std::cout << "delay saved: " << delay << std::endl;
       }
 
+      //LATITUDE
+      else if(line.substr(5,4) == "LAT:")
+      {
+	std::string s = "";
+	for(int i=9; i<line.length();i++)
+	{
+	  char c = line[i];
+	  //std::cout << c << std::endl;
+	  if(i == line.length()-1 || c == ',')
+	  {
+	    if(c != ',')
+	      s += c;
+	    if(s.length() == 0)
+	      continue;
+	    double latitude = std::stod(s);
+	    if(lat == nullptr)
+	      lat = new std::vector<double>();
+	    lat->push_back(latitude);
+	    s = "";
+	    std::cout << "latitude saved: " << latitude << std::endl;	    
+	  }
+	  else
+	    s +=c;
+	}
+      }
+
+      //LONGITUDE
+      else if(line.substr(5,4) == "LON:")
+      {
+	std::string s = "";
+	for(int i=9; i<line.length();i++)
+	{
+	  char c = line[i];
+	  //std::cout << c << std::endl;
+	  if(i == line.length()-1 || c == ',')
+	  {
+	    if(c != ',')
+	      s += c;
+	    if(s.length() == 0)
+	      continue;
+	    double longitude = std::stod(s);
+	    if(lon == nullptr)
+	      lon = new std::vector<double>();
+	    lon->push_back(longitude);
+	    s = "";
+	    std::cout << "longitude saved: " << longitude << std::endl;	    
+	  }
+	  else
+	    s +=c;
+	}
+      }
+      //MESSAGE
+      else if(line.substr(5,4) == "MES:")
+      {
+	message = line.substr(9,line.length()-1);
+	std::cout << "Message saved: " << message << std::endl;
+      }
+      
     }
   }
 
   
-  /*save the last task
-  if(type /= -1)
+  //save the last task
+  if(type != -1)
   {
+    std::cout << "Saving last task" << std::endl;
     if(type == 1 && delay != -1)
       taskQueue.push(new Task(delay,false));
-    //TODO the rest
+    else if(type == 2 && lat != nullptr && lon != nullptr)
+    {
+
+      if(lat->size() > 0 && lon->size() > 0)
+      {
+	double dlat = (*lat)[0];
+	double dlon = (*lon)[0];
+	taskQueue.push(new Task(dlat,dlon));
+      }
+    }
   }
-  */
+  else if(type == 3 && lat != nullptr && lon != nullptr)
+  {
+    if(lat->size() > 0 && lon->size() > 0 && lat->size() == lon->size())
+    {
+      taskQueue.push(new Task(new Polygon(0,lat,lon)));
+    }
+  }
+  else if(type == 4)
+  {
+    if(message != "")
+      taskQueue.push(new Task(message));
+  }  
+
+  if(lat!= nullptr)
+    delete lat;
+  if(lon!=nullptr)
+    delete lon; 
 }
 
 
@@ -223,6 +309,7 @@ Task* Mission::getNextTask()
         taskQueue.pop();
         return task;
     }
+    std::cout << "Mission: task is a nullptr" << std::endl;
     return nullptr;
 }
 

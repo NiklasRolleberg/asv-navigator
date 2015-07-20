@@ -16,12 +16,14 @@ Task::Task(int sleepTime, bool drift)
     std::cout << "Task: wait constructor" << std::endl;
     type = 1;
     delay = sleepTime;
+    std::cout << "delay time: " << delay << std::endl;
 }
 
 Task::Task(double coordinate1, double coordinate2)
 {
     std::cout << "Task: goToPoint constructor" << std::endl;
     type = 2;
+    std::cout << "GOTO point: ("<< coordinate1 << "," << coordinate2 << ")" << std::endl;
 }
 
 Task::Task(Polygon* polygon)
@@ -29,6 +31,11 @@ Task::Task(Polygon* polygon)
     std::cout << "Task: scan polygon constructor" << std::endl;
     type = 3;
     polygon_ptr = polygon;
+    for(int i=0;i<polygon->getLatBoundaries()->size();i++)
+    {
+      std::cout << "("<< polygon->getLatBoundaries()->at(i) << "," << polygon->getLonBoundaries()->at(i) <<")" << std::endl;
+
+    }
 }
 
 Task::Task(std::string incMessage)

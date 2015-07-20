@@ -43,6 +43,7 @@ void Navigator::start()
         {
             case 1:
                 std::cout << "New task type = 1 (sleep)" << std::endl;
+		std::cout << "size: " << sizeof((*t)) << std::endl;
                 usleep(t->getSleepTime());
                 break;
             case 2:
@@ -53,7 +54,6 @@ void Navigator::start()
             case 3:
                 std::cout << "New task type = 3 (scan polygon)" << std::endl;
                 scanPolygon(t);
-                //TODO Do something
                 break;
 	   case 4:
                 std::cout << "New task type 4 (send a message)" << std::endl;

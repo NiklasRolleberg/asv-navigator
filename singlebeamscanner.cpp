@@ -25,7 +25,7 @@ void SingleBeamScanner::startScan()
     std::cout << "scanner:SingleBeamScanner: starting scan" << std::endl;
 
 
-    /* real coordinates
+    /* real coordinates*/
     //first test: make the boat run on the edges of the polygon
     std::vector<double>* lat = polygon->getLatBoundaries();
     std::vector<double>* lon = polygon->getLonBoundaries();
@@ -84,9 +84,9 @@ void SingleBeamScanner::startScan()
             //data->setBoatSpeed(targetSpeed);
         }
     }
-    */
+    
 
-    /**Local */
+    /**Local 
     //first test: make the boat run on the edges of the polygon
     std::vector<double>* ypoints = polygon->getYBoundaries();
     std::vector<double>* xpoints = polygon->getXBoundaries();
@@ -143,6 +143,7 @@ void SingleBeamScanner::startScan()
 	    lap++;
 	}
     }
+    */
 }
 
 void SingleBeamScanner::abortScan()

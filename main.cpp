@@ -8,6 +8,7 @@
 
 int main()
 {
+  
   std::cout << "Main: program started" << std::endl;
 
   // (1) Create a  mission and a transmitter
@@ -21,9 +22,9 @@ int main()
   }
   //std::cout << missionPlan.size() << std::endl;
 
-  Mission* misssion = new Mission(missionPlan);
+  Mission* mission = new Mission(missionPlan);
 
-  return 0;
+  //return 0;
   */
 
   Mission* mission = new Mission(0);

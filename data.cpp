@@ -268,7 +268,7 @@ void Data::threadLoop()
 
 void Data::processMessage(std::string m)
 {
-     std::cout << "message rescieved: " << m << std::endl;
+    std::cout << "message rescieved: " << m << std::endl;
 
     //TODO GÖR OM ALLT!
 
