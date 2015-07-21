@@ -8,12 +8,12 @@
 #include "singlebeamscanner.hpp"
 #include <string>
 
-Navigator::Navigator(Transmitter* transmitter, int arg2, int arg3)
+Navigator::Navigator(Transmitter* transmitter, double d)
 {
     tr_ptr = transmitter;
     std::cout << "Navigator: constructor" << std::endl;
     data = new Data(transmitter,1000000,0); // 1000000 1s
-    delta = 1.0;
+    delta = d;
 }
 
 Navigator::~Navigator()
@@ -43,7 +43,7 @@ void Navigator::start()
         {
             case 1:
                 std::cout << "New task type = 1 (sleep)" << std::endl;
-				std::cout << "size: " << sizeof((*t)) << std::endl;
+				//std::cout << "size: " << sizeof((*t)) << std::endl;
                 usleep(t->getSleepTime());
                 break;
             case 2:
@@ -61,9 +61,8 @@ void Navigator::start()
             default:
 				std::cout << "Unknown task type " << type << std::endl;
         }
-		
-		//delete t memory  leak...  //TODO fix this
-		std::cout << "delete t.." << std::endl;
+		//delete t ; //memory  leak... --------------------------------------------------------------------------------- //TODO fix this
+		//std::cout << "delete t.." << std::endl;
     }
 
 
@@ -82,7 +81,7 @@ void Navigator::abort()
 void Navigator::goToCoordinates(Task* task)
 {
     std::cout << "Navigator: execute go to coordinates task" << std::endl;
-    
+
     usleep(2000000);
 }
 
@@ -104,4 +103,3 @@ void Navigator::sendMessage(Task* task)
 {
     tr_ptr->sendMessage(task->getMessage());
 }
-

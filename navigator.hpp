@@ -13,12 +13,12 @@ private:
     Transmitter* tr_ptr;// = nullptr;
     Mission* mission_ptr;// = nullptr;
     double delta;
-  
+
 public:
     Navigator(){};
 
     /**Constructor*/
-    Navigator(Transmitter* transmitter, int arg2, int arg3);
+    Navigator(Transmitter* transmitter, double d);
 
     /**Destructor*/
     ~Navigator();

@@ -14,8 +14,19 @@ private:
     std::vector<double>* latitude;// = nullptr;
     std::vector<double>* longitude;// = nullptr;
 
+    bool localSet;
     std::vector<double>* xPoints;// = nullptr;
     std::vector<double>* yPoints;// = nullptr;
+
+    double maxX;
+    double minX;
+    double maxY;
+    double minY;
+
+    double delta;
+    int nx;
+    int ny;
+
 
 public:
     /**Constructor*/
@@ -30,32 +41,30 @@ public:
 
     /** set boundaries for the local coorinate system */
     void setLocalBoundaries(std::vector<double>*x,std::vector<double>*y);
-  
+
     /**set the grid resolution*/
-    void setGridResolution(double delta);
+    void setGridSize(double delta);
 
     /**Calculate min,max values for area and creates the grid matrix
-       and creates the first polygonsegment (searchCell i kexet)*/ 
+       and creates the first polygonsegment (searchCell i kexet)*/
     void initialize();
 
     std::vector<double>* getXBoundaries();
     std::vector<double>* getYBoundaries();
-  
+
   /* more functions to be implemented
      get segmentList <vector kanske>
      get matrix
      bool insidePolygon
      get max,min of x and y
-     get delta? 
-     
+     get delta?
+
   */
-     
-     
+
+
 
 };
 
 
 
 #endif // POLYGON_H
-
-

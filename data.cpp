@@ -94,20 +94,20 @@ void Data::setLocalCoordinateSystem(Polygon* polygon, double delta)
 
     minLon = std::numeric_limits<double>::max();
     maxLon = std::numeric_limits<double>::min();
-    dLon = 1;    
+    dLon = 1;
 
 
     std::vector<double> *latitude = polygon->getLatBoundaries();
     for(int i=0; i < latitude->size();i++)
     {
-      double d = (*latitude)[i]; 
+      double d = (*latitude)[i];
       if(d<minLat)
-	minLat = d;
+	       minLat = d;
       if(d>maxLat)
-	maxLat = d;
+	       maxLat = d;
     }
     dLat = maxLat-minLat;
-    
+
     std::vector<double> *longitude = polygon->getLonBoundaries();
     for(int i=0; i < longitude->size();i++)
     {
@@ -122,17 +122,17 @@ void Data::setLocalCoordinateSystem(Polygon* polygon, double delta)
     dx = calculateDistance(minLat,minLon,minLat,maxLon);
 
     dy = calculateDistance(minLat,minLon,maxLat,minLon);
-    
+
     std::cout << "minLat : " << minLat << std::endl;
-    std::cout << "maxLat : " << maxLat << std::endl;  
+    std::cout << "maxLat : " << maxLat << std::endl;
     std::cout << "dLat : " << dLat << std::endl;
     std::cout << "minLon : " << minLon << std::endl;
     std::cout << "maxLon : " << maxLon << std::endl;
-    std::cout << "dLon : " << dLon << std::endl;  
+    std::cout << "dLon : " << dLon << std::endl;
     std::cout << "dx: " << dx << std::endl;
     std::cout << "dy: " << dy << std::endl;
 
-    
+
     localEnabled = true;
 
     boat_xpos = lonTOx(boat_longitude);
@@ -155,11 +155,12 @@ void Data::setLocalCoordinateSystem(Polygon* polygon, double delta)
     {
       std::cout << "(" << (*localX)[i] << "," << (*localY)[i] << ")" << std::endl;
     }
-    
+
     polygon->setLocalBoundaries(localX,localY);
-    //polygon->initialize()
-    
-    
+    polygon->setGridSize(delta);
+    polygon->initialize();
+
+
 }
 
 //TODO kanske lite inline
@@ -180,7 +181,7 @@ double Data::xTOlon(double x)
 
 double Data::latTOy(double lat)
 {
-  if(localEnabled) 
+  if(localEnabled)
     return ((lat-minLat)/dLat)*dy;
   return 0;
 }
@@ -249,7 +250,7 @@ void Data::threadLoop()
         //s << "$MSSTS," << i << ",*00";
         //data_transmitterptr->sendMessage(s.str());
 	//i++;
-	
+
         usleep(data_delay);
 
 	std::queue<std::string>* messages = data_transmitterptr->getMessages();
@@ -260,7 +261,7 @@ void Data::threadLoop()
 	  processMessage(messages->front());
 	  messages->pop();
 	}
-	
+
     }
     std::cout << "Data loop done" << std::endl;
 }
@@ -283,7 +284,7 @@ void Data::processMessage(std::string m)
       }
     }
 
-    
+
     if(startIndex != -1 && (m.length() - startIndex) > 6)
     {
       //std::cout << "first if" << std::endl;
@@ -309,11 +310,11 @@ void Data::processMessage(std::string m)
 	    lastIndex = i;
 	    break;
 	  }
-	  latitude += m[i];	  
+	  latitude += m[i];
 	}
 
 	//find longitude
-	
+
 	firstIndex = lastIndex;
 	std::string longitude = "";
 	for(int i=firstIndex+1; i<m.length() ;i++)
@@ -323,9 +324,9 @@ void Data::processMessage(std::string m)
 	    lastIndex = i;
 	    break;
 	  }
-	  longitude += m[i];	  
+	  longitude += m[i];
 	}
-	
+
 	//std::cout << "LATITUDE: " << latitude  << "\n" << "LONGITUDE: " << longitude << std::endl;
 
 	boat_latitude = strtod(latitude.c_str(),NULL);
@@ -339,10 +340,10 @@ void Data::processMessage(std::string m)
 	}
 
 	//std::cout << "boat LATITUDE: " << boat_latitude  << "\n" << "boat LONGITUDE: " << boat_longitude << std::endl;
-	
+
 	return;
       }
-      
+
     }
     //std::cout << "Unknown message: " << m << std::endl;
 }
@@ -355,7 +356,7 @@ void Data::setBoatWaypoint_real(double lat, double lon)
 
     std::stringstream s;
     s << "$MSSCP,0,0,0," << lat << "," << lon << ",0,0,*00";
-    data_transmitterptr->sendMessage(s.str());    
+    data_transmitterptr->sendMessage(s.str());
 }
 
 void Data::setBoatWaypoint_local(double x, double y)
@@ -363,7 +364,7 @@ void Data::setBoatWaypoint_local(double x, double y)
     std::cout << "Data: Set local waypoint" << std::endl;
 
     //calculate the real waypoint and send it to the boat
-    
+
 }
 
 void Data::setBoatSpeed(double speed)
