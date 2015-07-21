@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "element.hpp"
+#include "segment.hpp"
 
 /**The polygon class contains coordinates for the nodes, both in local and
     lat/long coordinate systems and methods for calculating if a position
@@ -29,6 +30,8 @@ private:
     int ny;
 
     Element*** matrix;
+
+    std::vector<PolygonSegment*>polygonSegments;
 
 
 public:

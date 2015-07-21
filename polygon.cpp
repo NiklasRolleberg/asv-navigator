@@ -39,6 +39,15 @@ Polygon::~Polygon()
     }
 
 
+    while(polygonSegments.size() > 0)
+    {
+      //remove polygonSegment
+      delete polygonSegments.at(0);
+      polygonSegments.erase (polygonSegments.begin()+0);
+      //std::cout << "vecor size:" << polygonSegments.size() << std::endl;
+    }
+
+
     delete xPoints;
     delete yPoints;
 
@@ -120,9 +129,11 @@ void Polygon::initialize()
   std::cout << "delta=" << delta << "-> grid size is: " << nx << "x" << ny << std::endl;
 
   //TODO (1) create a polygon-segment object for the entire polygon (searchCell in kexet)
-  PolygonSegment* ps = new PolygonSegment(nullptr,nullptr);
-  delete ps;
+  //PolygonSegment* ps = new PolygonSegment(nullptr,nullptr);
+  //delete ps;
 
+  // add PolygonSegment
+  polygonSegments.push_back(new PolygonSegment(xPoints,yPoints));
 
   //TODO (2) (check if the segment is convex, if not it should be triangulated) kanske senare iaf
 

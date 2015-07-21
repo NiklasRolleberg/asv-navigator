@@ -12,7 +12,7 @@ int main()
   std::cout << "Main: program started" << std::endl;
 
   // (1) Create a  mission and a transmitter
-
+  /*
   std::vector<std::string> missionPlan;
   for(std::string line; std::getline(std::cin,line);)
   {
@@ -25,9 +25,9 @@ int main()
   Mission* mission = new Mission(missionPlan);
 
   //return 0;
+  */
 
-
-  //Mission* mission = new Mission(0);
+  Mission* mission = new Mission(0);
 
   std::cout << "------------------------------------"<< std::endl;
 

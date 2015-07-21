@@ -8,13 +8,13 @@ class PolygonSegment
 {
 private:
 
-    std::vector<double>* xPoints;// = nullptr;
-    std::vector<double>* yPoints;// = nullptr;
+    std::vector<double> xPoints;// = nullptr;
+    std::vector<double> yPoints;// = nullptr;
 
-    double maxX;
-    double minX;
-    double maxY;
-    double minY;
+    double xMax;
+    double xMin;
+    double yMax;
+    double yMin;
 
 public:
 
@@ -23,6 +23,16 @@ public:
 
     /**Destructor*/
     ~PolygonSegment();
+
+
+    bool contains(double x, double y);
+    double findX(double y, bool right);
+    double maxX();
+    double minX();
+    double maxY();
+    double minY();
+
+
 
 };
 

@@ -61,7 +61,7 @@ void Navigator::start()
             default:
 				std::cout << "Unknown task type " << type << std::endl;
         }
-		//delete t ; //memory  leak... --------------------------------------------------------------------------------- //TODO fix this
+		delete t ; //memory  leak... --------------------------------------------------------------------------------- //TODO fix this
 		//std::cout << "delete t.." << std::endl;
     }
 
