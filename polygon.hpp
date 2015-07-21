@@ -33,7 +33,7 @@ private:
 
 public:
     /**Constructor*/
-    Polygon(int points, std::vector<double> *lat, std::vector<double> *lon);
+    Polygon(std::vector<double> *lat, std::vector<double> *lon);
 
     /**Destructor*/
     ~Polygon();

@@ -3,8 +3,9 @@
 #include <vector>
 #include <limits>
 #include "element.hpp"
+#include "segment.hpp"
 
-Polygon::Polygon(int points, std::vector<double> *lat, std::vector<double> *lon)
+Polygon::Polygon(std::vector<double> *lat, std::vector<double> *lon)
 {
     std::cout << "Polygon constructor" << std::endl;
     latitude = lat;
@@ -119,6 +120,10 @@ void Polygon::initialize()
   std::cout << "delta=" << delta << "-> grid size is: " << nx << "x" << ny << std::endl;
 
   //TODO (1) create a polygon-segment object for the entire polygon (searchCell in kexet)
+  PolygonSegment* ps = new PolygonSegment(nullptr,nullptr);
+  delete ps;
+
+
   //TODO (2) (check if the segment is convex, if not it should be triangulated) kanske senare iaf
 
   /*
