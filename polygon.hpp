@@ -2,6 +2,7 @@
 #define POLYGON_H
 
 #include <vector>
+#include "element.hpp"
 
 /**The polygon class contains coordinates for the nodes, both in local and
     lat/long coordinate systems and methods for calculating if a position
@@ -26,6 +27,8 @@ private:
     double delta;
     int nx;
     int ny;
+
+    Element*** matrix;
 
 
 public:

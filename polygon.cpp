@@ -10,6 +10,7 @@ Polygon::Polygon(int points, std::vector<double> *lat, std::vector<double> *lon)
     latitude = lat;
     longitude = lon;
     localSet = false;
+    matrix = NULL;
     /*
     for(int i=0;i<latitude->size();i++) {
         std::cout << "Latitude: " << latitude->at(i) << std::endl;
@@ -19,6 +20,24 @@ Polygon::Polygon(int points, std::vector<double> *lat, std::vector<double> *lon)
 
 Polygon::~Polygon()
 {
+    //delete element matrix
+    if(matrix != NULL)
+    {
+      for (int i = 0; i < nx; ++i)
+      {
+        for (int j = 0; j < ny; ++j)
+        {
+          delete matrix[i][j];
+        }
+      }
+      for (int i = 0; i < nx; ++i)
+      {
+        delete matrix[i];
+      }
+      delete matrix;
+    }
+
+
     delete xPoints;
     delete yPoints;
 
@@ -99,6 +118,32 @@ void Polygon::initialize()
 
   std::cout << "delta=" << delta << "-> grid size is: " << nx << "x" << ny << std::endl;
 
+  //TODO (1) create a polygon-segment object for the entire polygon (searchCell in kexet)
+  //TODO (2) (check if the segment is convex, if not it should be triangulated) kanske senare iaf
+
+  /*
+  nx = 3;
+  ny = 2;
+  // Create the 2d array:
+  matrix = new Element**[nx];
+  for (int i = 0; i < nx; ++i)
+  {
+    matrix[i] = new Element*[ny];
+  }
+  // Create the Elements:
+  for (int i = 0; i < nx; ++i)
+  {
+    for (int j = 0; j < ny; ++j)
+    {
+      matrix[i][j] = new Element(0.0,0.0,0,0);
+      //TODO set the status of the element depending on if it is outside or inside the polygon
+      //TODO check this by using methods in the polygon-segment class
+    }
+  }
+  */
+  //TODO add neighbours to elements that are inside the polygon
+
+  //TODO (add elements-pointers to the polygon segment objects)
 }
 
 std::vector<double>* Polygon::getXBoundaries()
