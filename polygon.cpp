@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <limits>
+#include "element.hpp"
 
 Polygon::Polygon(int points, std::vector<double> *lat, std::vector<double> *lon)
 {
