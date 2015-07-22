@@ -81,8 +81,20 @@ void Navigator::abort()
 void Navigator::goToCoordinates(Task* task)
 {
     std::cout << "Navigator: execute go to coordinates task" << std::endl;
+    double lat = task->getTargetLat();
+    double lon = task->getTargetLon();
 
-    usleep(2000000);
+    data->setBoatWaypoint_real(lat, lon);
+    //TODO SEND START MESSAGE
+    //data->sendMessage();
+    double d = data->calculateDistance(lat,lon, data->getLat(), data->getLon());
+    while(d > 3)
+    {
+      usleep(1000000);
+      d = data->calculateDistance(lat,lon, data->getLat(), data->getLon());
+      std::cout << "GOTO-TASK:  distance to target: " << d << std::endl;
+    }
+    std::cout << "Target reached, task completed" << std::endl;
 }
 
 /**Execute task of type 3*/

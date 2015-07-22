@@ -10,6 +10,7 @@
 #include <queue>
 #include <stdlib.h>
 #include <vector>
+#include <iomanip>
 
 Data::Data(Transmitter* transmitter,int delay, int arg3)
 {
@@ -239,131 +240,122 @@ double Data::getDepth()
 
 void Data::threadLoop()
 {
-    std::cout << "Data loop started" << std::endl;
-    int i=0;
-    while(!data_stop)
+  std::cout << "Data loop started" << std::endl;
+  int i=0;
+  while(!data_stop)
+  {
+    data_transmitterptr->requestData();
+    usleep(data_delay);
+    std::queue<std::string>* messages = data_transmitterptr->getMessages();
+
+    for(int i=0;i< messages->size();i++)
     {
-        data_transmitterptr->requestData();
+	     //std::cout << "DATA: "<< messages->front() << std::endl;
+	      processMessage(messages->front());
+	       messages->pop();
+     }
 
-        //std::cout << "Data: threadLoop requestData" << std::endl;
-        //std::stringstream s;
-        //s << "$MSSTS," << i << ",*00";
-        //data_transmitterptr->sendMessage(s.str());
-	//i++;
-
-        usleep(data_delay);
-
-	std::queue<std::string>* messages = data_transmitterptr->getMessages();
-
-	for(int i=0;i< messages->size();i++)
-	{
-	  //std::cout << "DATA: "<< messages->front() << std::endl;
-	  processMessage(messages->front());
-	  messages->pop();
-	}
-
-    }
-    std::cout << "Data loop done" << std::endl;
+  }
+  std::cout << "Data loop done" << std::endl;
 }
 
 
 void Data::processMessage(std::string m)
 {
-    std::cout << "message rescieved: " << m << std::endl;
 
-    //TODO GÖR OM ALLT!
+  std::cout << "message rescieved: " << m << std::endl;
 
-    //std::cout << "processMessage" << std::endl;
-    int startIndex = -1;
-    for(int i=0;i<m.length();i++)
+  //TODO GÖR OM ALLT!
+
+  //std::cout << "processMessage" << std::endl;
+  int startIndex = -1;
+  for(int i=0;i<m.length();i++)
+  {
+    if(m[i] == '$')
     {
-      if(m[i] == '$')
+      startIndex = i;
+      break;
+    }
+  }
+
+
+  if(startIndex != -1 && (m.length() - startIndex) > 6)
+  {
+    //std::cout << "first if" << std::endl;
+    if(m[startIndex+1] == 'M' &&
+       m[startIndex+2] == 'S' &&
+       m[startIndex+3] == 'G' &&
+       m[startIndex+4] == 'P' &&
+       m[startIndex+5] == 'S')
+    {
+    //std::cout << "Its a position message!" << std::endl;
+    //std::cout << m << std::endl;
+
+    //find latitude
+
+    //first ','
+    int firstIndex = startIndex+6;
+    int lastIndex;
+    std::string latitude = "";
+    for(int i=firstIndex+1; i<m.length() ;i++)
+    {
+      if(m[i] == ',')
       {
-	startIndex = i;
-	break;
+        lastIndex = i;
+        break;
       }
+      latitude += m[i];
     }
 
+  	//find longitude
 
-    if(startIndex != -1 && (m.length() - startIndex) > 6)
-    {
-      //std::cout << "first if" << std::endl;
-      if(m[startIndex+1] == 'M' &&
-	 m[startIndex+2] == 'S' &&
-	 m[startIndex+3] == 'G' &&
-	 m[startIndex+4] == 'P' &&
-	 m[startIndex+5] == 'S')
-      {
-	//std::cout << "Its a position message!" << std::endl;
-	//std::cout << m << std::endl;
+  	firstIndex = lastIndex;
+  	std::string longitude = "";
+  	for(int i=firstIndex+1; i<m.length() ;i++)
+  	{
+  	  if(m[i] == ',')
+  	  {
+  	    lastIndex = i;
+  	    break;
+  	  }
+  	  longitude += m[i];
+  	}
 
-	//find latitude
+  	//std::cout << "LATITUDE: " << latitude  << "\n" << "LONGITUDE: " << longitude << std::endl;
 
-	//first ','
-	int firstIndex = startIndex+6;
-	int lastIndex;
-	std::string latitude = "";
-	for(int i=firstIndex+1; i<m.length() ;i++)
-	{
-	  if(m[i] == ',')
-	  {
-	    lastIndex = i;
-	    break;
-	  }
-	  latitude += m[i];
-	}
+  	boat_latitude = strtod(latitude.c_str(),NULL);
+  	boat_longitude = strtod(longitude.c_str(),NULL);
 
-	//find longitude
+  	if(localEnabled)
+  	{
+  	  boat_xpos = lonTOx(boat_longitude);
+  	  boat_ypos = latTOy(boat_latitude);
+  	  //std::cout << "Local coordinates: (" << boat_xpos << "," << boat_ypos << ")" <<std::endl;
+  	}
 
-	firstIndex = lastIndex;
-	std::string longitude = "";
-	for(int i=firstIndex+1; i<m.length() ;i++)
-	{
-	  if(m[i] == ',')
-	  {
-	    lastIndex = i;
-	    break;
-	  }
-	  longitude += m[i];
-	}
+  	//std::cout << "boat LATITUDE: " << boat_latitude  << "\n" << "boat LONGITUDE: " << boat_longitude << std::endl;
 
-	//std::cout << "LATITUDE: " << latitude  << "\n" << "LONGITUDE: " << longitude << std::endl;
-
-	boat_latitude = strtod(latitude.c_str(),NULL);
-	boat_longitude = strtod(longitude.c_str(),NULL);
-
-	if(localEnabled)
-	{
-	  boat_xpos = lonTOx(boat_longitude);
-	  boat_ypos = latTOy(boat_latitude);
-	  //std::cout << "Local coordinates: (" << boat_xpos << "," << boat_ypos << ")" <<std::endl;
-	}
-
-	//std::cout << "boat LATITUDE: " << boat_latitude  << "\n" << "boat LONGITUDE: " << boat_longitude << std::endl;
-
-	return;
-      }
-
+    return;
     }
-    //std::cout << "Unknown message: " << m << std::endl;
+  }
+  //std::cout << "Unknown message: " << m << std::endl;
 }
 
 
 
 void Data::setBoatWaypoint_real(double lat, double lon)
 {
-    std::cout << "Data: Set real waypoint" << std::endl;
-
+    std::cout << "Data: Set real waypoint, real coordinates: ("<< lat <<","<< lon << ")" << std::endl;
     std::stringstream s;
-    s << "$MSSCP,0,0,0," << lat << "," << lon << ",0,0,*00";
+    s << "$MSSCP,0,0,0," << std::setprecision(10) << lat << "," << lon << ",0,0,*00";
     data_transmitterptr->sendMessage(s.str());
 }
 
 void Data::setBoatWaypoint_local(double x, double y)
 {
-    std::cout << "Data: Set local waypoint" << std::endl;
+    std::cout << "Data: Set local waypoint, local coordinates: (" << x << "," << y << ")" << std::endl;
 
-    //calculate the real waypoint and send it to the boat
+    setBoatWaypoint_real(yTOlat(y),xTOlon(x));
 
 }
 

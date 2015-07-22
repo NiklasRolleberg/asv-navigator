@@ -25,12 +25,18 @@ Mission::Mission(int arg0)
 
     //taskQueue.push(new Task("$MSSDL,3,*00"));
 
-    //sleep
-    taskQueue.push(new Task(10000000,false));
+    //TODO add goto-point task to a point inside the polygon
 
+    //sleep
+    taskQueue.push(new Task(1000000,false));
+
+    taskQueue.push(new Task(59.327927,18.075576));
+
+    taskQueue.push(new Task(1000000,false));
 
     std::vector<double> *lat = new std::vector<double>();
     std::vector<double> *lon = new std::vector<double>();
+
 
     //    59.326,18.071
     lat->push_back(59.326);
@@ -105,6 +111,28 @@ Mission::Mission(int arg0)
     lon->push_back(5.64);
     lon->push_back(6.54);
     */
+
+    /*
+    //test vid GIH
+    //59.346605, 18.079773
+    lat->push_back(59.346605);
+    lon->push_back(18.079773);
+
+    //59.346758, 18.079872
+    lat->push_back(59.346758);
+    lon->push_back(18.079872);
+
+    //59.346524, 18.080650
+    lat->push_back(59.346524);
+    lon->push_back(18.080650);
+
+    //59.346326, 18.080384
+    lat->push_back(59.346323);
+    lon->push_back(18.080384);
+    */
+
+
+
     taskQueue.push(new Task(new Polygon(lat,lon)));
 }
 

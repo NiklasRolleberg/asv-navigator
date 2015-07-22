@@ -24,6 +24,8 @@ Task::Task(double coordinate1, double coordinate2)
     std::cout << "Task: goToPoint constructor" << std::endl;
     type = 2;
     std::cout << "GOTO point: ("<< coordinate1 << "," << coordinate2 << ")" << std::endl;
+    targetLat = coordinate1;
+    targetLon = coordinate2;
 }
 
 Task::Task(Polygon* polygon)
@@ -58,6 +60,14 @@ int Task::getType()
     return type;
 }
 
+double Task::getTargetLat()
+{
+    return targetLat;
+}
+double Task::getTargetLon()
+{
+  return targetLon;
+}
 
 int Task::getSleepTime()
 {
@@ -73,4 +83,3 @@ std::string Task::getMessage()
 {
     return message;
 }
-

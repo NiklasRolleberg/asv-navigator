@@ -11,12 +11,12 @@ private:
     std::vector<double> xPoints;// = nullptr;
     std::vector<double> yPoints;// = nullptr;
 
+public:
+
     double xMax;
     double xMin;
     double yMax;
     double yMin;
-
-public:
 
     /**Constructor*/
     PolygonSegment(std::vector<double> *x, std::vector<double> *y);

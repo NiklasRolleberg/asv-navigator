@@ -12,6 +12,7 @@ private:
     Data* data;
     Polygon* polygon;
     double delta;
+    int delay;
 public:
     /**Constructor*/
   SingleBeamScanner(Data* data, Polygon* polygon,double delta);
@@ -29,5 +30,3 @@ public:
 
 
 #endif // SWEEPINGSSCANNER_H
-
-

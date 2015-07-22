@@ -26,15 +26,22 @@ private:
     double minY;
 
     double delta;
+
+    /*
+    int nx;
+    int ny;
+    Element*** matrix;
+    */
+
+
+public:
+
     int nx;
     int ny;
 
     Element*** matrix;
-
     std::vector<PolygonSegment*>polygonSegments;
 
-
-public:
     /**Constructor*/
     Polygon(std::vector<double> *lat, std::vector<double> *lon);
 

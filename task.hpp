@@ -13,6 +13,8 @@ private:
     int delay;// = 0;
     Polygon* polygon_ptr;// = nullptr;
     std::string message;// = "";
+    double targetLat;
+    double targetLon;
 
 public:
     /**Default constructor (type 0)*/
@@ -37,6 +39,9 @@ public:
     int getType();
 
     int getSleepTime();
+
+    double getTargetLat();
+    double getTargetLon();
 
     Polygon* getPolygon();
 
