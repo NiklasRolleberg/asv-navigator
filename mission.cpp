@@ -30,8 +30,10 @@ Mission::Mission(int arg0)
     //sleep
     taskQueue.push(new Task(1000000,false));
 
+    //go to a point inside the polygon
     taskQueue.push(new Task(59.327927,18.075576));
 
+    //sleep
     taskQueue.push(new Task(1000000,false));
 
     std::vector<double> *lat = new std::vector<double>();

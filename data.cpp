@@ -349,6 +349,7 @@ void Data::setBoatWaypoint_real(double lat, double lon)
     std::stringstream s;
     s << "$MSSCP,0,0,0," << std::setprecision(10) << lat << "," << lon << ",0,0,*00";
     data_transmitterptr->sendMessage(s.str());
+    data_transmitterptr->sendMessage("$MSSTA,*00");
 }
 
 void Data::setBoatWaypoint_local(double x, double y)
