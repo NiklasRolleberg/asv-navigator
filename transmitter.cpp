@@ -18,13 +18,13 @@
 
 Transmitter::Transmitter(int arg0)
 {
-  
+
     std::cout << "Transmitter constructor" << std::endl;
     std::cout << "Opening serial port..";
     listen = false;
     lock = false;
     messageQueue = new std::queue<std::string>();
-    
+
     // NO BOOST
     serialPort = open("/dev/ttyUSB0", O_RDWR | O_NOCTTY | O_NDELAY);
     if(serialPort == -1)
@@ -35,8 +35,8 @@ Transmitter::Transmitter(int arg0)
     fcntl(serialPort, F_SETFL ,0);
 
     /** Change settings for the serial port with "stty -F /dev/--- -"settings"*/
-    
-    
+
+
     /* BOOST
     std::string port = "/dev/ttyACM0";//"/dev/ttyUSB0";
     unsigned int baud_rate = 115200;//9600;
@@ -47,13 +47,13 @@ Transmitter::Transmitter(int arg0)
       std::cout << "Failed" << std::endl;
     }
     std::cout << std::endl;
-    
+
     // option settings...
     serial->set_option(boost::asio::serial_port_base::baud_rate(baud_rate));
     serial->set_option(boost::asio::serial_port_base::character_size(8));
     serial->set_option(boost::asio::serial_port_base::stop_bits(boost::asio::serial_port_base::stop_bits::one));
     serial->set_option(boost::asio::serial_port_base::parity(boost::asio::serial_port_base::parity::none));
-    serial->set_option(boost::asio::serial_port_base::flow_control(boost::asio::serial_port_base::flow_control::none)); 
+    serial->set_option(boost::asio::serial_port_base::flow_control(boost::asio::serial_port_base::flow_control::none));
     */
 }
 
@@ -71,11 +71,11 @@ Transmitter::~Transmitter()
     }
     delete listenThread;
 
-    
+
     //std::cout << "Closong serial port " << std::endl;
     //delete serial; BOOST
     close(serialPort); //NO BOOST
- 
+
     std::cout << "Transmitter destructor" << std::endl;
 }
 void Transmitter::start()
@@ -97,48 +97,48 @@ void Transmitter::listenToSerialPort()
     //NO BOOST
     char* d = new char[128];
 
-    
+
     //int i=0;
     while(listen)
     {
       usleep(1000); //try higher values
-     
+
       //if(lock)
       //continue;
-      
+
       //BOOST
       //boost::asio::read((*serial),boost::asio::buffer(&c,1));
 
       // NO BOOST
       int rd = read(serialPort,d,128);
       if(rd == -1) {
-	std::cout << "read failed" << std::endl;
-	usleep(1000000);
+        //std::cout << "read failed" << std::endl;
+        usleep(1000000);
       }
 
       if(rd == 0)
       {
-	//Nothing to read
-	continue;
+	       //Nothing to read
+         continue;
       }
-	  
-      
+
+
       for(int i=0;i<rd;i++)
       {
-	c = d[i];
-	switch(c)
-	{
-	case '\r':
-	    break;
-	case '\n':
-	  messageQueue->push(message);	    
-	  //std::cout << "Message rescieved: " << message  << "  rd = " << rd << " queue size: " << messageQueue->size() << std::endl;
-	  
-	    message = "";
-	    break;
-	default:
-	    message+=c;
-	}
+      	c = d[i];
+      	switch(c)
+      	{
+      	case '\r':
+      	    break;
+      	case '\n':
+  	        messageQueue->push(message);
+      	    //std::cout << "Message rescieved: " << message  << "  rd = " << rd << " queue size: " << messageQueue->size() << std::endl;
+
+      	    message = "";
+      	    break;
+      	default:
+      	    message+=c;
+      	}
       }
     }
     delete[] d;
@@ -148,7 +148,7 @@ void Transmitter::listenToSerialPort()
 void Transmitter::abort()
 {
     std::cout << "Transmitter abort" << std::endl;
-    
+
     listen = false;
     //serial->cancel(); BOOST
     if(listenThread != nullptr)
@@ -168,7 +168,7 @@ void Transmitter::sendMessage(std::string s)
 {
   writeToSerial(s);
 }
-  
+
 
 std::queue<std::string>* Transmitter::getMessages()
 {
@@ -182,34 +182,33 @@ void Transmitter::writeToSerial(std::string message)
   //std::cout << "Write to serial port: " << message << std::endl;
   //printf("Write to serial port\n");
   message+='\n';
-  
+
   while(lock){
     //std::cout << "-serial port locked-" << std::endl;;
     usleep(1000);
   }
-  
-      
+
+
   lock = true;
-  
+
   //NO BOOST
   int wr=write(serialPort,message.c_str(),message.size());
 
   if(wr < 0)
   {
-      std::cout << "Writing error" << std::endl;
+      //std::cout << "Writing error" << std::endl;
   }
-  
+
   //std::cout << "tcDrain" << std::endl;
   int tc = tcdrain(serialPort);
   //std::cout << "Write complete: " << std::endl;//tc <<  std::endl;
-  
+
   // BOOST
   //boost::asio::write((*serial),boost::asio::buffer(message.c_str(),message.size()));
   lock = false;
 
-  std::cout << "message sent: " << message;
-  
+  //std::cout << "message sent: " << message;
+
   //is the message coming back? turn off echo in stty..
   // turn off conversion of characters with -icrnl
 }
-

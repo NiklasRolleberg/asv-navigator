@@ -23,7 +23,7 @@ private:
 
     bool data_stop; //= false; //false
     int data_delay; //= 500000; //0.5s
-    Transmitter* data_transmitterptr;
+    //Transmitter* data_transmitterptr;
     std::thread *data_threadptr;// = nullptr;
     Polygon* localPolygon;// = nullptr;
 
@@ -38,21 +38,23 @@ private:
 
     double dx;
     double dy;
-  
+
 
     /**collects data, calculates new coordinates*/
     void threadLoop();
 
     /**Determine the  type of message andstore data from message */
     void processMessage(std::string m);
-  
+
     //Conversions between local and global coordinates
     double lonTOx(double lon);
     double xTOlon(double x);
     double latTOy(double lat);
     double yTOlat(double y);
-  
+
 public:
+
+  Transmitter* data_transmitterptr;
 
     Data(){};
 

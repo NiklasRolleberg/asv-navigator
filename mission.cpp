@@ -31,15 +31,15 @@ Mission::Mission(int arg0)
     taskQueue.push(new Task(1000000,false));
 
     //go to a point inside the polygon
-    taskQueue.push(new Task(59.327927,18.075576));
+    //taskQueue.push(new Task(59.300837,18.214686));
 
     //sleep
-    taskQueue.push(new Task(1000000,false));
+    //taskQueue.push(new Task(1000000,false));
 
     std::vector<double> *lat = new std::vector<double>();
     std::vector<double> *lon = new std::vector<double>();
 
-
+    /*
     //    59.326,18.071
     lat->push_back(59.326);
     lon->push_back(18.071);
@@ -51,7 +51,7 @@ Mission::Mission(int arg0)
     //    59.325,18.082
     lat->push_back(59.325);
     lon->push_back(18.082);
-
+    */
     /*
     //59.347717, 18.074659
     lat->push_back(59.347717);
@@ -132,6 +132,23 @@ Mission::Mission(int arg0)
     lat->push_back(59.346323);
     lon->push_back(18.080384);
     */
+
+
+    //test på sjön
+
+    lat->push_back(59.301091);
+    lon->push_back(18.213823);
+
+    lat->push_back(59.301125);
+    lon->push_back(18.215594);
+
+    lat->push_back(59.300555);
+    lon->push_back(18.215850);
+
+    lat->push_back(59.300515);
+    lon->push_back(18.213855);
+
+
 
 
 

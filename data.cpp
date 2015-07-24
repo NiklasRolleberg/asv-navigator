@@ -20,8 +20,13 @@ Data::Data(Transmitter* transmitter,int delay, int arg3)
     //Get initial values for variables
 
     //59.352884, 18.073585
-    boat_latitude = 59.352884;
-    boat_longitude = 18.073585;
+    //boat_latitude = 59.352884;
+    //boat_longitude = 18.073585;
+
+    //59.300837,18.214686
+    boat_latitude = 59.300837;
+    boat_longitude = 18.214686;
+
     boat_heading_real = 0;
 
     boat_xpos = 0;
@@ -114,9 +119,9 @@ void Data::setLocalCoordinateSystem(Polygon* polygon, double delta)
     {
       double d = (*longitude)[i];
       if(d<minLon)
-	minLon = d;
+	       minLon = d;
       if(d>maxLon)
-	maxLon = d;
+	       maxLon = d;
     }
     dLon = maxLon-minLon;
 
@@ -348,6 +353,7 @@ void Data::setBoatWaypoint_real(double lat, double lon)
     std::cout << "Data: Set real waypoint, real coordinates: ("<< lat <<","<< lon << ")" << std::endl;
     std::stringstream s;
     s << "$MSSCP,0,0,0," << std::setprecision(10) << lat << "," << lon << ",0,0,*00";
+    //s << "$MSSCP,,,," << lat << "," << lon << ",,,*00";
     data_transmitterptr->sendMessage(s.str());
     data_transmitterptr->sendMessage("$MSSTA,*00");
 }

@@ -29,7 +29,8 @@ void SingleBeamScanner::startScan()
     std::cout << "scanner:SingleBeamScanner: starting scan" << std::endl;
 
 
-    /* real coordinates
+    //real coordinates
+    /*
     //first test: make the boat run on the edges of the polygon
     std::vector<double>* lat = polygon->getLatBoundaries();
     std::vector<double>* lon = polygon->getLonBoundaries();
@@ -65,13 +66,14 @@ void SingleBeamScanner::startScan()
 
     //std::cout << targetLat << " " << targetLon << std::endl;
 
-    int lap = 10; //0
-    double threshold = 3;
-    while(lap < 2)
+    int lap = 0; //0
+    double threshold = 10;
+    while(lap < 4)
     {
-        usleep(2000000);
+        usleep(500000);
         d = data->calculateDistance(data->getLat(),data->getLon(),targetLat, targetLon);
         std::cout << "scanner:distance to target " << d << std::endl;
+        data->data_transmitterptr->sendMessage("$MSGCP,*00");
         if(d < threshold)
         {
             std::cout << "scanner:waypoint reached, picking the next one" << std::endl;
@@ -87,8 +89,8 @@ void SingleBeamScanner::startScan()
             data->setBoatWaypoint_real(targetLat, targetLon);
             //data->setBoatSpeed(targetSpeed);
         }
-    }
-    */
+    }*/
+
 
     /**Local
     //first test: make the boat run on the edges of the polygon
@@ -171,7 +173,7 @@ void SingleBeamScanner::startScan()
   double targetLine = targetY;
 
   bool stop = false;
-  double tol = 5; // radius around target
+  double tol = 300000000; // radius around target
 
   //start sweeping
   while(!stop)
