@@ -2,6 +2,7 @@
 #define POLYGON_H
 
 #include <vector>
+#include <iostream>
 #include "element.hpp"
 #include "segment.hpp"
 

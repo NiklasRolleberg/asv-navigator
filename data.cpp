@@ -391,3 +391,9 @@ double Data::calculateDistance(double lat1,double lon1,double lat2,double lon2)
 
     return R * c;
 }
+
+
+void Data::writeToLog(std::string s)
+{
+  data_transmitterptr->writeToLog(s);
+}

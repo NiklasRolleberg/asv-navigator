@@ -9,6 +9,7 @@
 //#include <boost/asio.hpp>BOOST
 #include <iostream>
 #include <queue>
+#include <fstream>
 
 class Transmitter
 {
@@ -23,14 +24,14 @@ private:
 
     /*NO BOOST*/
     int serialPort;
-  
+
     bool listen; // = false;
     bool lock;// = false;
-
+    std::ofstream *logfile;
     std::thread* listenThread;
     void writeToSerial(std::string message);
     void listenToSerialPort();
-    
+
 
 
 public:
@@ -54,16 +55,13 @@ public:
 
     //Send a message on the serial port*/
     void sendMessage(std::string s);
-       
+
+    //write a message to the log
+    void writeToLog(std::string s);
+
     /** Get all new messages*/
     std::queue<std::string>* getMessages();
-  
+
 };
 
 #endif
-
-/*
- std::stringstream s;
-    s << "$MSSTS," << speed << ",checksum";
-    writeToSerial(s.str());
-*/

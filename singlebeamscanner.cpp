@@ -1,33 +1,45 @@
 #include "singlebeamscanner.hpp"
 #include <iostream>
+#include <sstream>
 #include "polygon.hpp"
 #include "data.hpp"
 #include <unistd.h>
 #include <limits>
 #include <cmath>
 #include "segment.hpp"
+#include <iomanip>
 //#include element
 
 SingleBeamScanner::SingleBeamScanner(Data* dataptr, Polygon* polygonptr, double d)
 {
-    std::cout << "scanner:SingleBeamScanner constructor" << std::endl;
-    data = dataptr;
-    polygon = polygonptr;
-    delay = 1000000;
-    delta = d;
+  std::cout << "scanner:SingleBeamScanner constructor" << std::endl;
+  data = dataptr;
+  polygon = polygonptr;
+  delay = 1000000;
+  delta = d;
 }
 
 
 SingleBeamScanner::~SingleBeamScanner()
 {
-    std::cout << "scanner:SingleBeamScanner destructor" << std::endl;
+  std::cout << "scanner:SingleBeamScanner destructor" << std::endl;
+  //TODO delete polygon?
 }
 
 
 void SingleBeamScanner::startScan()
 {
-    std::cout << "scanner:SingleBeamScanner: starting scan" << std::endl;
+  std::cout << "Writing polygon coordinates to log" << std::endl;
+  std::stringstream s;
+  s << "POLYGONCOORDINATES:" <<  std::setprecision(8);
+  for(int i=0;i< polygon->getLatBoundaries()->size();i++)
+  {
+    s << "(" << polygon -> getLatBoundaries()->at(i) << ',' << polygon->getLonBoundaries()->at(i) << ")";
+  }
+  //s << std::endl;
+  data->writeToLog(s.str());
 
+  std::cout << "scanner:SingleBeamScanner: starting scan" << std::endl;
 
     //real coordinates
     /*
@@ -240,5 +252,5 @@ void SingleBeamScanner::startScan()
 
 void SingleBeamScanner::abortScan()
 {
-    std::cout << "scanner:SingleBeamScanner: abort scan" << std::endl;
+  std::cout << "scanner:SingleBeamScanner: abort scan" << std::endl;
 }

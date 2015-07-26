@@ -7,6 +7,7 @@
 #include "transmitter.hpp"
 #include "polygon.hpp"
 #include <limits>
+#include <string>
 
 class Data
 {
@@ -23,7 +24,7 @@ private:
 
     bool data_stop; //= false; //false
     int data_delay; //= 500000; //0.5s
-    //Transmitter* data_transmitterptr;
+    Transmitter* data_transmitterptr;
     std::thread *data_threadptr;// = nullptr;
     Polygon* localPolygon;// = nullptr;
 
@@ -54,7 +55,7 @@ private:
 
 public:
 
-  Transmitter* data_transmitterptr;
+  //Transmitter* data_transmitterptr;
 
     Data(){};
 
@@ -116,6 +117,9 @@ public:
 
     /**Calculate distance between two coordinates*/
     double calculateDistance(double lat0,double lon0, double lat1, double lon1);
+
+    /**Write a message to the transmitter log*/
+    void writeToLog(std::string s);
 
 };
 
