@@ -12,6 +12,9 @@
 #include <errno.h>
 #include <termios.h>
 #include <queue>
+#include <chrono>
+#include <iomanip>
+#include <ctime>
 /*
 #include <boost/asio.hpp>
 #include <boost/lockfree/queue.hpp>
@@ -37,8 +40,23 @@ Transmitter::Transmitter(int arg0)
 
     /** Change settings for the serial port with "stty -F /dev/--- -"settings"*/
 
-    std::cout << "creating log" << std::endl;
-    logfile = new std::ofstream("logs/test.txt");
+
+    time_t now;
+    char the_date[20];
+    the_date[0] = '\0';
+    now = time(NULL);
+
+    if (now != -1)
+    {
+      strftime(the_date, 20, "%Y_%m_%d_%T", gmtime(&now));
+    }
+
+    std::string s = std::string(the_date);
+    s = "logs/" + s;
+    s +=".txt";
+
+    std::cout << "creating log, log name: "<< s << std::endl;
+    logfile = new std::ofstream(s);
     //(*logfile) << "LOG TEST" << std::endl;
     //logfile->close();
 
