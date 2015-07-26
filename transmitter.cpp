@@ -207,6 +207,9 @@ void Transmitter::writeToSerial(std::string message)
 {
   //std::cout << "Write to serial port: " << message << std::endl;
   //printf("Write to serial port\n");
+
+  (*logfile) << "sent: " << message << std::endl;;
+
   message+='\n';
 
   while(lock)
@@ -235,7 +238,6 @@ void Transmitter::writeToSerial(std::string message)
   lock = false;
 
   //std::cout << "message sent: " << message;
-  (*logfile) << "sent: " << message;
 
   //is the message coming back? turn off echo in stty..
   // turn off conversion of characters with -icrnl

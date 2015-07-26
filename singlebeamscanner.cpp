@@ -185,7 +185,7 @@ void SingleBeamScanner::startScan()
   double targetLine = targetY;
 
   bool stop = false;
-  double tol = 300000000; // radius around target
+  double tol = 3000000; // radius around target
 
   //start sweeping
   while(!stop)
