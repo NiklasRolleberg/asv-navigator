@@ -16,6 +16,9 @@ private:
     double boat_longitude;
     double boat_heading_real;
 
+    double boat_targetLat;
+    double boat_targetLon;
+
     double boat_xpos;
     double boat_ypos;
     double boat_heading_local;

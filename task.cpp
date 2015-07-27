@@ -9,6 +9,7 @@ Task::Task()
     std::cout << "Task: Default constructor" << std::endl;
     type = 0;
     message = "";
+    polygon_ptr = nullptr;
 }
 
 Task::Task(int sleepTime, bool drift)
@@ -17,6 +18,7 @@ Task::Task(int sleepTime, bool drift)
     type = 1;
     delay = sleepTime;
     std::cout << "delay time: " << delay << std::endl;
+    polygon_ptr = nullptr;
 }
 
 Task::Task(double coordinate1, double coordinate2)
@@ -26,6 +28,7 @@ Task::Task(double coordinate1, double coordinate2)
     std::cout << "GOTO point: ("<< coordinate1 << "," << coordinate2 << ")" << std::endl;
     targetLat = coordinate1;
     targetLon = coordinate2;
+    polygon_ptr = nullptr;
 }
 
 Task::Task(Polygon* polygon)
@@ -45,11 +48,13 @@ Task::Task(std::string incMessage)
     std::cout << "Task: send message contructor" << std::endl;
     type = 4;
     message = incMessage;
+    polygon_ptr = nullptr;
 }
 
 
 Task::~Task()
 {
+    //std::cout << "TASK destructor called" << std::endl;
     if(polygon_ptr != nullptr)
         delete polygon_ptr;
     std::cout << "Task destructor" << std::endl;

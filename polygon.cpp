@@ -10,6 +10,8 @@ Polygon::Polygon(std::vector<double> *lat, std::vector<double> *lon)
     std::cout << "Polygon constructor" << std::endl;
     latitude = lat;
     longitude = lon;
+    xPoints = NULL;
+    yPoints = NULL;
     localSet = false;
     matrix = NULL;
     /*
@@ -21,7 +23,9 @@ Polygon::Polygon(std::vector<double> *lat, std::vector<double> *lon)
 
 Polygon::~Polygon()
 {
+    //std::cout << "polygon destructor called" << std::endl;
     //delete element matrix
+
     if(matrix != NULL)
     {
       for (int i = 0; i < nx; ++i)
@@ -36,6 +40,7 @@ Polygon::~Polygon()
         delete matrix[i];
       }
       delete matrix;
+      std::cout << "Matrix deleted" << std::endl;
     }
 
 
@@ -47,12 +52,18 @@ Polygon::~Polygon()
       //std::cout << "vecor size:" << polygonSegments.size() << std::endl;
     }
 
+    //std::cout << "polygonSegments deleted" << std::endl;
+
 
     delete xPoints;
     delete yPoints;
 
+    //std::cout << "x&y deleted" << std::endl;
+
     delete latitude;
     delete longitude;
+
+    //std::cout << "latlong deleted" << std::endl;
 
     std::cout << "Polygon destructor" << std::endl;
 }

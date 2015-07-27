@@ -175,17 +175,21 @@ void SingleBeamScanner::startScan()
   bool goToRight = false;//(Math.random() < 0.5); //traveling from left side to right
   bool goToNextLine = true;
   bool skipRest = false; //true -> the boat has to find a new waypoint
-  double targetY = data->getX();
+  double targetY = data->getY();
   double targetX = region->findX(targetY, !goToRight);
-
   data->setBoatWaypoint_local(targetX,targetY);
+
+  //north out south
+  int updown = 1;
+  if(targetY > (region->yMax/2.0))
+    updown = -1;
 
   double dx;// = targetX-data->getX();
   double dy;// = targetY-data->getY();
   double targetLine = targetY;
 
   bool stop = false;
-  double tol = 3000000; // radius around target
+  double tol = 2; // radius around target
 
   //start sweeping
   while(!stop)
@@ -205,7 +209,7 @@ void SingleBeamScanner::startScan()
       if(goToNextLine)
       {
         std::cout << "GO TO NEXT LINE" << std::endl;
-        targetLine +=delta;
+        targetLine +=delta*updown;
         targetY = targetLine;
         targetX = region->findX(targetY, !goToRight);
         goToNextLine = false;

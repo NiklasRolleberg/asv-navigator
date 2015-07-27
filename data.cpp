@@ -27,6 +27,9 @@ Data::Data(Transmitter* transmitter,int delay, int arg3)
     boat_latitude = 59.300837;
     boat_longitude = 18.214686;
 
+    boat_targetLat = 59.3534;
+    boat_targetLon = 18.34343;
+
     boat_heading_real = 0;
 
     boat_xpos = 0;
@@ -246,10 +249,13 @@ double Data::getDepth()
 void Data::threadLoop()
 {
   std::cout << "Data loop started" << std::endl;
-  int i=0;
+  bool i = false;
   while(!data_stop)
   {
     data_transmitterptr->requestData();
+    //if(i)
+      //data_transmitterptr->sendMessage("$MSGCP,*00");
+    i = (i==false);
     usleep(data_delay);
     std::queue<std::string>* messages = data_transmitterptr->getMessages();
 
@@ -268,7 +274,7 @@ void Data::threadLoop()
 void Data::processMessage(std::string m)
 {
 
-  std::cout << "message rescieved: " << m << std::endl;
+  //std::cout << "message rescieved: " << m << std::endl;
 
   //TODO GÖR OM ALLT!
 
@@ -286,61 +292,53 @@ void Data::processMessage(std::string m)
 
   if(startIndex != -1 && (m.length() - startIndex) > 6)
   {
-    //std::cout << "first if" << std::endl;
-    if(m[startIndex+1] == 'M' &&
-       m[startIndex+2] == 'S' &&
-       m[startIndex+3] == 'G' &&
-       m[startIndex+4] == 'P' &&
-       m[startIndex+5] == 'S')
+    if(m.substr(startIndex+1,5) == "MSGPS")
     {
-    //std::cout << "Its a position message!" << std::endl;
-    //std::cout << m << std::endl;
-
-    //find latitude
-
-    //first ','
-    int firstIndex = startIndex+6;
-    int lastIndex;
-    std::string latitude = "";
-    for(int i=firstIndex+1; i<m.length() ;i++)
-    {
-      if(m[i] == ',')
+      //find latitude
+      //first ','
+      int firstIndex = startIndex+6;
+      int lastIndex;
+      std::string latitude = "";
+      for(int i=firstIndex+1; i<m.length() ;i++)
       {
-        lastIndex = i;
-        break;
+        if(m[i] == ',')
+        {
+          lastIndex = i;
+          break;
+        }
+        latitude += m[i];
       }
-      latitude += m[i];
+
+    	//find longitude
+    	firstIndex = lastIndex;
+    	std::string longitude = "";
+    	for(int i=firstIndex+1; i<m.length() ;i++)
+    	{
+    	  if(m[i] == ',')
+    	  {
+    	    lastIndex = i;
+    	    break;
+    	  }
+    	  longitude += m[i];
+    	}
+
+    	//std::cout << "LATITUDE: " << latitude  << "\n" << "LONGITUDE: " << longitude << std::endl;
+
+    	boat_latitude = strtod(latitude.c_str(),NULL);
+    	boat_longitude = strtod(longitude.c_str(),NULL);
+
+    	if(localEnabled)
+    	{
+    	  boat_xpos = lonTOx(boat_longitude);
+    	  boat_ypos = latTOy(boat_latitude);
+    	  //std::cout << "Local coordinates: (" << boat_xpos << "," << boat_ypos << ")" <<std::endl;
+    	}
+
+    	//std::cout << "boat LATITUDE: " << boat_latitude  << "\n" << "boat LONGITUDE: " << boat_longitude << std::endl;
     }
-
-  	//find longitude
-
-  	firstIndex = lastIndex;
-  	std::string longitude = "";
-  	for(int i=firstIndex+1; i<m.length() ;i++)
-  	{
-  	  if(m[i] == ',')
-  	  {
-  	    lastIndex = i;
-  	    break;
-  	  }
-  	  longitude += m[i];
-  	}
-
-  	//std::cout << "LATITUDE: " << latitude  << "\n" << "LONGITUDE: " << longitude << std::endl;
-
-  	boat_latitude = strtod(latitude.c_str(),NULL);
-  	boat_longitude = strtod(longitude.c_str(),NULL);
-
-  	if(localEnabled)
-  	{
-  	  boat_xpos = lonTOx(boat_longitude);
-  	  boat_ypos = latTOy(boat_latitude);
-  	  //std::cout << "Local coordinates: (" << boat_xpos << "," << boat_ypos << ")" <<std::endl;
-  	}
-
-  	//std::cout << "boat LATITUDE: " << boat_latitude  << "\n" << "boat LONGITUDE: " << boat_longitude << std::endl;
-
-    return;
+    else if(m.substr(startIndex+1,5) == "MSCPA")
+    {
+      //std::cout << "Current path message rescieved" << std::endl;
     }
   }
   //std::cout << "Unknown message: " << m << std::endl;
