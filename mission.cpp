@@ -149,9 +149,6 @@ Mission::Mission(int arg0)
     lon->push_back(18.213855);
 
 
-
-
-
     taskQueue.push(new Task(new Polygon(lat,lon)));
 }
 

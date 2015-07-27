@@ -12,10 +12,11 @@ private:
     Data* data;
     Polygon* polygon;
     double delta;
+    double tol;
     int delay;
 public:
     /**Constructor*/
-  SingleBeamScanner(Data* data, Polygon* polygon,double delta);
+  SingleBeamScanner(Data* data, Polygon* polygon,double delta,double tol);
 
     /**Destructor*/
     ~SingleBeamScanner();

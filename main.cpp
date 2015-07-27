@@ -8,6 +8,9 @@
 
 int main()
 {
+  std::cout << "------------------------------------"<< std::endl;
+  std::cout << "---------------START----------------"<< std::endl;
+  std::cout << "------------------------------------"<< std::endl;
 
   std::cout << "Main: program started" << std::endl;
 
@@ -29,13 +32,13 @@ int main()
 
   //Mission* mission = new Mission(0);
 
-  std::cout << "------------------------------------"<< std::endl;
+  std::cout << "\n---------starting mission-----------\n"<< std::endl;
 
   Transmitter* transmitter = new Transmitter(2);
   transmitter->start();
 
   // (2) Create the navigator, and pass the transmitter to it
-  Navigator* navigator = new Navigator(transmitter,3);
+  Navigator* navigator = new Navigator(transmitter,5,4);
 
   // (3) give the navigator a mission
   navigator->setMission(mission);
@@ -50,5 +53,10 @@ int main()
   delete navigator;
   delete mission;
   delete transmitter;
+
   std::cout << "Main: program done" << std::endl;
+
+  std::cout << "------------------------------------"<< std::endl;
+  std::cout << "----------------DONE----------------"<< std::endl;
+  std::cout << "------------------------------------"<< std::endl;
 }

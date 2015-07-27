@@ -8,12 +8,13 @@
 #include "singlebeamscanner.hpp"
 #include <string>
 
-Navigator::Navigator(Transmitter* transmitter, double d)
+Navigator::Navigator(Transmitter* transmitter, double d, double t)
 {
     tr_ptr = transmitter;
     std::cout << "Navigator: constructor" << std::endl;
     data = new Data(transmitter,1000000,0); // 1000000 1s
     delta = d;
+    tol = t;
 }
 
 Navigator::~Navigator()
@@ -86,7 +87,7 @@ void Navigator::goToCoordinates(Task* task)
 
     data->setBoatWaypoint_real(lat, lon);
     double d = data->calculateDistance(lat,lon, data->getLat(), data->getLon());
-    double tol = 2;
+    double tol = 5;
     while(d > tol)
     {
       usleep(1000000);
@@ -101,7 +102,7 @@ void Navigator::scanPolygon(Task* task)
 {
     std::cout << "Navigator: execute scan polygon task" << std::endl;
     data->setLocalCoordinateSystem(task->getPolygon(),delta);
-    SingleBeamScanner scanner = SingleBeamScanner(data, task->getPolygon(),delta);
+    SingleBeamScanner scanner = SingleBeamScanner(data, task->getPolygon(),delta, tol);
     std::cout << "start scanning" << std::endl;
     scanner.startScan();
     //usleep(2000000);

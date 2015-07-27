@@ -10,13 +10,14 @@
 #include <iomanip>
 //#include element
 
-SingleBeamScanner::SingleBeamScanner(Data* dataptr, Polygon* polygonptr, double d)
+SingleBeamScanner::SingleBeamScanner(Data* dataptr, Polygon* polygonptr, double d, double t)
 {
   std::cout << "scanner:SingleBeamScanner constructor" << std::endl;
   data = dataptr;
   polygon = polygonptr;
   delay = 1000000;
   delta = d;
+  tol = t;
 }
 
 
@@ -189,7 +190,7 @@ void SingleBeamScanner::startScan()
   double targetLine = targetY;
 
   bool stop = false;
-  double tol = 2; // radius around target
+  //double tol = 5; // radius around target
 
   //start sweeping
   while(!stop)
