@@ -86,7 +86,6 @@ void Navigator::goToCoordinates(Task* task)
 
     data->setBoatWaypoint_real(lat, lon);
     double d = data->calculateDistance(lat,lon, data->getLat(), data->getLon());
-    double tol = 5;
     while(d > tol)
     {
       usleep(1000000);

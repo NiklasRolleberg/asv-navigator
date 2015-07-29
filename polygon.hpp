@@ -21,24 +21,17 @@ private:
     std::vector<double>* xPoints;// = nullptr;
     std::vector<double>* yPoints;// = nullptr;
 
-    double maxX;
-    double minX;
-    double maxY;
-    double minY;
-
-    double delta;
-
-    /*
-    int nx;
-    int ny;
-    Element*** matrix;
-    */
-
-
 public:
 
     int nx;
     int ny;
+
+    double maxX;
+    double minX;
+    double maxY;
+    double minY;
+    double delta;
+
 
     Element*** matrix;
     std::vector<PolygonSegment*>polygonSegments;

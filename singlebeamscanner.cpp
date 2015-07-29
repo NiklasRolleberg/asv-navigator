@@ -195,9 +195,17 @@ void SingleBeamScanner::startScan()
   //start sweeping
   while(!stop)
   {
-    dx = targetX-data->getX();//data[0];
-    dy = targetY-data->getY();//data[1];
+    double x = data->getX();
+    double y = data->getY();
+    double depth = 10;
+
+    dx = targetX-x;
+    dy = targetY-y;
     //--set speed--
+
+    //update depth
+    //updateDepth(polygon,x,y,depth,false);
+
 
     std::cout << "Distance to target: " << sqrt(dx*dx + dy*dy) << std::endl;
     //target reached -> choose new target
@@ -253,6 +261,29 @@ void SingleBeamScanner::startScan()
     usleep(delay);
   }
   std::cout <<"SweepingPattern done" << std::endl;
+}
+
+void SingleBeamScanner::updateDepth(Polygon* polygon, double x, double y, double depth, bool followingLand)
+{
+  std::cout << "Updating depth" << std::endl;
+  if(!followingLand)
+  {
+    //find index
+    int ix = (int) round((x - polygon->minX) / polygon->delta);
+    int iy = (int) round((y - polygon->minY) / polygon->delta);
+
+    std::cout << "Updating depth at (" << ix << "," << iy << ")" << std::endl;
+    std::cout << "x:" << x << std::endl;
+    std::cout << "y:" << y << std::endl;
+
+
+  }
+  else
+  {
+    std::cout << "Not implemented" << std::endl;
+  }
+
+
 }
 
 void SingleBeamScanner::abortScan()

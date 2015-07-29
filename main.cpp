@@ -38,7 +38,7 @@ int main()
   transmitter->start();
 
   // (2) Create the navigator, and pass the transmitter to it
-  Navigator* navigator = new Navigator(transmitter,10,7);
+  Navigator* navigator = new Navigator(transmitter,10,1);
 
   // (3) give the navigator a mission
   navigator->setMission(mission);
