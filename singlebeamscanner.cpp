@@ -80,13 +80,13 @@ void SingleBeamScanner::startScan()
     //std::cout << targetLat << " " << targetLon << std::endl;
 
     int lap = 0; //0
-    double threshold = 10;
+    double threshold = 5;
     while(lap < 4)
     {
         usleep(500000);
         d = data->calculateDistance(data->getLat(),data->getLon(),targetLat, targetLon);
         std::cout << "scanner:distance to target " << d << std::endl;
-        data->data_transmitterptr->sendMessage("$MSGCP,*00");
+        //data->data_transmitterptr->sendMessage("$MSGCP,*00");
         if(d < threshold)
         {
             std::cout << "scanner:waypoint reached, picking the next one" << std::endl;
@@ -102,8 +102,8 @@ void SingleBeamScanner::startScan()
             data->setBoatWaypoint_real(targetLat, targetLon);
             //data->setBoatSpeed(targetSpeed);
         }
-    }*/
-
+    }
+    */
 
     /**Local
     //first test: make the boat run on the edges of the polygon

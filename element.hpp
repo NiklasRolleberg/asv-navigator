@@ -23,8 +23,8 @@ public:
 
   //void getStatus();
   //void setStatus(int newStatus);
-
   //void updateDepth(double newDepth);
+  //double getDepth();
 
 };
 
