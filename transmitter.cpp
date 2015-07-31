@@ -30,7 +30,7 @@ Transmitter::Transmitter(int arg0)
     messageQueue = new std::queue<std::string>();
 
     // NO BOOST
-    serialPort = open("/dev/ttyUSB0", O_RDWR | O_NOCTTY | O_NDELAY);
+    serialPort = open("/dev/ttyUSB1", O_RDWR | O_NOCTTY | O_NDELAY);
     if(serialPort == -1)
       std::cout << "failed" << std::endl;
     else
@@ -225,7 +225,7 @@ void Transmitter::writeToSerial(std::string message)
   int wr=write(serialPort,message.c_str(),message.size());
 
   if(wr < 0)
-  {void writeToLog(std::string s);
+  {
       //std::cout << "Writing error" << std::endl;
   }
 
