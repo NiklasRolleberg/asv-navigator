@@ -100,20 +100,17 @@ public:
     /**Get boat heading*/
     double getHeading();
 
-
     /**Get boat speed*/
     double getSpeed();
 
     /**Get Depth*/
     double getDepth();
 
-
     /**Set waypoint for the boat*/
     void setBoatWaypoint_real(double lat, double lon);
 
     /**Set waypoint for the boat*/
     void setBoatWaypoint_local(double x, double y);
-
 
     /**Set waypoint for the boat*/
     void setBoatSpeed(double speed);
@@ -123,7 +120,6 @@ public:
 
     /**Write a message to the transmitter log*/
     void writeToLog(std::string s);
-
 };
 
 

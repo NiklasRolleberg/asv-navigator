@@ -105,69 +105,7 @@ void SingleBeamScanner::startScan()
     }
     */
 
-    /**Local
-    //first test: make the boat run on the edges of the polygon
-    std::vector<double>* ypoints = polygon->getYBoundaries();
-    std::vector<double>* xpoints = polygon->getXBoundaries();
-
-    double boatX = data->getX();
-    double boatY = data->getY();
-
-    std::cout << "boat pos: << " << boatX << "," << boatY << std::endl;
-
-    //1) find closest node.
-    int index = -1;
-    double minimum = std::numeric_limits<double>::max();
-    //std::cout << minimum << std::endl;
-    double d = 0;
-    for(int i=0;i< xpoints->size();i++)
-    {
-        double dx = xpoints->at(i) - boatX;
-        double dy = ypoints->at(i) - boatY;
-        d = sqrt(dx*dx+dy*dy);
-        std::cout << d << std::endl;
-        if(d<minimum)
-        {
-            index = i;
-            minimum = d;
-        }
-    }
-
-    std::cout << "scanner:minimum found: " << minimum << " at index " << index << std::endl;
-
-    double targetX = xpoints->at(index);
-    double targetY = ypoints->at(index);
-    double targetSpeed = 1;
-
-    data->setBoatWaypoint_local(targetX,targetY);
-
-    int lap = 0;
-    while(lap < 3)
-    {
-      usleep(2000000);
-
-      boatX = data->getX();
-      boatY = data->getY();
-      std::cout << "scanner: boat local coordinates: (" << boatX << "," << boatY << ")" << std::endl;
-      double dx = xpoints->at(index) - boatX;
-      double dy = ypoints->at(index) - boatY;
-      d = sqrt(dx*dx+dy*dy);
-      std::cout << "scanner: Distance: " << d << std::endl;
-
-      if(d<10)
-      {
-        index ++;
-        index = index % xpoints->size();
-        targetX = xpoints->at(index);
-        targetY = ypoints->at(index);
-        std::cout << "target reached" << std::endl;
-        data->setBoatWaypoint_local(targetX,targetY);
-
-         if(index == 0)
-            lap++;
-       }
-   }
-   */
+ //-------------------------------------------------------------------------------------
 
   std::cout << "sweeping pattern, delta = " << delta << std::endl;
 
@@ -204,7 +142,7 @@ void SingleBeamScanner::startScan()
     //--set speed--
 
     //update depth
-    //updateDepth(polygon,x,y,depth,false);
+    //updateDepth(polygon,x,y,depth,false);------------------------------------------------------------
 
 
     std::cout << "Distance to target: " << sqrt(dx*dx + dy*dy) << std::endl;
@@ -261,22 +199,29 @@ void SingleBeamScanner::startScan()
     usleep(delay);
   }
   std::cout <<"SweepingPattern done" << std::endl;
+  //polygon->saveMatrix();----------------------------------------------------------------------
 }
 
 void SingleBeamScanner::updateDepth(Polygon* polygon, double x, double y, double depth, bool followingLand)
 {
-  std::cout << "Updating depth" << std::endl;
+  //find index
+  int ix = (int) round((x - polygon->minX) / polygon->delta);
+  int iy = (int) round((y - polygon->minY) / polygon->delta);
+
+  if(ix < 0 || ix > polygon->nx || iy < 0 || iy > polygon->ny)
+  {
+    std::cout << "index Oob" << std::endl;
+    return;
+  }
+
   if(!followingLand)
   {
-    //find index
-    int ix = (int) round((x - polygon->minX) / polygon->delta);
-    int iy = (int) round((y - polygon->minY) / polygon->delta);
-
+    /*
     std::cout << "Updating depth at (" << ix << "," << iy << ")" << std::endl;
     std::cout << "x:" << x << std::endl;
     std::cout << "y:" << y << std::endl;
-
-
+    */
+    polygon->matrix[ix][iy]->updateDepth(1);
   }
   else
   {

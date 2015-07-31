@@ -59,13 +59,15 @@ public:
     std::vector<double>* getXBoundaries();
     std::vector<double>* getYBoundaries();
 
+    /**Save the element matrix for debuging*/
+    void saveMatrix();
+
   /* more functions to be implemented
      get segmentList <vector kanske>
      get matrix
      bool insidePolygon
      get max,min of x and y
      get delta?
-
   */
 
 

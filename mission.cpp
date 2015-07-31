@@ -344,7 +344,7 @@ Mission::~Mission()
 
 Task* Mission::getNextTask()
 {
-    std::cout << "Mission: getNextTask" << std::endl;
+    //std::cout << "Mission: getNextTask" << std::endl;
     if(!taskQueue.empty())
     {
         Task* task = taskQueue.front();

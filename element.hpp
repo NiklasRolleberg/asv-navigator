@@ -10,8 +10,10 @@ class Element
 private:
 
   std::vector<Element*> neighbours;
-  double posx;
-  double posy;
+  int indexX;
+  int indexY;
+  double posX;
+  double posY;
   double accumulatedDepth;
   int timesVisited;
   int status;
@@ -21,11 +23,16 @@ public:
   Element(double px, double py, int ix, int iy);
   ~Element();
 
-  //void getStatus();
-  //void setStatus(int newStatus);
-  //void updateDepth(double newDepth);
-  //double getDepth();
+  int getStatus();
+  void setStatus(int newStatus);
+  void updateDepth(double newDepth);
+  double getDepth();
+  int getTimesVisited();
 
+  //int[] getIndex();
+  double getX();
+  double getY();
+  std::vector<Element*>* getNeighbours();
 };
 
 

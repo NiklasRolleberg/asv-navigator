@@ -35,7 +35,7 @@ void Navigator::start()
     //start data collection from the boat
     data->start();
 
-
+    std::cout << std::endl;
     Task* t = nullptr;
     while((t = mission_ptr->getNextTask()) != nullptr)
     {
@@ -61,8 +61,8 @@ void Navigator::start()
             default:
 				        std::cout << "Unknown task type " << type << std::endl;
         }
-		delete t ; //memory  leak... --------------------------------------------------------------------------------- //TODO fix this
-		//std::cout << "delete t.." << std::endl;
+        delete t ; //memory  leak... --------------------------------------------------------------------------------- //TODO fix this
+	      std::cout << std::endl;
     }
 
 

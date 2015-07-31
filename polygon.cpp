@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <limits>
+#include <fstream>
 #include "element.hpp"
 #include "segment.hpp"
 
@@ -123,10 +124,10 @@ void Polygon::initialize()
   }
 
   //add a few meters to avoid segmentation fault
-  minX-=10;
-  minY-=10;
-  maxX+=10;
-  maxY+=10;
+  //minX-=10;
+  //minY-=10;
+  //maxX+=10;
+  //maxY+=10;
 
   std::cout << "maxX: " << maxX << ", minX: " << minX << "\nmaxY: " << maxY << ", minY: " << minY << std::endl;
 
@@ -140,17 +141,18 @@ void Polygon::initialize()
   std::cout << "delta=" << delta << "-> grid size is: " << nx << "x" << ny << std::endl;
 
   //TODO (1) create a polygon-segment object for the entire polygon (searchCell in kexet)
-  //PolygonSegment* ps = new PolygonSegment(nullptr,nullptr);
-  //delete ps;
 
   // add PolygonSegment
   polygonSegments.push_back(new PolygonSegment(xPoints,yPoints));
 
   //TODO (2) (check if the segment is convex, if not it should be triangulated) kanske senare iaf
 
+
+  std::cout << "creating " << nx*ny << "elements" << std::endl;
+
   /*
-  nx = 3;
-  ny = 2;
+  //nx = 3;
+  //ny = 2;
   // Create the 2d array:
   matrix = new Element**[nx];
   for (int i = 0; i < nx; ++i)
@@ -162,12 +164,13 @@ void Polygon::initialize()
   {
     for (int j = 0; j < ny; ++j)
     {
-      matrix[i][j] = new Element(0.0,0.0,0,0);
+      matrix[i][j] = new Element(minX + delta*i, minY + delta*j,i,j);
       //TODO set the status of the element depending on if it is outside or inside the polygon
       //TODO check this by using methods in the polygon-segment class
     }
   }
   */
+
   //TODO add neighbours to elements that are inside the polygon
 
   //TODO (add elements-pointers to the polygon segment objects)
@@ -180,4 +183,24 @@ std::vector<double>* Polygon::getXBoundaries()
 std::vector<double>* Polygon::getYBoundaries()
 {
   return yPoints;
+}
+
+void Polygon::saveMatrix()
+{
+  std::cout << "Saving matrix" << std::endl;
+  std::string fileName = "logs/matrix.txt";
+  //std::ofstream logfile = std::ofstream(fileName);
+  std::ofstream *logfile = new std::ofstream(fileName);
+
+  for(int j=0;j<ny;j++) {
+    for(int i=0;i<nx-1;i++) {
+        (*logfile) << matrix[i][j]->getDepth() << ", ";
+    }
+    (*logfile) << matrix[nx-1][j]->getDepth() << std::endl;
+  }
+
+  std::cout << "matrix saved" << std::endl;
+
+  logfile->close();
+  delete logfile;
 }
