@@ -27,7 +27,7 @@ private:
 
     bool data_stop; //= false; //false
     int data_delay; //= 500000; //0.5s
-    Transmitter* data_transmitterptr;
+    //Transmitter* data_transmitterptr; //TODO fixa
     std::thread *data_threadptr;// = nullptr;
     Polygon* localPolygon;// = nullptr;
 
@@ -57,8 +57,7 @@ private:
     double yTOlat(double y);
 
 public:
-
-  //Transmitter* data_transmitterptr;
+    Transmitter* data_transmitterptr;
 
     Data(){};
 

@@ -350,7 +350,7 @@ void Data::setBoatWaypoint_real(double lat, double lon)
 {
     std::cout << "Data: Set real waypoint, real coordinates: ("<< lat <<","<< lon << ")" << std::endl;
     std::stringstream s;
-    s << "$MSSCP,0,0,0," << std::setprecision(10) << lat << "," << lon << ",0,0,*00";
+    s << "$MSSCP,0,0,0," << std::setprecision(10) << lat << "," << lon << ",0,999,*00";
     //s << "$MSSCP,,,," << lat << "," << lon << ",,,*00";
     data_transmitterptr->sendMessage(s.str());
     data_transmitterptr->sendMessage("$MSSTA,*00");
