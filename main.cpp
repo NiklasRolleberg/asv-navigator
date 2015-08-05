@@ -39,7 +39,7 @@ int main()
 
   // (2) Create the navigator, and pass the transmitter to
   double delta = 10;
-  double tol = 5;
+  double tol = 5000000;
 
   Navigator* navigator = new Navigator(transmitter,delta,tol);
 

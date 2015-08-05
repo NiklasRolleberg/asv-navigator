@@ -148,11 +148,11 @@ void Polygon::initialize()
   //TODO (2) (check if the segment is convex, if not it should be triangulated) kanske senare iaf
 
 
-  std::cout << "creating " << nx*ny << "elements" << std::endl;
 
-  /*
   //nx = 3;
   //ny = 2;
+
+  /*
   // Create the 2d array:
   matrix = new Element**[nx];
   for (int i = 0; i < nx; ++i)
@@ -169,6 +169,7 @@ void Polygon::initialize()
       //TODO check this by using methods in the polygon-segment class
     }
   }
+  std::cout << nx*ny << " elements created" << std::endl;
   */
 
   //TODO add neighbours to elements that are inside the polygon
@@ -187,9 +188,11 @@ std::vector<double>* Polygon::getYBoundaries()
 
 void Polygon::saveMatrix()
 {
+  if(matrix == NULL)
+    return;
+
   std::cout << "Saving matrix" << std::endl;
-  std::string fileName = "logs/matrix.txt";
-  //std::ofstream logfile = std::ofstream(fileName);
+  std::string fileName = "logs/matrix.csv";
   std::ofstream *logfile = new std::ofstream(fileName);
 
   for(int j=0;j<ny;j++) {

@@ -43,7 +43,7 @@ void SingleBeamScanner::startScan()
   std::cout << "scanner:SingleBeamScanner: starting scan" << std::endl;
 
     //real coordinates
-
+/*
     //first test: make the boat run on the edges of the polygon
     std::vector<double>* lat = polygon->getLatBoundaries();
     std::vector<double>* lon = polygon->getLonBoundaries();
@@ -117,10 +117,10 @@ void SingleBeamScanner::startScan()
             //data->setBoatSpeed(targetSpeed);
         }
     }
-
+*/
 
  //-------------------------------------------------------------------------------------
- /*
+
   std::cout << "sweeping pattern, delta = " << delta << std::endl;
 
   PolygonSegment* region = polygon->polygonSegments.at(0);
@@ -156,7 +156,7 @@ void SingleBeamScanner::startScan()
     //--set speed--
 
     //update depth
-    //updateDepth(polygon,x,y,depth,false);------------------------------------------------------------
+    updateDepth(polygon,x,y,depth,false);
 
 
     std::cout << "Distance to target: " << sqrt(dx*dx + dy*dy) << std::endl;
@@ -200,7 +200,6 @@ void SingleBeamScanner::startScan()
       }
 
       std::cout << "TARGET: " << targetX << " " << targetY <<std::endl;
-      //xte.setWaypoint(lastTargetX, lastTargetY, targetX, targetY);
       data->setBoatWaypoint_local(lastTargetX,lastTargetY,targetX,targetY,targetSpeed);
       if(skipRest)
       {
@@ -213,8 +212,7 @@ void SingleBeamScanner::startScan()
     usleep(delay);
   }
   std::cout <<"SweepingPattern done" << std::endl;
-  //polygon->saveMatrix();---------------------------------------------------------------------- //TODO ha med
-  */
+  polygon->saveMatrix();
 }
 
 void SingleBeamScanner::updateDepth(Polygon* polygon, double x, double y, double depth, bool followingLand)
@@ -236,7 +234,8 @@ void SingleBeamScanner::updateDepth(Polygon* polygon, double x, double y, double
     std::cout << "x:" << x << std::endl;
     std::cout << "y:" << y << std::endl;
     */
-    polygon->matrix[ix][iy]->updateDepth(1);
+    if(polygon->matrix != NULL)
+      polygon->matrix[ix][iy]->updateDepth(1);
   }
   else
   {
