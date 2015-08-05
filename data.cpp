@@ -24,8 +24,9 @@ Data::Data(Transmitter* transmitter,int delay, int arg3)
     //boat_longitude = 18.073585;
 
     //59.300837,18.214686
-    boat_latitude = 59.300837;
-    boat_longitude = 18.214686;
+    //59.296566, 18.226487
+    boat_latitude = 59.296566;
+    boat_longitude = 18.226487;
 
     boat_targetLat = 59.3534;
     boat_targetLon = 18.34343;
@@ -261,11 +262,9 @@ void Data::threadLoop()
 
     for(int i=0;i< messages->size();i++)
     {
-	     //std::cout << "DATA: "<< messages->front() << std::endl;
-	      processMessage(messages->front());
-	       messages->pop();
-     }
-
+      processMessage(messages->front());
+      messages->pop();
+    }
   }
   std::cout << "Data loop done" << std::endl;
 }
@@ -273,11 +272,7 @@ void Data::threadLoop()
 
 void Data::processMessage(std::string m)
 {
-
   //std::cout << "message rescieved: " << m << std::endl;
-
-  //TODO GÖR OM ALLT!
-
   //std::cout << "processMessage" << std::endl;
   int startIndex = -1;
   for(int i=0;i<m.length();i++)
@@ -345,22 +340,21 @@ void Data::processMessage(std::string m)
 }
 
 
-
-void Data::setBoatWaypoint_real(double lat, double lon)
+void Data::setBoatWaypoint_real(double lat0, double lon0,double lat1, double lon1, double speed)
 {
-    std::cout << "Data: Set real waypoint, real coordinates: ("<< lat <<","<< lon << ")" << std::endl;
+    std::cout << "Data: Set real waypoint, real coordinates: (" << lat0 << "," << lon0 << ") -> ("<< lat1 <<","<< lon1 << ")" << std::endl;
     std::stringstream s;
-    s << "$MSSCP,0,0,0," << std::setprecision(10) << lat << "," << lon << ",0,999,*00";
+    s << "$MSSCP,0,0,0," << std::setprecision(10) << lat1 << "," << lon1 << ",0,"<< speed << ",*00";
     //s << "$MSSCP,,,," << lat << "," << lon << ",,,*00";
     data_transmitterptr->sendMessage(s.str());
     data_transmitterptr->sendMessage("$MSSTA,*00");
 }
 
-void Data::setBoatWaypoint_local(double x, double y)
+void Data::setBoatWaypoint_local(double x0, double y0,double x1, double y1, double speed)
 {
-    std::cout << "Data: Set local waypoint, local coordinates: (" << x << "," << y << ")" << std::endl;
+    std::cout << "Data: Set local waypoint, local coordinates:: (" << x0 << "," << y0 << ") -> (" << x1 << "," << y1 << ")" << std::endl;
 
-    setBoatWaypoint_real(yTOlat(y),xTOlon(x));
+    setBoatWaypoint_real(yTOlat(y0),xTOlon(x0),yTOlat(y1),xTOlon(x1),speed);
 
 }
 
@@ -394,4 +388,9 @@ double Data::calculateDistance(double lat1,double lon1,double lat2,double lon2)
 void Data::writeToLog(std::string s)
 {
   data_transmitterptr->writeToLog(s);
+}
+
+void Data::sendMessage(std::string s)
+{
+    data_transmitterptr->sendMessage(s);
 }

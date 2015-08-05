@@ -72,9 +72,11 @@ void SingleBeamScanner::startScan()
     //
     double targetLat = lat->at(index);
     double targetLon = lon->at(index);
+    double lastTargetLat = 0;
+    double lastTargetLon = 0;
     double targetSpeed = 3;
 
-    data->setBoatWaypoint_real(targetLat, targetLon);
+    data->setBoatWaypoint_real(lastTargetLat, lastTargetLon, targetLat, targetLon, targetSpeed);
     //data->setBoatSpeed(targetSpeed);
 
     //std::cout << targetLat << " " << targetLon << std::endl;
@@ -89,11 +91,13 @@ void SingleBeamScanner::startScan()
         usleep(500000);
         d = data->calculateDistance(data->getLat(),data->getLon(),targetLat, targetLon);
         std::cout << "scanner:distance to target " << d << std::endl;
-        //data->data_transmitterptr->sendMessage("$MSGCP,*00");
-        if(temp == 0){
-          data->data_transmitterptr->sendMessage("$MSSMC,*00");
-          data->data_transmitterptr->sendMessage("$MSSTA,*00");
-        }
+        //data->sendMessage("$MSGCP,*00");
+
+        //if(temp == 0){
+        //  data->data_transmitterptr->sendMessage("$MSSMC,*00");
+        //  data->data_transmitterptr->sendMessage("$MSSTA,*00");
+        //}
+
         if(d < tol)
         {
             std::cout << "scanner:waypoint reached, picking the next one" << std::endl;
@@ -104,16 +108,19 @@ void SingleBeamScanner::startScan()
                 lap++;
             }
 
+            lastTargetLat = targetLat;
+            lastTargetLon = targetLon;
+
             targetLat = lat->at(index);
             targetLon = lon->at(index);
-            data->setBoatWaypoint_real(targetLat, targetLon);
+            data->setBoatWaypoint_real(lastTargetLat, lastTargetLon, targetLat, targetLon, targetSpeed);
             //data->setBoatSpeed(targetSpeed);
         }
     }
 
 
  //-------------------------------------------------------------------------------------
-/*
+ /*
   std::cout << "sweeping pattern, delta = " << delta << std::endl;
 
   PolygonSegment* region = polygon->polygonSegments.at(0);
@@ -123,9 +130,10 @@ void SingleBeamScanner::startScan()
   bool skipRest = false; //true -> the boat has to find a new waypoint
   double targetY = data->getY();
   double targetX = region->findX(targetY, !goToRight);
-  data->setBoatWaypoint_local(targetX,targetY);
+  double targetSpeed = 5;
+  data->setBoatWaypoint_local(0,0,targetX,targetY,targetSpeed);
 
-  //north out south
+  //north or south
   int updown = 1;
   if(targetY > (region->yMax/2.0))
     updown = -1;
@@ -135,7 +143,6 @@ void SingleBeamScanner::startScan()
   double targetLine = targetY;
 
   bool stop = false;
-  //double tol = 5; // radius around target
 
   //start sweeping
   while(!stop)
@@ -194,7 +201,7 @@ void SingleBeamScanner::startScan()
 
       std::cout << "TARGET: " << targetX << " " << targetY <<std::endl;
       //xte.setWaypoint(lastTargetX, lastTargetY, targetX, targetY);
-      data->setBoatWaypoint_local(targetX,targetY);
+      data->setBoatWaypoint_local(lastTargetX,lastTargetY,targetX,targetY,targetSpeed);
       if(skipRest)
       {
         skipRest = false;
@@ -206,7 +213,7 @@ void SingleBeamScanner::startScan()
     usleep(delay);
   }
   std::cout <<"SweepingPattern done" << std::endl;
-  //polygon->saveMatrix();----------------------------------------------------------------------
+  //polygon->saveMatrix();---------------------------------------------------------------------- //TODO ha med
   */
 }
 

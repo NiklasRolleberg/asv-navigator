@@ -27,7 +27,7 @@ private:
 
     bool data_stop; //= false; //false
     int data_delay; //= 500000; //0.5s
-    //Transmitter* data_transmitterptr; //TODO fixa
+    Transmitter* data_transmitterptr;
     std::thread *data_threadptr;// = nullptr;
     Polygon* localPolygon;// = nullptr;
 
@@ -57,7 +57,6 @@ private:
     double yTOlat(double y);
 
 public:
-    Transmitter* data_transmitterptr;
 
     Data(){};
 
@@ -106,10 +105,10 @@ public:
     double getDepth();
 
     /**Set waypoint for the boat*/
-    void setBoatWaypoint_real(double lat, double lon);
+    void setBoatWaypoint_real(double lat0, double lon0,double lat1, double lon1, double speed);
 
     /**Set waypoint for the boat*/
-    void setBoatWaypoint_local(double x, double y);
+    void setBoatWaypoint_local(double x0, double y0, double x1, double y1, double speed);
 
     /**Set waypoint for the boat*/
     void setBoatSpeed(double speed);
@@ -119,6 +118,9 @@ public:
 
     /**Write a message to the transmitter log*/
     void writeToLog(std::string s);
+
+    /**Send a custom message through the transmitter*/
+    void sendMessage(std::string s);
 };
 
 
