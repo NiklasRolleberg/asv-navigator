@@ -152,7 +152,7 @@ void Polygon::initialize()
   //nx = 3;
   //ny = 2;
 
-  /*
+
   // Create the 2d array:
   matrix = new Element**[nx];
   for (int i = 0; i < nx; ++i)
@@ -170,7 +170,7 @@ void Polygon::initialize()
     }
   }
   std::cout << nx*ny << " elements created" << std::endl;
-  */
+
 
   //TODO add neighbours to elements that are inside the polygon
 
@@ -197,9 +197,11 @@ void Polygon::saveMatrix()
 
   for(int j=0;j<ny;j++) {
     for(int i=0;i<nx-1;i++) {
-        (*logfile) << matrix[i][j]->getDepth() << ", ";
+        //(*logfile) << matrix[i][j]->getDepth() << ", ";
+        (*logfile) << matrix[i][j]->getTimesVisited() << ", "; //TODO byt ut
     }
-    (*logfile) << matrix[nx-1][j]->getDepth() << std::endl;
+    //(*logfile) << matrix[nx-1][j]->getDepth() << std::endl;
+    (*logfile) << matrix[nx-1][j]->getTimesVisited() << std::endl;
   }
 
   std::cout << "matrix saved" << std::endl;

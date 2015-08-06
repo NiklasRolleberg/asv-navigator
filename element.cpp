@@ -21,7 +21,7 @@ Element::~Element()
 
 void Element::updateDepth(double newDepth)
 {
-  std::cout << "Element updating depth" << std::endl;
+  //std::cout << "Element updating depth" << std::endl;
   accumulatedDepth+=newDepth;
   timesVisited++;
 }

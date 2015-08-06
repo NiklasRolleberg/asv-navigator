@@ -344,7 +344,8 @@ void Data::setBoatWaypoint_real(double lat0, double lon0,double lat1, double lon
 {
     std::cout << "Data: Set real waypoint, real coordinates: (" << lat0 << "," << lon0 << ") -> ("<< lat1 <<","<< lon1 << ")" << std::endl;
     std::stringstream s;
-    s << "$MSSCP,0,0,0," << std::setprecision(10) << lat1 << "," << lon1 << ",0,"<< speed << ",*00";
+    //s << "$MSSCP,0,0,0," << std::setprecision(10) << lat1 << "," << lon1 << ",0,"<< speed << ",*00";
+    s << "$MSSCP," << std::setprecision(10) << lat0 << ","<< lon0 << ",0," << lat1 << "," << lon1 << ",0,"<< speed << ",*00";
     //s << "$MSSCP,,,," << lat << "," << lon << ",,,*00";
     data_transmitterptr->sendMessage(s.str());
     data_transmitterptr->sendMessage("$MSSTA,*00");

@@ -74,7 +74,7 @@ void SingleBeamScanner::startScan()
     double targetLon = lon->at(index);
     double lastTargetLat = 0;
     double lastTargetLon = 0;
-    double targetSpeed = 3;
+    double targetSpeed = 30;
 
     data->setBoatWaypoint_real(lastTargetLat, lastTargetLon, targetLat, targetLon, targetSpeed);
     //data->setBoatSpeed(targetSpeed);
@@ -213,6 +213,7 @@ void SingleBeamScanner::startScan()
   }
   std::cout <<"SweepingPattern done" << std::endl;
   polygon->saveMatrix();
+  
 }
 
 void SingleBeamScanner::updateDepth(Polygon* polygon, double x, double y, double depth, bool followingLand)
