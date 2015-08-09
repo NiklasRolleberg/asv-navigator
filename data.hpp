@@ -56,6 +56,12 @@ private:
     double latTOy(double lat);
     double yTOlat(double y);
 
+    //calculate nmea checksum
+    int calculateChecksum(std::string s);
+
+    //check if a message has a valid checksum
+    bool isValid(std::string s);
+
 public:
 
     Data(){};

@@ -138,8 +138,8 @@ void SingleBeamScanner::startScan()
   if(targetY > (region->yMax/2.0))
     updown = -1;
 
-  double dx;// = targetX-data->getX();
-  double dy;// = targetY-data->getY();
+  double dx;
+  double dy;
   double targetLine = targetY;
 
   bool stop = false;
@@ -147,6 +147,8 @@ void SingleBeamScanner::startScan()
   //start sweeping
   while(!stop)
   {
+    usleep(delay);
+
     double x = data->getX();
     double y = data->getY();
     double depth = 10;
@@ -208,12 +210,11 @@ void SingleBeamScanner::startScan()
       }
     }
     //close to land
+    //TODO add land following
 
-    usleep(delay);
   }
   std::cout <<"SweepingPattern done" << std::endl;
   polygon->saveMatrix();
-  
 }
 
 void SingleBeamScanner::updateDepth(Polygon* polygon, double x, double y, double depth, bool followingLand)

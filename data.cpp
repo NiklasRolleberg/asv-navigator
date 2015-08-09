@@ -274,6 +274,13 @@ void Data::processMessage(std::string m)
 {
   //std::cout << "message rescieved: " << m << std::endl;
   //std::cout << "processMessage" << std::endl;
+
+  if(!isValid(m))
+  {
+    std::cout << "message not valid" << std::endl;
+    return;
+  }
+
   int startIndex = -1;
   for(int i=0;i<m.length();i++)
   {
@@ -344,11 +351,17 @@ void Data::setBoatWaypoint_real(double lat0, double lon0,double lat1, double lon
 {
     std::cout << "Data: Set real waypoint, real coordinates: (" << lat0 << "," << lon0 << ") -> ("<< lat1 <<","<< lon1 << ")" << std::endl;
     std::stringstream s;
-    //s << "$MSSCP,0,0,0," << std::setprecision(10) << lat1 << "," << lon1 << ",0,"<< speed << ",*00";
-    s << "$MSSCP," << std::setprecision(10) << lat0 << ","<< lon0 << ",0," << lat1 << "," << lon1 << ",0,"<< speed << ",*00";
-    //s << "$MSSCP,,,," << lat << "," << lon << ",,,*00";
-    data_transmitterptr->sendMessage(s.str());
-    data_transmitterptr->sendMessage("$MSSTA,*00");
+
+    if(lat0 == 0 || lon0 == 0)
+      s << "MSSCP,,,," << std::setprecision(10) << lat1 << "," << lon1 << ",,"<< speed << ",";
+    else
+      s << "MSSCP," << std::setprecision(10) << lat0 << ","<< lon0 << ",0," << lat1 << "," << lon1 << ",0,"<< speed << ",";
+    s << '*' << std::hex << calculateChecksum(s.str());
+    std::string str = "$" + s.str();
+
+    data_transmitterptr->sendMessage(str); //send path
+    data_transmitterptr->sendMessage("$MSSTA,*74"); //start
+    data_transmitterptr->sendMessage("$MSGCP,*66"); //ask for current path
 }
 
 void Data::setBoatWaypoint_local(double x0, double y0,double x1, double y1, double speed)
@@ -383,6 +396,35 @@ double Data::calculateDistance(double lat1,double lon1,double lat2,double lon2)
     double c = 2 * atan2(sqrt(a), sqrt(1-a));
 
     return R * c;
+}
+
+int Data::calculateChecksum(std::string s) {
+  int c = 0;
+    for(int i=0;i<s.length();i++)
+      c ^= s[i];
+    return c;
+}
+
+bool Data::isValid(std::string s)
+{
+  int i;
+  for(i=0;i<s.length();i++)
+    if(s[i]=='*')
+      break;
+  if(s.length()-i < 2)
+    return false;
+
+  //std::cout << "extracted checksum: " << s.substr(i+1,2) << std::endl;
+  //std::cout << "message to calculate checksum on: " << s.substr(1,i-1) << std::endl;
+  std::string cs = s.substr(i+1,2);
+  int cs1 = strtol( s.substr(i+1,2).c_str(), NULL, 16 );
+  int cs2 = calculateChecksum(s.substr(1,i-1));
+
+  //std::cout << "cs1: " << cs1 << " cs2: " << cs2 << std::endl;
+
+  if(cs1 == cs2)
+    return true;
+  return false;
 }
 
 
