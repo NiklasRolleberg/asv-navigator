@@ -43,7 +43,7 @@ void SingleBeamScanner::startScan()
   std::cout << "scanner:SingleBeamScanner: starting scan" << std::endl;
 
     //real coordinates
-/*
+
     //first test: make the boat run on the edges of the polygon
     std::vector<double>* lat = polygon->getLatBoundaries();
     std::vector<double>* lon = polygon->getLonBoundaries();
@@ -82,21 +82,17 @@ void SingleBeamScanner::startScan()
     //std::cout << targetLat << " " << targetLon << std::endl;
 
     int lap = 0; //0
-    //double threshold = 5;
-    int temp = 0;
     while(lap < 4)
     {
-        temp++;
-        temp = temp % 100;
-        usleep(500000);
+        usleep(750000);
         d = data->calculateDistance(data->getLat(),data->getLon(),targetLat, targetLon);
         std::cout << "scanner:distance to target " << d << std::endl;
-        //data->sendMessage("$MSGCP,*00");
 
-        //if(temp == 0){
-        //  data->data_transmitterptr->sendMessage("$MSSMC,*00");
-        //  data->data_transmitterptr->sendMessage("$MSSTA,*00");
-        //}
+        if(!data->hasCorrectPath(lastTargetLat, lastTargetLon, targetLat, targetLon, targetSpeed))
+        {
+          std::cout << "resending path" << std::endl;
+          data->setBoatWaypoint_real(lastTargetLat, lastTargetLon, targetLat, targetLon, targetSpeed);
+        }
 
         if(d < tol)
         {
@@ -117,10 +113,9 @@ void SingleBeamScanner::startScan()
             //data->setBoatSpeed(targetSpeed);
         }
     }
-*/
 
  //-------------------------------------------------------------------------------------
-
+/*
   std::cout << "sweeping pattern, delta = " << delta << std::endl;
 
   PolygonSegment* region = polygon->polygonSegments.at(0);
@@ -154,10 +149,7 @@ void SingleBeamScanner::startScan()
     double depth = 10;
 
 
-    if(data->hasCorrectPath(0,0,data->yTOlat(targetY),data->xTOlon(targetX),2)){
-      std::cout << "correct path!" << std::endl;
-    }
-    else {
+    if(!data->hasCorrectPath(0,0,data->yTOlat(targetY),data->xTOlon(targetX),2)){
       std::cout << "wrong path, sending path again" << std::endl;
       data->setBoatWaypoint_local(0,0,targetX,targetY,targetSpeed);
     }
@@ -226,6 +218,7 @@ void SingleBeamScanner::startScan()
   }
   std::cout <<"SweepingPattern done" << std::endl;
   polygon->saveMatrix();
+  */
 }
 
 void SingleBeamScanner::updateDepth(Polygon* polygon, double x, double y, double depth, bool followingLand)

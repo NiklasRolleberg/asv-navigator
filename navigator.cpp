@@ -61,7 +61,7 @@ void Navigator::start()
             default:
 				        std::cout << "Unknown task type " << type << std::endl;
         }
-        delete t ; //memory  leak... --------------------------------------------------------------------------------- //TODO fix this
+        delete t ;
 	      std::cout << std::endl;
     }
 
@@ -91,8 +91,10 @@ void Navigator::goToCoordinates(Task* task)
       usleep(1000000);
       d = data->calculateDistance(lat,lon, data->getLat(), data->getLon());
       std::cout << "GOTO-TASK:  distance to target: " << d << std::endl;
-      if(data->hasCorrectPath(0,0,lat,lon,2))
-        std::cout << "correct path!" << std::endl;
+      if(!data->hasCorrectPath(0,0,lat,lon,2)) {
+        std::cout << "incorrect path. resending path" << std::endl;
+        data->setBoatWaypoint_real(0,0,lat, lon,500);
+      }
     }
     std::cout << "Target reached, task completed" << std::endl;
 }
