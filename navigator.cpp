@@ -91,6 +91,8 @@ void Navigator::goToCoordinates(Task* task)
       usleep(1000000);
       d = data->calculateDistance(lat,lon, data->getLat(), data->getLon());
       std::cout << "GOTO-TASK:  distance to target: " << d << std::endl;
+      if(data->hasCorrectPath(0,0,lat,lon,2))
+        std::cout << "correct path!" << std::endl;
     }
     std::cout << "Target reached, task completed" << std::endl;
 }

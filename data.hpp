@@ -50,12 +50,6 @@ private:
     /**Determine the  type of message andstore data from message */
     void processMessage(std::string m);
 
-    //Conversions between local and global coordinates
-    double lonTOx(double lon);
-    double xTOlon(double x);
-    double latTOy(double lat);
-    double yTOlat(double y);
-
     //calculate nmea checksum
     int calculateChecksum(std::string s);
 
@@ -77,6 +71,13 @@ public:
 
     /**Stop collecting data*/
     void stop();
+
+
+    //Conversions between local and global coordinates
+    double lonTOx(double lon);
+    double xTOlon(double x);
+    double latTOy(double lat);
+    double yTOlat(double y);
 
 
     /**Get boat x-position*/
@@ -109,6 +110,9 @@ public:
 
     /**Get Depth*/
     double getDepth();
+
+    /** true if the distance between the boats path and the coordinates given is less than tol */
+    bool hasCorrectPath(double lat0, double lon0, double lat1, double lon1, double tol);
 
     /**Set waypoint for the boat*/
     void setBoatWaypoint_real(double lat0, double lon0,double lat1, double lon1, double speed);

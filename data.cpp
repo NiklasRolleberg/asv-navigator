@@ -247,6 +247,14 @@ double Data::getDepth()
     return boat_depth;
 }
 
+bool Data::hasCorrectPath(double lat0, double lon0, double lat1, double lon1, double tol)
+{
+  //TODO check start pos
+  if(calculateDistance(lat1,lon1,boat_targetLat,boat_targetLon) <  tol)
+    return true;
+  return false;
+}
+
 void Data::threadLoop()
 {
   std::cout << "Data loop started" << std::endl;
@@ -277,9 +285,10 @@ void Data::processMessage(std::string m)
 
   if(!isValid(m))
   {
-    std::cout << "message not valid" << std::endl;
+    //std::cout << "message not valid:\t " << m << std::endl;
     return;
   }
+  //std::cout << "message valid:\t " << m << std::endl;
 
   int startIndex = -1;
   for(int i=0;i<m.length();i++)
@@ -340,7 +349,41 @@ void Data::processMessage(std::string m)
     }
     else if(m.substr(startIndex+1,5) == "MSCPA")
     {
-      //std::cout << "Current path message rescieved" << std::endl;
+      //$MSCPA,59.34836197,18.07197952,0.00,59.29697418,18.22008705,0.00,500.00,*50
+      //TODO extract startlat, startlon,stoplat,stomlon
+
+      int current = 0;;
+      for(int i=0;i<5;i++)
+      {
+        while(current < m.length())
+        {
+          current++;
+          if(m[current] == ',')
+            break;
+        }
+        int next = current+1;
+        while(next < m.length())
+        {
+          next++;
+          if(m[next] == ',')
+            break;
+        }
+        std::string nr = m.substr(current+1,next-current-1);
+        current  = next-1;
+
+        //std::cout << "i= " << i << " number= " << nr << std::endl;
+        //i==0  startlat
+        //i==1  startlon
+        //i==2  startDepth
+        //i==3  stoplat
+        //i==4  stoplon
+
+        if(i==3)
+          boat_targetLat = strtod(nr.c_str(),NULL);
+        if(i==4)
+          boat_targetLon = strtod(nr.c_str(),NULL);
+      }
+      //std::cout << "targetLat, targetLon " << boat_targetLat << " " <<  boat_targetLon << std::endl;
     }
   }
   //std::cout << "Unknown message: " << m << std::endl;
@@ -417,6 +460,9 @@ bool Data::isValid(std::string s)
   //std::cout << "extracted checksum: " << s.substr(i+1,2) << std::endl;
   //std::cout << "message to calculate checksum on: " << s.substr(1,i-1) << std::endl;
   std::string cs = s.substr(i+1,2);
+  if (cs=="00")
+    return true;
+
   int cs1 = strtol( s.substr(i+1,2).c_str(), NULL, 16 );
   int cs2 = calculateChecksum(s.substr(1,i-1));
 

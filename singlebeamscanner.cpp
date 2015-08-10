@@ -153,6 +153,17 @@ void SingleBeamScanner::startScan()
     double y = data->getY();
     double depth = 10;
 
+
+    if(data->hasCorrectPath(0,0,data->yTOlat(targetY),data->xTOlon(targetX),2)){
+      std::cout << "correct path!" << std::endl;
+    }
+    else {
+      std::cout << "wrong path, sending path again" << std::endl;
+      data->setBoatWaypoint_local(0,0,targetX,targetY,targetSpeed);
+    }
+
+
+
     dx = targetX-x;
     dy = targetY-y;
     //--set speed--
