@@ -165,6 +165,21 @@ void Polygon::initialize()
     for (int j = 0; j < ny; ++j)
     {
       matrix[i][j] = new Element(minX + delta*i, minY + delta*j,i,j);
+      bool inside = false;
+      for(int k=0; k<polygonSegments.size();k++)
+      {
+        if(polygonSegments.at(k)->contains(minX + delta*i, minY + delta*j))
+        {
+          inside = true;
+          break;
+        }
+      }
+
+      if(inside)
+        matrix[i][j]->setStatus(0);
+      else
+        matrix[i][j]->setStatus(5);
+
       //TODO set the status of the element depending on if it is outside or inside the polygon
       //TODO check this by using methods in the polygon-segment class
     }
@@ -192,20 +207,31 @@ void Polygon::saveMatrix()
     return;
 
   std::cout << "Saving matrix" << std::endl;
-  std::string fileName = "logs/matrix.csv";
-  std::ofstream *logfile = new std::ofstream(fileName);
+  std::string fileName1 = "logs/matrix_depth.csv";
+  std::string fileName2 = "logs/matrix_visited.csv";
+  std::string fileName3 = "logs/matrix_status.csv";
+
+  std::ofstream *logfile1 = new std::ofstream(fileName1);
+  std::ofstream *logfile2 = new std::ofstream(fileName2);
+  std::ofstream *logfile3 = new std::ofstream(fileName3);
 
   for(int j=0;j<ny;j++) {
     for(int i=0;i<nx-1;i++) {
-        //(*logfile) << matrix[i][j]->getDepth() << ", ";
-        (*logfile) << matrix[i][j]->getTimesVisited() << ", "; //TODO byt ut
+        (*logfile1) << matrix[i][j]->getDepth() << ", ";
+        (*logfile2) << matrix[i][j]->getTimesVisited() << ", ";
+        (*logfile3) << matrix[i][j]->getStatus() << ", ";
     }
-    //(*logfile) << matrix[nx-1][j]->getDepth() << std::endl;
-    (*logfile) << matrix[nx-1][j]->getTimesVisited() << std::endl;
+    (*logfile1) << matrix[nx-1][j]->getDepth() << std::endl;
+    (*logfile2) << matrix[nx-1][j]->getTimesVisited() << std::endl;
+    (*logfile3) << matrix[nx-1][j]->getStatus() << std::endl;
   }
 
   std::cout << "matrix saved" << std::endl;
 
-  logfile->close();
-  delete logfile;
+  logfile1->close();
+  logfile2->close();
+  logfile3->close();
+  delete logfile1;
+  delete logfile2;
+  delete logfile3;
 }

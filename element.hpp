@@ -4,7 +4,19 @@
 #include <vector>
 
 /** each element represents a small square, it containes data for how many times
- it has been visited, the depth and also the neighbouring elements, etc.*/
+ it has been visited, the depth and also the neighbouring elements, etc.
+
+
+ Status of element:
+ -1 = default value / error
+  0 = unknown
+  1 = scanned
+  2 = land / not accessible
+  3 = probably land
+  4 = ?
+  5 = outside search area
+
+ */
 class Element
 {
 private:

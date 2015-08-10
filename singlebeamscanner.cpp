@@ -43,7 +43,7 @@ void SingleBeamScanner::startScan()
   std::cout << "scanner:SingleBeamScanner: starting scan" << std::endl;
 
     //real coordinates
-
+    /*
     //first test: make the boat run on the edges of the polygon
     std::vector<double>* lat = polygon->getLatBoundaries();
     std::vector<double>* lon = polygon->getLonBoundaries();
@@ -113,9 +113,9 @@ void SingleBeamScanner::startScan()
             //data->setBoatSpeed(targetSpeed);
         }
     }
-
+*/
  //-------------------------------------------------------------------------------------
-/*
+
   std::cout << "sweeping pattern, delta = " << delta << std::endl;
 
   PolygonSegment* region = polygon->polygonSegments.at(0);
@@ -146,7 +146,7 @@ void SingleBeamScanner::startScan()
 
     double x = data->getX();
     double y = data->getY();
-    double depth = 10;
+    double depth = 1;
 
 
     if(!data->hasCorrectPath(0,0,data->yTOlat(targetY),data->xTOlon(targetX),2)){
@@ -218,7 +218,7 @@ void SingleBeamScanner::startScan()
   }
   std::cout <<"SweepingPattern done" << std::endl;
   polygon->saveMatrix();
-  */
+
 }
 
 void SingleBeamScanner::updateDepth(Polygon* polygon, double x, double y, double depth, bool followingLand)
@@ -241,7 +241,7 @@ void SingleBeamScanner::updateDepth(Polygon* polygon, double x, double y, double
     std::cout << "y:" << y << std::endl;
     */
     if(polygon->matrix != NULL)
-      polygon->matrix[ix][iy]->updateDepth(1);
+      polygon->matrix[ix][iy]->updateDepth(depth);
   }
   else
   {

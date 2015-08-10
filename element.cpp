@@ -10,6 +10,8 @@ Element::Element(double px, double py, int ix, int iy)
   indexX = ix;
   indexY = iy;
 
+  status = -1;
+
   accumulatedDepth = 0;
   timesVisited = 0;
 
@@ -22,6 +24,7 @@ Element::~Element()
 void Element::updateDepth(double newDepth)
 {
   //std::cout << "Element updating depth" << std::endl;
+  status = 1;
   accumulatedDepth+=newDepth;
   timesVisited++;
 }
