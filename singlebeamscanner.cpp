@@ -141,8 +141,19 @@ void SingleBeamScanner::startScan()
     scanRegion(region);
     polygon->removeRegion(region);
     region = NULL;
-
   }
+
+  /*
+  //DEBUG
+  for(int i=0;i<polygon->nx;i++)
+  {
+    for(int j=0;j<polygon->ny;j++)
+    {
+      if(polygon->matrix[i][j]->getStatus() == 0 && i == polygon->nx/2)
+        polygon->matrix[i][j]->setStatus(1);
+    }
+  }
+  */
 
   while(true)
   {
@@ -222,7 +233,7 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
       std::cout << "wrong path, sending path again" << std::endl;
       data->setBoatWaypoint_local(0,0,targetX,targetY,targetSpeed);
     }
-    
+
 
     dx = targetX-x;
     dy = targetY-y;
@@ -232,7 +243,7 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
     if (!updateDepth(polygon,x,y,depth,false))
     {
       //this area has been scanened several times before -> abort scan
-      std::cout << "Boat stuck abouring scan" << std::endl;
+      std::cout << "Boat stuck aborting scan" << std::endl;
       std::cout << std::endl;
       return false;
     }
@@ -322,9 +333,9 @@ bool SingleBeamScanner::updateDepth(Polygon* polygon, double x, double y, double
     if(polygon->matrix != NULL)
     {
       polygon->matrix[ix][iy]->updateDepth(depth);
-      if(polygon->matrix[ix][iy]->getTimesVisited() > 5*delta)
+      if(polygon->matrix[ix][iy]->getTimesVisited() > 5*delta) //hitta på en bra gräns
       {
-        return false;
+        return true; //ska vara false
       }
     }
   }

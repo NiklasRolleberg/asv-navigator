@@ -4,6 +4,7 @@
 #include <limits>
 #include <fstream>
 #include <cmath>
+#include <set>
 #include "element.hpp"
 #include "segment.hpp"
 
@@ -245,6 +246,87 @@ void Polygon::removeRegion(PolygonSegment* region)
 void Polygon::generateRegions()
 {
   std::cout << "generateRegions()" << std::endl;
+
+  //(1) Find unknown elements
+  //(2) expand with known neighbours
+  //(3) find the convex hull
+  //(4) create a polygonSegment
+  //(5) add boundaryElements
+
+  //Find unknown elements
+  std::set<Element*> not_scanned;
+  for(int i=0;i<nx;i++)
+  {
+    for(int j=0;j<ny;j++)
+    {
+      if(matrix[i][j]->getStatus() == 0)
+        not_scanned.insert(matrix[i][j]);
+    }
+  }
+  std::cout << "\t" << not_scanned.size() << " unscanned elements found" << std::endl;
+
+  std::vector<std::set<Element*>> clusters;
+
+  while(true)
+  {
+    if(not_scanned.empty())
+      break;
+
+    std::set<Element*> cluster;
+    cluster.insert(*not_scanned.begin());
+    for(std::set<Element*>::iterator it=cluster.begin(); it!=cluster.end(); ++it)
+    {
+      for(int i=0;i< (*it)->getNeighbours()->size();i++)
+      {
+        if(not_scanned.find((*it)->getNeighbours()->at(i)) != not_scanned.end())
+        {
+          cluster.insert((*it)->getNeighbours()->at(i));
+          //std::cout << "cluster size:" << cluster.size() << std::endl;
+          not_scanned.erase(not_scanned.find((*it)->getNeighbours()->at(i))); //TODO kan göras bättre
+        }
+      }
+    }
+    clusters.push_back(cluster);
+  }
+
+  std::cout <<"\t"<< clusters.size() << " new regions will be created" << std::endl;
+
+  //expand with known neighbours
+  for(int i=0;i<clusters.size();i++)
+  {
+    std::set<Element*> neighbours;
+    for(std::set<Element*>::iterator it=clusters.at(i).begin(); it!=clusters.at(i).end(); ++it)
+    {
+      for(int j=0;j<(*it)->getNeighbours()->size();j++)
+      {
+        if(clusters.at(i).find((*it)->getNeighbours()->at(j)) == clusters.at(i).end()
+            && (*it)->getNeighbours()->at(j)->getStatus() == 1)
+        {
+          neighbours.insert((*it)->getNeighbours()->at(j));
+        }
+      }
+    }
+
+    for(std::set<Element*>::iterator it=neighbours.begin(); it!=neighbours.end(); ++it)
+    {
+      clusters.at(i).insert(*it);
+    }
+  }
+
+  //TODO find the convex hull
+  for(int i=0;i<clusters.size();i++)
+  {
+    std::cout << "\tnumber of elements in new cell: " << clusters.at(i).size() << std::endl;
+
+    //TODO do something
+
+    std::cout << "\tnumber of points in convex hull: " << std::endl;
+  }
+
+  //TODO create a polygonSegment
+  //TODO add boundaryElements
+
+
 }
 
 
