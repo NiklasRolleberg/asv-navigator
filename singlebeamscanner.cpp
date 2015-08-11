@@ -118,8 +118,81 @@ void SingleBeamScanner::startScan()
 
   std::cout << "sweeping pattern, delta = " << delta << std::endl;
 
-  PolygonSegment* region = polygon->polygonSegments.at(0);
 
+  /**Start scanning the first region */
+  int index = -1;
+  for(int i=0;i<polygon->polygonSegments.size();i++)
+  {
+    if(polygon->polygonSegments.at(i)->contains(data->getX(),data->getY()))
+      index = i;
+  }
+
+  if(index == -1)
+  {
+    std::cout << "boat is not inside the polygon" << std::endl;
+    //return;
+  }
+
+  PolygonSegment* region = NULL;
+
+  if(index != -1)
+  {
+    region = polygon->polygonSegments.at(index);
+    scanRegion(region);
+    //TODO remove that region
+    polygon->removeRegion(region);
+    region = NULL;
+
+  }
+
+  while(true)
+  {
+    //(rework regions) TODO kanske senare
+
+    //if regions left in list pick the closest accessible one
+    //else identify new regions and pick the closest accessible one
+
+    Closest c = findClosest(data->getX(),data->getY());
+    if(c.x == -1 || c.y==-1 || c.region == nullptr)
+    {
+      //no path found try generating new regions
+      //TODO remove all old regions
+      polygon->generateRegions();
+
+      c = findClosest(data->getX(),data->getY());
+      if(c.x == -1 || c.y==-1 || c.region == nullptr)
+      {
+        std::cout << "No accessible regions left to scan" << std::endl;
+        break; //no path found -> nothing left to scan
+      }
+    }
+
+    std::cout << "new region found" << std::endl;
+
+    //go to that region
+    if(!gotoRegion(c)) {
+      std::cout << "go to region failed" << std::endl;
+      continue; //continue with something else
+    }
+
+    std::cout << "new region reached" << std::endl;
+
+    //scan that region
+    scanRegion(c.region);
+    polygon->removeRegion(c.region);
+
+    break;
+  }
+
+
+  std::cout <<"SweepingPattern done" << std::endl;
+  polygon->saveMatrix();
+
+}
+
+bool SingleBeamScanner::scanRegion(PolygonSegment* region)
+{
+  std::cout << std::endl;
   bool goToRight = false;//(Math.random() < 0.5); //traveling from left side to right
   bool goToNextLine = true;
   bool skipRest = false; //true -> the boat has to find a new waypoint
@@ -153,16 +226,20 @@ void SingleBeamScanner::startScan()
       std::cout << "wrong path, sending path again" << std::endl;
       data->setBoatWaypoint_local(0,0,targetX,targetY,targetSpeed);
     }
-
-
+    
 
     dx = targetX-x;
     dy = targetY-y;
     //--set speed--
 
     //update depth
-    updateDepth(polygon,x,y,depth,false);
-
+    if (!updateDepth(polygon,x,y,depth,false))
+    {
+      //this area has been scanened several times before -> abort scan
+      std::cout << "Aborting scan" << std::endl;
+      std::cout << std::endl;
+      return false;
+    }
 
     std::cout << "Distance to target: " << sqrt(dx*dx + dy*dy) << std::endl;
     //target reached -> choose new target
@@ -216,12 +293,17 @@ void SingleBeamScanner::startScan()
     //TODO add land following
 
   }
-  std::cout <<"SweepingPattern done" << std::endl;
-  polygon->saveMatrix();
-
+  std::cout << std::endl;
+  return true;
 }
 
-void SingleBeamScanner::updateDepth(Polygon* polygon, double x, double y, double depth, bool followingLand)
+bool SingleBeamScanner::gotoRegion(Closest target)
+{
+  return true; //failed
+}
+
+
+bool SingleBeamScanner::updateDepth(Polygon* polygon, double x, double y, double depth, bool followingLand)
 {
   //find index
   int ix = (int) round((x - polygon->minX) / polygon->delta);
@@ -230,7 +312,7 @@ void SingleBeamScanner::updateDepth(Polygon* polygon, double x, double y, double
   if(ix < 0 || ix > polygon->nx || iy < 0 || iy > polygon->ny)
   {
     std::cout << "index Oob" << std::endl;
-    return;
+    return true; //TODO kanske false;
   }
 
   if(!followingLand)
@@ -241,15 +323,28 @@ void SingleBeamScanner::updateDepth(Polygon* polygon, double x, double y, double
     std::cout << "y:" << y << std::endl;
     */
     if(polygon->matrix != NULL)
+    {
       polygon->matrix[ix][iy]->updateDepth(depth);
+      if(polygon->matrix[ix][iy]->getTimesVisited() > 5*delta)
+      {
+        return false; //TODO ska vara false senare
+      }
+    }
   }
   else
   {
     std::cout << "Not implemented" << std::endl;
   }
 
-
+  return true;
 }
+
+
+Closest SingleBeamScanner::findClosest(int startX,int startY)
+{
+  return Closest(startX,startY,polygon->polygonSegments.at(0));
+}
+
 
 void SingleBeamScanner::abortScan()
 {

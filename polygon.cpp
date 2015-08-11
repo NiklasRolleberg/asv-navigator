@@ -192,6 +192,18 @@ void Polygon::initialize()
   //TODO (add elements-pointers to the polygon segment objects)
 }
 
+void Polygon::removeRegion(PolygonSegment* region)
+{
+  std::cout << "deleting region" << std::endl;
+}
+
+
+void Polygon::generateRegions()
+{
+  std::cout << "generateRegions()" << std::endl;
+}
+
+
 std::vector<double>* Polygon::getXBoundaries()
 {
   return xPoints;

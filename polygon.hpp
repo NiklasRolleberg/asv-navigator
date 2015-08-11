@@ -62,13 +62,11 @@ public:
     /**Save the element matrix for debuging*/
     void saveMatrix();
 
-  /* more functions to be implemented
-     get segmentList <vector kanske>
-     get matrix
-     bool insidePolygon
-     get max,min of x and y
-     get delta?
-  */
+    /**remove a region from the list and delete it*/
+    void removeRegion(PolygonSegment* region);
+
+    /**Creates regions from the unscanned elements in the matrix*/
+    void generateRegions();
 
 
 
