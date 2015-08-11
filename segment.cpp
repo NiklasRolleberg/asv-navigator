@@ -1,6 +1,7 @@
 #include "segment.hpp"
 #include <iostream>
 #include <limits>
+#include <algorithm>
 
 /**Constructor*/
 PolygonSegment::PolygonSegment(std::vector<double> *x, std::vector<double> *y)
@@ -171,4 +172,15 @@ double PolygonSegment::minY()
       temp = value;
   }
   return temp;
+}
+
+void PolygonSegment::addBoundaryElement(Element* e)
+{
+  if(std::find(boundaries.begin(), boundaries.end(), e) == boundaries.end())
+    boundaries.push_back(e);
+}
+
+std::vector<Element*>* PolygonSegment::getBoundaryElements()
+{
+  return &boundaries;
 }

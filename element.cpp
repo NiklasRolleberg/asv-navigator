@@ -1,5 +1,6 @@
 #include "element.hpp"
 #include <iostream>
+#include <algorithm>
 
 Element::Element(double px, double py, int ix, int iy)
 {
@@ -15,6 +16,7 @@ Element::Element(double px, double py, int ix, int iy)
   accumulatedDepth = 0;
   timesVisited = 0;
 
+  timesTargeted = 0;
 }
 Element::~Element()
 {
@@ -59,6 +61,22 @@ double Element::getX()
 double Element::getY()
 {
   return posY;
+}
+
+void Element::targeted()
+{
+  timesTargeted++;
+}
+
+int Element::getTimesTargeted()
+{
+  return timesTargeted;
+}
+
+void Element::addNeighBour(Element* n)
+{
+  if(std::find(neighbours.begin(), neighbours.end(), n) == neighbours.end())
+    neighbours.push_back(n);
 }
 
 std::vector<Element*>* Element::getNeighbours()

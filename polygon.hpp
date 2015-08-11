@@ -21,6 +21,8 @@ private:
     std::vector<double>* xPoints;// = nullptr;
     std::vector<double>* yPoints;// = nullptr;
 
+    void addBoundaryElements(PolygonSegment* ps);
+
 public:
 
     int nx;

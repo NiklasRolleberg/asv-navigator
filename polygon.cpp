@@ -3,6 +3,7 @@
 #include <vector>
 #include <limits>
 #include <fstream>
+#include <cmath>
 #include "element.hpp"
 #include "segment.hpp"
 
@@ -123,12 +124,6 @@ void Polygon::initialize()
       maxY = y;
   }
 
-  //add a few meters to avoid segmentation fault
-  //minX-=10;
-  //minY-=10;
-  //maxX+=10;
-  //maxY+=10;
-
   std::cout << "maxX: " << maxX << ", minX: " << minX << "\nmaxY: " << maxY << ", minY: " << minY << std::endl;
 
 
@@ -140,19 +135,13 @@ void Polygon::initialize()
 
   std::cout << "delta=" << delta << "-> grid size is: " << nx << "x" << ny << std::endl;
 
-  //TODO (1) create a polygon-segment object for the entire polygon (searchCell in kexet)
-
-  // add PolygonSegment
+  //(1) create a polygon-segment object for the entire polygon (searchCell in kexet)
   polygonSegments.push_back(new PolygonSegment(xPoints,yPoints));
 
   //TODO (2) (check if the segment is convex, if not it should be triangulated) kanske senare iaf
 
-
-
   //nx = 3;
   //ny = 2;
-
-
   // Create the 2d array:
   matrix = new Element**[nx];
   for (int i = 0; i < nx; ++i)
@@ -179,22 +168,77 @@ void Polygon::initialize()
         matrix[i][j]->setStatus(0);
       else
         matrix[i][j]->setStatus(5);
-
-      //TODO set the status of the element depending on if it is outside or inside the polygon
-      //TODO check this by using methods in the polygon-segment class
     }
   }
   std::cout << nx*ny << " elements created" << std::endl;
 
 
-  //TODO add neighbours to elements that are inside the polygon
+  //add neighbours to elements that are inside the polygon
+  for (int i = 0; i < nx; ++i)
+  {
+    for (int j = 0; j < ny; ++j)
+    {
+      int x[] = {i , i+1, i+1 ,i+1 ,i ,i-1 ,i-1 ,i-1};
+      int y[] = {j-1 , j-1, j ,j+1 ,j+1 ,j+1 ,j ,j-1};
+
+      for(int k=0;k<8;k++)
+      {
+        int ix = x[k];
+        int iy = y[k];
+
+        if(ix>=0 && ix<nx && iy>=0 && iy<ny)
+        {
+          matrix[i][j]->addNeighBour(matrix[ix][iy]);
+        }
+      }
+    }
+  }
 
   //TODO (add elements-pointers to the polygon segment objects)
+  for(int i=0;i<polygonSegments.size();i++)
+    addBoundaryElements(polygonSegments.at(i));
+}
+
+void Polygon::addBoundaryElements(PolygonSegment* ps)
+{
+  std::cout << "add boundary elements to polygonsegment" << std::endl;
+  //works for convex segments
+
+  double y = ps->yMin;
+
+  while(y < ps->yMax)
+  {
+    double xpos1 = ps->findX(y, true);
+    double xpos2 = ps->findX(y, false);
+    int xIndex1 = (int) round((xpos1 - ps->xMin) / delta);
+    int xIndex2 = (int) round((xpos2 - ps->xMin) / delta);
+    int yIndex = (int)  round((y - ps->yMin) / delta);
+
+    ps->addBoundaryElement(matrix[xIndex1][yIndex]);
+    ps->addBoundaryElement(matrix[xIndex2][yIndex]);
+    y+=delta/2.0;
+  }
 }
 
 void Polygon::removeRegion(PolygonSegment* region)
 {
   std::cout << "deleting region" << std::endl;
+  //(1) find index
+  int index = -1;
+  for(int i=0;i<polygonSegments.size();i++)
+  {
+    if( region == polygonSegments.at(i))
+    {
+      index = i;
+      break;
+    }
+  }
+
+  if(index == -1)
+    return;
+
+  delete polygonSegments.at(index);
+  polygonSegments.erase (polygonSegments.begin()+index);
 }
 
 

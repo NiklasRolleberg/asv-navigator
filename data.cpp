@@ -396,7 +396,7 @@ void Data::setBoatWaypoint_real(double lat0, double lon0,double lat1, double lon
     std::stringstream s;
 
     /*
-    s << "$MSSCP,0,0,0," << std::setprecision(10) << lat1 << "," << lon1 << ",0,"<< speed << ",*00\n";
+    s << "$MSSCP,0,0,0," << std::setprecision(10) << lat1 << "," << lon1 << ",0,"<< speed << ",*00";
     data_transmitterptr->sendMessage(s.str()); //send path
     */
 

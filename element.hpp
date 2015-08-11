@@ -28,6 +28,7 @@ private:
   double posY;
   double accumulatedDepth;
   int timesVisited;
+  int timesTargeted; //used to calculate travelcost.
   int status;
 
 public:
@@ -39,11 +40,15 @@ public:
   void setStatus(int newStatus);
   void updateDepth(double newDepth);
   double getDepth();
+  void targeted();
   int getTimesVisited();
+  int getTimesTargeted();
 
   //int[] getIndex();
   double getX();
   double getY();
+
+  void addNeighBour(Element* n);
   std::vector<Element*>* getNeighbours();
 };
 
