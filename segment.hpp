@@ -31,6 +31,7 @@ public:
     std::vector<Element*>* getBoundaryElements();
     bool contains(double x, double y);
     double findX(double y, bool right);
+    double findY(double x, bool top);
     double maxX();
     double minX();
     double maxY();

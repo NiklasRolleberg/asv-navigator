@@ -219,6 +219,21 @@ void Polygon::addBoundaryElements(PolygonSegment* ps)
     ps->addBoundaryElement(matrix[xIndex2][yIndex]);
     y+=delta/2.0;
   }
+
+  double x = ps->xMin;
+  while(x < ps->xMax)
+  {
+    double ypos1 = ps->findY(x, true);
+    double ypos2 = ps->findY(x, false);
+    int xIndex = (int)  round((x - ps->xMin) / delta);
+    int yIndex1 =(int)  round((ypos1 - ps->yMin) / delta);
+    int yIndex2 =(int)  round((ypos2 - ps->yMin) / delta);
+
+    ps->addBoundaryElement(matrix[xIndex][yIndex1]);
+    ps->addBoundaryElement(matrix[xIndex][yIndex2]);
+    x+=delta/2.0;
+  }
+
 }
 
 void Polygon::removeRegion(PolygonSegment* region)
@@ -312,23 +327,136 @@ void Polygon::generateRegions()
       clusters.at(i).insert(*it);
     }
   }
-
   //TODO find the convex hull
   for(int i=0;i<clusters.size();i++)
   {
     std::cout << "\tnumber of elements in new cell: " << clusters.at(i).size() << std::endl;
 
-    //TODO do something
+    //TODO create a polygonSegment
+    PolygonSegment* newRegion = createSegmentFromElements(clusters.at(i)); //skicka pekare/ref om det går för långsamt
+    std::cout << "\tregion created" << std::endl;
 
-    std::cout << "\tnumber of points in convex hull: " << std::endl;
+    //TODO add boundaryElements
+    if(newRegion != NULL)
+    {
+      addBoundaryElements(newRegion);
+      polygonSegments.push_back(newRegion);
+    }
   }
-
-  //TODO create a polygonSegment
-  //TODO add boundaryElements
 
 
 }
 
+
+PolygonSegment* Polygon::createSegmentFromElements(std::set<Element*> cluster)
+{
+  //find the convex hull
+  std::cout << "Convex hull. points before: " << cluster.size() << std::endl;
+
+  //ArrayList<ArrayList<Double>> cHull = new ArrayList<ArrayList<Double>>();
+
+  std::vector<Point2D> pts;
+  std::vector<Point2D> hullPts;
+
+  //create Point2D objects
+  std::cout << "loop1" << std::endl;
+  for(std::set<Element*>::iterator it=cluster.begin(); it!=cluster.end(); ++it)
+  {
+    pts.push_back(Point2D((*it)->getX(),(*it)->getY()));
+  }
+
+  if (pts.size() == 0) {
+    std::cout << "no point in hull" << std::endl;
+    return NULL;
+  }
+  if (pts.size() < 3){
+    std::cout << "Size less than 3" << std::endl;
+    //TODO create a polygonSegment
+    return NULL;
+  }
+
+
+  //find a starting point
+  int index = -1;
+  double x = std::numeric_limits<double>::max();
+  double y = std::numeric_limits<double>::max();
+
+  for(int i=0;i<pts.size();i++)
+  {
+    if(pts.at(i).x < x)
+    {
+      index = i;
+      x = pts.at(i).x;
+      y = pts.at(i).y;
+    }
+    else if(pts.at(i).x == x)
+    {
+      if(pts.at(i).y < y)
+      {
+        index = i;
+        x = pts.at(i).x;
+        y = pts.at(i).y;
+      }
+    }
+  }
+
+  std::cout << "start: (" << pts.at(index).x/delta << "," << pts.at(index).y/delta << ")" << std::endl;
+  //return NULL;
+
+  //convex hull algorithm
+  Point2D pointOnHull = pts.at(index);
+  Point2D endpoint;
+  do
+  {
+    hullPts.push_back(pointOnHull);
+    endpoint = pts.at(0);
+    for (int i=1;i<pts.size();i++)
+    {
+      Point2D pt = pts[i];
+      int turn = findTurn(pointOnHull, endpoint, pt);
+
+      double dx = (pointOnHull.x - pt.x);
+      double dy = (pointOnHull.y - pt.y);
+      double dist1 = dx * dx + dy * dy;  //pointOnHull.distance(pt)
+
+      dx = (endpoint.x - pointOnHull.x);
+      dy = (endpoint.y - pointOnHull.y);
+      double dist2 = dx * dx + dy * dy; //endpoint.distance(pointOnHull)
+
+      if ((((endpoint.x == pointOnHull.x) && (endpoint.y == pointOnHull.y)) || turn == -1 || turn == 0)  && (dist1 > dist2))
+      {
+        endpoint = pt;
+      }
+    }
+    pointOnHull = endpoint;
+  }while(!((endpoint.x == pts.at(index).x) && (endpoint.y == pts.at(index).y)));
+
+
+  std::cout << "points after: " << hullPts.size() << std::endl;
+
+  for(int i=0;i<hullPts.size();i++)
+    std::cout << "point: " << hullPts.at(i).x/delta << " " << hullPts.at(i).y/delta << std::endl;
+
+  //error
+  return NULL;
+}
+
+int Polygon::findTurn(Point2D p, Point2D q, Point2D r)
+{
+
+  //double zero = 0.0;
+  double x1 = (q.x - p.x) * (r.y - p.y);
+  double x2 = (r.y - p.y) * (q.y - p.y);
+  double anotherDouble = x1 - x2;
+
+  std::cout << "findTurn: p:(" << p.x/delta << "," << p.y/delta << ") q:(" << q.x/delta << "," << q.y/delta << ") r:(" << r.x/delta << "," << r.y/delta << ") score: "<< anotherDouble << std::endl;
+
+  if(anotherDouble < 0)
+    return 1;
+  if(anotherDouble > 0)
+    return -1;
+  return 0;
+}
 
 std::vector<double>* Polygon::getXBoundaries()
 {

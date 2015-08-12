@@ -130,6 +130,92 @@ double PolygonSegment::findX(double y, bool right)
   return min;
 }
 
+double PolygonSegment::findY(double x, bool top)
+{
+
+  int l1[] = {-1,-1};
+  int l2[] = {-1,-1};
+
+  int l11 = -1;
+  int l12 = -1;
+
+  int l21 = -1;
+  int l22 = -1;
+
+  int l = xPoints.size();
+  for(int i=0; i < l; i++)
+  {
+    if(((xPoints.at((i+1)%l) >= x) && (xPoints.at(i) <= x))
+    || ((xPoints.at((i+1)%l) <= x) && (xPoints.at(i) >= x)))
+    {
+      //interpolate
+      if(l11 == -1)
+      {
+        l11 = (i+1)%l;
+        l12 = i%l;
+      }
+      else
+      {
+        l21 = (i+1)%l;
+        l22 = i%l;
+      }
+    }
+  }
+
+  /*error return some default value*/
+  if(l11 == -1 || l12 == -1 || l21 == -1 || l22 == -1)
+  {
+    double meanY = 0;
+    for(int i=0;i<yPoints.size();i++)
+    {
+      meanY += yPoints.at(i);
+    }
+    meanY /= yPoints.size();
+    return meanY;
+  }
+
+  //interpolate
+  double x0 = xPoints.at(l11);
+  double y0 = yPoints.at(l11);
+  double x1 = xPoints.at(l12);
+  double y1 = yPoints.at(l12);
+
+  //how far is x on the line
+  double p = (x-x0) / (x1-x0);
+  double pY1 = (1-p)*y0 + p*y1;
+
+  //System.out.println("p1=" + p);
+  x0 = xPoints.at(l21);
+  y0 = yPoints.at(l21);
+  x1 = xPoints.at(l22);
+  y1 = yPoints.at(l22);
+
+  //how far is y on the line
+  p = (x-x0) / (x1-x0);
+  double pY2 = (1-p)*x0 + p*x1;
+  //System.out.println("p2=" + p);
+
+  double max;
+  double min;
+
+  if(pY1>pY2)
+  {
+    max = pY1;
+    min = pY2;
+  }
+  else
+  {
+    max = pY2;
+    min = pY1;
+  }
+
+  if(top)
+  {
+    return max;
+  }
+  return min;
+}
+
 double PolygonSegment::maxX()
 {
   double temp = std::numeric_limits<double>::min();
@@ -178,6 +264,7 @@ void PolygonSegment::addBoundaryElement(Element* e)
 {
   if(std::find(boundaries.begin(), boundaries.end(), e) == boundaries.end())
     boundaries.push_back(e);
+  std::cout << "Boundary elements: " << boundaries.size() << std::endl;
 }
 
 std::vector<Element*>* PolygonSegment::getBoundaryElements()

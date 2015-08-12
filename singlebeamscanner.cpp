@@ -138,12 +138,12 @@ void SingleBeamScanner::startScan()
   if(index != -1)
   {
     region = polygon->polygonSegments.at(index);
-    scanRegion(region);
+    //scanRegion(region);
     polygon->removeRegion(region);
     region = NULL;
   }
 
-  /*
+
   //DEBUG
   for(int i=0;i<polygon->nx;i++)
   {
@@ -153,7 +153,7 @@ void SingleBeamScanner::startScan()
         polygon->matrix[i][j]->setStatus(1);
     }
   }
-  */
+  
 
   while(true)
   {
@@ -161,7 +161,7 @@ void SingleBeamScanner::startScan()
 
     //if regions left in list pick the closest accessible one
     //else identify new regions and pick the closest accessible one
-
+    polygon->saveMatrix();
     Closest c = findClosest(data->getX(),data->getY());
     if(c.x == -1 || c.y==-1 || c.region == nullptr)
     {
@@ -194,7 +194,7 @@ void SingleBeamScanner::startScan()
 
 
   std::cout <<"SweepingPattern done" << std::endl;
-  polygon->saveMatrix();
+  //polygon->saveMatrix();
 
 }
 
@@ -228,12 +228,12 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
     double y = data->getY();
     double depth = 1;
 
-
+    /*
     if(!data->hasCorrectPath(0,0,data->yTOlat(targetY),data->xTOlon(targetX),2)){
       std::cout << "wrong path, sending path again" << std::endl;
       data->setBoatWaypoint_local(0,0,targetX,targetY,targetSpeed);
     }
-
+    */
 
     dx = targetX-x;
     dy = targetY-y;

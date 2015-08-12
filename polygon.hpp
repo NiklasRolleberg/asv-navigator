@@ -3,13 +3,19 @@
 
 #include <vector>
 #include <iostream>
+#include <set>
 #include "element.hpp"
 #include "segment.hpp"
+
+
+struct Point2D {
+  Point2D(int px = 99, int py = -99): x(px), y(py){}
+  double x,y;
+};
 
 /**The polygon class contains coordinates for the nodes, both in local and
     lat/long coordinate systems and methods for calculating if a position
     is inside the polygon*/
-
 class Polygon
 {
 private:
@@ -22,6 +28,8 @@ private:
     std::vector<double>* yPoints;// = nullptr;
 
     void addBoundaryElements(PolygonSegment* ps);
+    PolygonSegment* createSegmentFromElements(std::set<Element*>);
+    int findTurn(Point2D p, Point2D q, Point2D r);
 
 public:
 
