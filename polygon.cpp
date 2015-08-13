@@ -5,6 +5,7 @@
 #include <fstream>
 #include <cmath>
 #include <set>
+#include <algorithm>
 #include "element.hpp"
 #include "segment.hpp"
 
@@ -215,8 +216,13 @@ void Polygon::addBoundaryElements(PolygonSegment* ps)
     int xIndex2 = (int) round((xpos2 - ps->xMin) / delta);
     int yIndex = (int)  round((y - ps->yMin) / delta);
 
-    ps->addBoundaryElement(matrix[xIndex1][yIndex]);
-    ps->addBoundaryElement(matrix[xIndex2][yIndex]);
+    if(yIndex<ny && yIndex>=0)
+    {
+      if(xIndex1<nx && xIndex1>=0)
+        ps->addBoundaryElement(matrix[xIndex1][yIndex]);
+      if(xIndex2<nx && xIndex2>=0)
+        ps->addBoundaryElement(matrix[xIndex2][yIndex]);
+    }
     y+=delta/2.0;
   }
 
@@ -229,11 +235,15 @@ void Polygon::addBoundaryElements(PolygonSegment* ps)
     int yIndex1 =(int)  round((ypos1 - ps->yMin) / delta);
     int yIndex2 =(int)  round((ypos2 - ps->yMin) / delta);
 
-    ps->addBoundaryElement(matrix[xIndex][yIndex1]);
-    ps->addBoundaryElement(matrix[xIndex][yIndex2]);
+    if(xIndex<nx && xIndex>=0)
+    {
+      if(yIndex1<ny && yIndex1>=0)
+        ps->addBoundaryElement(matrix[xIndex][yIndex1]);
+      if(yIndex2<ny && yIndex2>=0)
+        ps->addBoundaryElement(matrix[xIndex][yIndex2]);
+    }
     x+=delta/2.0;
   }
-
 }
 
 void Polygon::removeRegion(PolygonSegment* region)
@@ -278,7 +288,7 @@ void Polygon::generateRegions()
         not_scanned.insert(matrix[i][j]);
     }
   }
-  std::cout << "\t" << not_scanned.size() << " unscanned elements found" << std::endl;
+  std::cout << not_scanned.size() << " unscanned elements found" << std::endl;
 
   std::vector<std::set<Element*>> clusters;
 
@@ -289,6 +299,8 @@ void Polygon::generateRegions()
 
     std::set<Element*> cluster;
     cluster.insert(*not_scanned.begin());
+    not_scanned.erase(not_scanned.begin());
+    //std::cout << "cluster size:" << cluster.size() << std::endl;
     for(std::set<Element*>::iterator it=cluster.begin(); it!=cluster.end(); ++it)
     {
       for(int i=0;i< (*it)->getNeighbours()->size();i++)
@@ -296,7 +308,6 @@ void Polygon::generateRegions()
         if(not_scanned.find((*it)->getNeighbours()->at(i)) != not_scanned.end())
         {
           cluster.insert((*it)->getNeighbours()->at(i));
-          //std::cout << "cluster size:" << cluster.size() << std::endl;
           not_scanned.erase(not_scanned.find((*it)->getNeighbours()->at(i))); //TODO kan göras bättre
         }
       }
@@ -304,7 +315,7 @@ void Polygon::generateRegions()
     clusters.push_back(cluster);
   }
 
-  std::cout <<"\t"<< clusters.size() << " new regions will be created" << std::endl;
+  std::cout << clusters.size() << " new regions will be created" << std::endl;
 
   //expand with known neighbours
   for(int i=0;i<clusters.size();i++)
@@ -327,14 +338,13 @@ void Polygon::generateRegions()
       clusters.at(i).insert(*it);
     }
   }
-  //TODO find the convex hull
+
   for(int i=0;i<clusters.size();i++)
   {
-    std::cout << "\tnumber of elements in new cell: " << clusters.at(i).size() << std::endl;
 
     //TODO create a polygonSegment
     PolygonSegment* newRegion = createSegmentFromElements(clusters.at(i)); //skicka pekare/ref om det går för långsamt
-    std::cout << "\tregion created" << std::endl;
+    std::cout << "new region created" << std::endl;
 
     //TODO add boundaryElements
     if(newRegion != NULL)
@@ -347,115 +357,91 @@ void Polygon::generateRegions()
 
 }
 
-
+//from https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Convex_hull/Monotone_chain
 PolygonSegment* Polygon::createSegmentFromElements(std::set<Element*> cluster)
 {
+
+  if(cluster.size()<3)
+    return NULL;
+
+  if(cluster.size()==3)
+  {
+    std::vector<double>* x = new std::vector<double>();
+    std::vector<double>* y = new std::vector<double>();
+
+    for(std::set<Element*>::iterator it=cluster.begin(); it!=cluster.end(); ++it)
+    {
+      x->push_back((*it)->getX());
+      y->push_back((*it)->getY());
+    }
+    PolygonSegment* ps = new PolygonSegment(x,y);
+    return ps;
+  }
+
+
   //find the convex hull
   std::cout << "Convex hull. points before: " << cluster.size() << std::endl;
+  std::vector<Point> P;
 
-  //ArrayList<ArrayList<Double>> cHull = new ArrayList<ArrayList<Double>>();
-
-  std::vector<Point2D> pts;
-  std::vector<Point2D> hullPts;
-
-  //create Point2D objects
-  std::cout << "loop1" << std::endl;
+  std::set<Element*> neighbours;
   for(std::set<Element*>::iterator it=cluster.begin(); it!=cluster.end(); ++it)
   {
-    pts.push_back(Point2D((*it)->getX(),(*it)->getY()));
+    P.push_back(Point((*it)->getX(),(*it)->getY()));
   }
 
-  if (pts.size() == 0) {
-    std::cout << "no point in hull" << std::endl;
-    return NULL;
-  }
-  if (pts.size() < 3){
-    std::cout << "Size less than 3" << std::endl;
-    //TODO create a polygonSegment
-    return NULL;
-  }
+  // Note: the last point in the returned list is the same as the first one.
+  int n = P.size(), k = 0;
+  std::vector<Point> H(2*n);
+  std::sort(P.begin(), P.end());
 
-
-  //find a starting point
-  int index = -1;
-  double x = std::numeric_limits<double>::max();
-  double y = std::numeric_limits<double>::max();
-
-  for(int i=0;i<pts.size();i++)
+  // Build lower hull
+  for (int i = 0; i < n; ++i)
   {
-    if(pts.at(i).x < x)
-    {
-      index = i;
-      x = pts.at(i).x;
-      y = pts.at(i).y;
-    }
-    else if(pts.at(i).x == x)
-    {
-      if(pts.at(i).y < y)
-      {
-        index = i;
-        x = pts.at(i).x;
-        y = pts.at(i).y;
-      }
-    }
+    while (k >= 2 && cross(H[k-2], H[k-1], P[i]) <= 0) k--;
+      H[k++] = P[i];
   }
 
-  std::cout << "start: (" << pts.at(index).x/delta << "," << pts.at(index).y/delta << ")" << std::endl;
-  //return NULL;
-
-  //convex hull algorithm
-  Point2D pointOnHull = pts.at(index);
-  Point2D endpoint;
-  do
+  // Build upper hull
+  for (int i = n-2, t = k+1; i >= 0; i--)
   {
-    hullPts.push_back(pointOnHull);
-    endpoint = pts.at(0);
-    for (int i=1;i<pts.size();i++)
-    {
-      Point2D pt = pts[i];
-      int turn = findTurn(pointOnHull, endpoint, pt);
+    while (k >= t && cross(H[k-2], H[k-1], P[i]) <= 0) k--;
+      H[k++] = P[i];
+  }
 
-      double dx = (pointOnHull.x - pt.x);
-      double dy = (pointOnHull.y - pt.y);
-      double dist1 = dx * dx + dy * dy;  //pointOnHull.distance(pt)
+	H.resize(k);
 
-      dx = (endpoint.x - pointOnHull.x);
-      dy = (endpoint.y - pointOnHull.y);
-      double dist2 = dx * dx + dy * dy; //endpoint.distance(pointOnHull)
+  std::cout << "Convex hull. points after: " << H.size()-1 << std::endl;
 
-      if ((((endpoint.x == pointOnHull.x) && (endpoint.y == pointOnHull.y)) || turn == -1 || turn == 0)  && (dist1 > dist2))
-      {
-        endpoint = pt;
-      }
-    }
-    pointOnHull = endpoint;
-  }while(!((endpoint.x == pts.at(index).x) && (endpoint.y == pts.at(index).y)));
+  /*
+  for(int i=0;i<H.size();i++)
+  {
+    std::cout << "Point: (" << H.at(i).x/delta << "," << H.at(i).y/delta << ")" << std::endl;
+  }*/
 
+  std::vector<double>* x = new std::vector<double>();
+  std::vector<double>* y = new std::vector<double>();
 
-  std::cout << "points after: " << hullPts.size() << std::endl;
+  for(int i=0;i<H.size();i++)
+  {
+    x->push_back(H.at(i).x);
+    y->push_back(H.at(i).y);
+  }
 
-  for(int i=0;i<hullPts.size();i++)
-    std::cout << "point: " << hullPts.at(i).x/delta << " " << hullPts.at(i).y/delta << std::endl;
+  //polygonSegments.push_back(new PolygonSegment(x,y));
+
+  PolygonSegment* ps = new PolygonSegment(x,y);
+  return ps;
 
   //error
   return NULL;
 }
 
-int Polygon::findTurn(Point2D p, Point2D q, Point2D r)
+// 2D cross product of OA and OB vectors, i.e. z-component of their 3D cross product.
+// Returns a positive value, if OAB makes a counter-clockwise turn,
+// negative for clockwise turn, and zero if the points are collinear.
+double Polygon::cross(const Point &O, const Point &A, const Point &B)
 {
-
-  //double zero = 0.0;
-  double x1 = (q.x - p.x) * (r.y - p.y);
-  double x2 = (r.y - p.y) * (q.y - p.y);
-  double anotherDouble = x1 - x2;
-
-  std::cout << "findTurn: p:(" << p.x/delta << "," << p.y/delta << ") q:(" << q.x/delta << "," << q.y/delta << ") r:(" << r.x/delta << "," << r.y/delta << ") score: "<< anotherDouble << std::endl;
-
-  if(anotherDouble < 0)
-    return 1;
-  if(anotherDouble > 0)
-    return -1;
-  return 0;
+	return (long)(A.x - O.x) * (B.y - O.y) - (long)(A.y - O.y) * (B.x - O.x);
 }
 
 std::vector<double>* Polygon::getXBoundaries()

@@ -264,7 +264,7 @@ void PolygonSegment::addBoundaryElement(Element* e)
 {
   if(std::find(boundaries.begin(), boundaries.end(), e) == boundaries.end())
     boundaries.push_back(e);
-  std::cout << "Boundary elements: " << boundaries.size() << std::endl;
+  //std::cout << "Boundary elements: " << boundaries.size() << std::endl;
 }
 
 std::vector<Element*>* PolygonSegment::getBoundaryElements()

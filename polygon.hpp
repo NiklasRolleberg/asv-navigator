@@ -8,9 +8,15 @@
 #include "segment.hpp"
 
 
-struct Point2D {
-  Point2D(int px = 99, int py = -99): x(px), y(py){}
-  double x,y;
+struct Point {
+	double x, y;
+
+  Point(int px = 99, int py = -99): x(px), y(py){}
+
+	bool operator <(const Point &p) const
+  {
+		return x < p.x || (x == p.x && y < p.y);
+	}
 };
 
 /**The polygon class contains coordinates for the nodes, both in local and
@@ -29,7 +35,7 @@ private:
 
     void addBoundaryElements(PolygonSegment* ps);
     PolygonSegment* createSegmentFromElements(std::set<Element*>);
-    int findTurn(Point2D p, Point2D q, Point2D r);
+    double cross(const Point &O, const Point &A, const Point &B);
 
 public:
 
