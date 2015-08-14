@@ -392,16 +392,16 @@ void Data::processMessage(std::string m)
 
 void Data::setBoatWaypoint_real(double lat0, double lon0,double lat1, double lon1, double speed)
 {
-    std::cout << "Data: Set real waypoint, real coordinates: (" << lat0 << "," << lon0 << ") -> ("<< lat1 <<","<< lon1 << ")" << std::endl;
+    //std::cout << "Data: Set real waypoint, real coordinates: (" << lat0 << "," << lon0 << ") -> ("<< lat1 <<","<< lon1 << ")" << std::endl;
     std::stringstream s;
 
-
+    /*
     //DEBUG
     s << "$MSSCP,0,0,0," << std::setprecision(10) << lat1 << "," << lon1 << ",0,"<< speed << ",*00";
     data_transmitterptr->sendMessage(s.str()); //send path
+    */
 
 
-    /*
     if(lat0 == 0 || lon0 == 0)
       s << "MSSCP,,,," << std::setprecision(10) << lat1 << "," << lon1 << ",,"<< speed << ",";
     else
@@ -412,7 +412,6 @@ void Data::setBoatWaypoint_real(double lat0, double lon0,double lat1, double lon
     data_transmitterptr->sendMessage(str); //send path
     data_transmitterptr->sendMessage("$MSSTA,*74"); //start
     data_transmitterptr->sendMessage("$MSGCP,*66"); //ask for current path
-    */
 }
 
 void Data::setBoatWaypoint_local(double x0, double y0,double x1, double y1, double speed)

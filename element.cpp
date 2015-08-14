@@ -53,6 +53,15 @@ double Element::getDepth()
   return 0;
 }
 
+int Element::getIndexX()
+{
+  return indexX;
+}
+int Element::getIndexY()
+{
+  return indexY;
+}
+
 double Element::getX()
 {
   return posX;

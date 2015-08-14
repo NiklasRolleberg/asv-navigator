@@ -44,7 +44,9 @@ public:
   int getTimesVisited();
   int getTimesTargeted();
 
-  //int[] getIndex();
+  int getIndexX();
+  int getIndexY();
+
   double getX();
   double getY();
 

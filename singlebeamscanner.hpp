@@ -23,7 +23,7 @@ private:
     int delay;
 
     /**Update values in the element matrix*/
-    bool updateDepth(Polygon* p, double x, double y, double depth, bool followingLand);
+    bool updateDepth(double x, double y, double depth, bool followingLand);
 
     /**scan a polygonsegment with sweeping pattern*/
     bool scanRegion(PolygonSegment* region);

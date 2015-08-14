@@ -39,7 +39,7 @@ bool PolygonSegment::contains(double x, double y)
     return false;
   double left = findX(y,false);
   double right = findX(y,true);
-  if(x<right && x>left)
+  if(x<=right && x>=left)
     return true;
   return false;
 }

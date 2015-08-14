@@ -267,6 +267,17 @@ void Polygon::removeRegion(PolygonSegment* region)
   polygonSegments.erase (polygonSegments.begin()+index);
 }
 
+void Polygon::removeAllRegions()
+{
+  std::cout << "deleting all regions" << std::endl;
+
+  for(int i=0;i<polygonSegments.size();i++)
+  {
+    delete polygonSegments.at(i);
+  }
+  polygonSegments.clear();
+}
+
 
 void Polygon::generateRegions()
 {
@@ -442,6 +453,98 @@ PolygonSegment* Polygon::createSegmentFromElements(std::set<Element*> cluster)
 double Polygon::cross(const Point &O, const Point &A, const Point &B)
 {
 	return (long)(A.x - O.x) * (B.y - O.y) - (long)(A.y - O.y) * (B.x - O.x);
+}
+
+
+double** Polygon::createCostMatrix(int cx, int cy)
+{
+
+  std::cout << "createCostMatrix: (" << cx << "," << cy << ")" << std::endl;
+
+  if(!localSet)
+    return NULL;
+
+  double** g_score = new double*[nx];
+  double f_score[nx][ny];
+
+  for (int i = 0; i < nx; ++i)
+  {
+    g_score[i] = new double[ny];
+  }
+  for(int i=0;i<nx;i++)
+    for(int j=0;j<ny;j++)
+      g_score[i][j] = -1;
+
+
+  std::set<Element*> openSet;
+  std::set<Element*> closedSet;
+
+  openSet.insert(matrix[cx][cy]);
+
+  g_score[cx][cy] = 0;
+  f_score[cx][cy] = 0;
+
+  while(!openSet.empty())
+  {
+    //std::cout << "openSet: " << openSet.size() << std::endl;
+    //std::cout << "closedSet: " << closedSet.size() << std::endl;
+
+    //find node with lowest f_score value
+    double min = std::numeric_limits<double>::max();
+    Element* current = NULL;
+    for(std::set<Element*>::iterator it=openSet.begin(); it!=openSet.end(); ++it)
+    {
+      int ix = (*it)->getIndexX();
+      int iy = (*it)->getIndexY();
+      if(f_score[ix][iy] <= min)
+      {
+        min = f_score[ix][iy];
+        current = (*it);
+      }
+    }
+
+    openSet.erase(current);
+    closedSet.insert(current);
+
+    if(current == NULL)
+      std::cout << "current is NULL" << std::endl;
+
+    /*
+    std::cout << "current:" << std::endl;
+    std::cout << "pos:" << current->getX() << "," << current->getY() << std::endl;
+    std::cout << "index:" << current->getIndexX() << "," << current->getIndexY() << std::endl;
+    std::cout << "nr of neighbours:" << current->getNeighbours()->size() << std::endl;
+    */
+    //itterate through neighbours
+    for(int i=0;i<current->getNeighbours()->size();i++)
+    {
+      Element* n = current->getNeighbours()->at(i);
+      if(closedSet.find(n) != closedSet.end() || n->getStatus() != 1)
+        continue;
+
+      double dx = n->getX()-current->getX();
+      double dy = n->getX()-current->getY();
+      double tentative_g_score;
+
+      if (g_score[current->getIndexX()][current->getIndexY()] != -1)
+        tentative_g_score = g_score[current->getIndexX()][current->getIndexX()] + sqrt(dx*dx + dy*dy);
+      else
+        tentative_g_score = sqrt(dx*dx + dy*dy);
+
+      if (openSet.find(n) == openSet.end() || tentative_g_score < g_score[n->getIndexX()][n->getIndexY()])
+      {
+        g_score[n->getIndexX()][n->getIndexY()] = tentative_g_score;
+        f_score[n->getIndexX()][n->getIndexY()] = tentative_g_score;
+
+        if(openSet.find(n) == openSet.end())
+        {
+          openSet.insert(n);
+        }
+      }
+    }
+  }
+
+  return g_score;
 }
 
 std::vector<double>* Polygon::getXBoundaries()

@@ -81,8 +81,14 @@ public:
     /**remove a region from the list and delete it*/
     void removeRegion(PolygonSegment* region);
 
+		/**remove all regions*/
+		void removeAllRegions();
+
     /**Creates regions from the unscanned elements in the matrix*/
     void generateRegions();
+
+		/**Creates a nx x ny matrix with costs for all accessible elements with cost=0 at cx,cy*/
+		double** createCostMatrix(int cx, int cy);
 
 
 
