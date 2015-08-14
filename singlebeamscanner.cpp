@@ -223,8 +223,6 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
 
   bool stop = false;
 
-  bool checkpath = false;
-
   //start sweeping
   while(!stop)
   {
@@ -234,13 +232,9 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
     double y = data->getY();
     double depth = 1;
 
-    if(checkpath)
-    {
-      checkpath = !checkpath;
-      if(!data->hasCorrectPath(0,0,data->yTOlat(targetY),data->xTOlon(targetX),2)){
-        std::cout << "wrong path, sending path again" << std::endl;
-        data->setBoatWaypoint_local(0,0,targetX,targetY,targetSpeed);
-      }
+    if(!data->hasCorrectPath(0,0,data->yTOlat(targetY),data->xTOlon(targetX),2)){
+      std::cout << "wrong path, sending path again" << std::endl;
+      data->setBoatWaypoint_local(0,0,targetX,targetY,targetSpeed);
     }
 
     dx = targetX-x;
@@ -417,7 +411,7 @@ Closest SingleBeamScanner::findClosest(int startX,int startY)
   if(cost == NULL)
     return Closest(-1,-1,nullptr);
 
-
+/*
   std::cout << "Cost matrix:" << std::endl;
   for(int j=0;j<polygon->ny;j++)
   {
@@ -427,7 +421,7 @@ Closest SingleBeamScanner::findClosest(int startX,int startY)
     }
     std::cout << cost[polygon->nx-1][j] << std::endl;
   }
-
+*/
 
   Element* target = NULL;
   PolygonSegment* targetRegion = NULL;

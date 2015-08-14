@@ -30,7 +30,7 @@ Transmitter::Transmitter(int arg0)
     messageQueue = new std::queue<std::string>();
 
     // NO BOOST
-    serialPort = open("/dev/ttyACM0", O_RDWR | O_NOCTTY | O_NDELAY);
+    serialPort = open("/dev/ttyUSB0", O_RDWR | O_NOCTTY | O_NDELAY);
     if(serialPort == -1)
       std::cout << "failed" << std::endl;
     else
