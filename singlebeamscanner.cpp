@@ -134,7 +134,7 @@ void SingleBeamScanner::startScan()
   polygon->generateRegions();
   */
 
-  /**Start scanning the first region */
+  //Start scanning the first region
   int index = -1;
   for(int i=0;i<polygon->polygonSegments.size();i++)
   {
@@ -210,7 +210,12 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
   double targetY = data->getY();
   double targetX = region->findX(targetY, !goToRight);
   double targetSpeed = 5;
-  data->setBoatWaypoint_local(0,0,targetX,targetY,targetSpeed);
+
+  double lastTargetX = data->getX();
+  double lastTargetY = data->getY();
+
+
+  data->setBoatWaypoint_local(lastTargetX,lastTargetY,targetX,targetY,targetSpeed);
 
   //north or south
   int updown = 1;
@@ -232,10 +237,12 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
     double y = data->getY();
     double depth = 1;
 
-    if(!data->hasCorrectPath(0,0,data->yTOlat(targetY),data->xTOlon(targetX),2)){
+
+    if(!data->hasCorrectPath(data->yTOlat(lastTargetY),data->xTOlon(lastTargetX),data->yTOlat(targetY),data->xTOlon(targetX),2)){
       std::cout << "wrong path, sending path again" << std::endl;
-      data->setBoatWaypoint_local(0,0,targetX,targetY,targetSpeed);
+      data->setBoatWaypoint_local(lastTargetX,lastTargetY,targetX,targetY,targetSpeed);
     }
+
 
     dx = targetX-x;
     dy = targetY-y;
@@ -254,8 +261,8 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
     //target reached -> choose new target
     if(sqrt(dx*dx + dy*dy) < tol || skipRest)
     {
-      double lastTargetX = targetX;
-      double lastTargetY = targetY;
+      lastTargetX = targetX;
+      lastTargetY = targetY;
 
       //System.out.println("Waypoint reached");
       if(goToNextLine)
