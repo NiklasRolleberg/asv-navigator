@@ -305,7 +305,7 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
         usleep(delay);
       }
 
-      /*
+
       //DEBUG
       //change status of elements
       double DX = (lastTargetX-targetX);
@@ -317,7 +317,7 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
       {
           updateDepth(targetX + DX*i,targetY + DY*i, 2, false);
       }
-      */
+
 
     }
     //close to land
