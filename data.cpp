@@ -38,8 +38,8 @@ Data::Data(Transmitter* transmitter,int delay, int arg3)
     boat_heading_local = 0;
     boat_speed = 0;
     boat_depth = 0;
-
-    data_threadptr != nullptr;
+    localEnabled = false;
+    data_threadptr = nullptr;
 }
 
 Data::~Data()
