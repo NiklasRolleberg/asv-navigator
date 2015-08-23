@@ -6,6 +6,9 @@
 #include "segment.hpp"
 #include "element.hpp"
 
+//FOR GUI
+#include "view.hpp"
+
 struct Closest {
   Closest(int ix, int iy,PolygonSegment* ptr): x(ix), y(iy),region(ptr){}
   int x,y;
@@ -21,6 +24,9 @@ private:
     double delta;
     double tol;
     int delay;
+
+    bool showGUI;
+    View* GUI;
 
     /**Update values in the element matrix*/
     bool updateDepth(double x, double y, double depth, bool followingLand);

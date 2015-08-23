@@ -8,7 +8,13 @@
 #include <cmath>
 #include "segment.hpp"
 #include <iomanip>
-//#include element
+
+
+//FOR GUI
+#include "view.hpp"
+IMPLEMENT_APP_NO_MAIN(View);
+IMPLEMENT_WX_THEME_SUPPORT;
+
 
 SingleBeamScanner::SingleBeamScanner(Data* dataptr, Polygon* polygonptr, double d, double t)
 {
@@ -18,13 +24,32 @@ SingleBeamScanner::SingleBeamScanner(Data* dataptr, Polygon* polygonptr, double 
   delay = 1000000;
   delta = d;
   tol = t;
+
+  showGUI = true;
+  GUI = NULL;
+
+
+
+  //GUI = new View();//a1,a2
+  //GUI->start( 500, 200 );
+
+  /*
+  for(int i=0;i<10;i++)
+  {
+    GUI->drawPath(rand()%200,rand()%200);
+    GUI->update();
+    usleep(500000);
+  }
+  usleep(1000000);
+  */
+  //delete GUI;
 }
 
 
 SingleBeamScanner::~SingleBeamScanner()
 {
   std::cout << "scanner:SingleBeamScanner destructor" << std::endl;
-  //TODO delete polygon?
+  delete GUI;
 }
 
 
@@ -41,6 +66,14 @@ void SingleBeamScanner::startScan()
   data->writeToLog(s.str());
 
   std::cout << "scanner:SingleBeamScanner: starting scan" << std::endl;
+
+  if(showGUI)
+  {
+    GUI = new View();//a1,a2
+    GUI->start( 500, std::max(polygon->maxX,polygon->maxY) );
+    GUI->drawPolygon(polygon->getXBoundaries(),polygon->getYBoundaries());
+    GUI->update();
+  }
 
     //real coordinates
     /*
@@ -241,6 +274,12 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
     if(!data->hasCorrectPath(data->yTOlat(lastTargetY),data->xTOlon(lastTargetX),data->yTOlat(targetY),data->xTOlon(targetX),2)){
       std::cout << "wrong path, sending path again" << std::endl;
       data->setBoatWaypoint_local(lastTargetX,lastTargetY,targetX,targetY,targetSpeed);
+    }
+
+    if(showGUI)
+    {
+      GUI->drawPath(x,y);
+      GUI->update();
     }
 
 

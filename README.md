@@ -1,6 +1,10 @@
 # asv-navigator
 
-compile: g++ *.cpp -std=c++0x -pthread
+Install wx-widgets!
+
+compile: g++ *.cpp `wx-config --cxxflags --libs` -pthread -std=c++0x
+
+
 
 stty options:
 speed 9600 baud; rows 0; columns 0; line = 0;
