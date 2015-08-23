@@ -570,7 +570,7 @@ void Polygon::saveMatrix()
   std::ofstream *logfile2 = new std::ofstream(fileName2);
   std::ofstream *logfile3 = new std::ofstream(fileName3);
 
-  for(int j=0;j<ny;j++) {
+  for(int j=ny-1;j>0;j--) {
     for(int i=0;i<nx-1;i++) {
         (*logfile1) << matrix[i][j]->getDepth() << ", ";
         (*logfile2) << matrix[i][j]->getTimesVisited() << ", ";
