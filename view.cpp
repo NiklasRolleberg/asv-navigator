@@ -39,18 +39,18 @@ View::~View()
 
 void View::start(int ws, int max)
 {
-  std::cout << "View start" << std::endl;
+  //std::cout << "View start" << std::endl;
   windowSize = ws;
   maxXY = max;
   if(uiThread == NULL)
     uiThread = new std::thread(&View::init,this);
-  std::cout << "View: thread started" << std::endl;
+  //std::cout << "View: thread started" << std::endl;
   usleep(500000);
 }
 
 void View::init()
 {
-  std::cout << "View init" << std::endl;
+  //std::cout << "View init" << std::endl;
   argc = 0;
   argv = new char*[argc];
   wxEntryStart( argc, argv );
@@ -60,7 +60,7 @@ void View::init()
 
 bool View::OnInit()
 {
-  std::cout << "View OnInit" << std::endl;
+  //std::cout << "View OnInit" << std::endl;
   wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
   frame = new wxFrame((wxFrame *)NULL, -1,  wxT("wxframe"), wxPoint(50,50), wxSize(windowSize,windowSize+25));
   drawPane = new BasicDrawPane( (wxFrame*) frame , windowSize);
@@ -91,7 +91,7 @@ void View::drawPath(double posx, double posy)
     return;
   }
 
-  drawLine((int) lastPosx, (int) lastPosy, (int) posx,(int) posy, 1, 255,0,0);
+  drawLine((int) lastPosx, (int) lastPosy, (int) posx,(int) posy, 3, 255,0,0);
   lastPosx = posx;
   lastPosy = posy;
 }
@@ -126,8 +126,18 @@ END_EVENT_TABLE()
 
 BasicDrawPane::BasicDrawPane(wxFrame* parent, int ws) : wxPanel(parent)
 {
+  std::cout << "DrawPane constructor" << std::endl;
   windowSize = ws;
   bmp = wxBitmap(windowSize, windowSize, -1);
+}
+
+BasicDrawPane::~BasicDrawPane()
+{
+  std::cout << "DrawPane destructor" << std::endl;
+  
+  wxString test(_T("logs/bild.png"));
+  bmp.SaveFile(test, wxBITMAP_TYPE_PNG);
+
 }
 
 void BasicDrawPane::drawLine(int startx, int starty, int stopx,int stopy,int width,int r, int g , int b)

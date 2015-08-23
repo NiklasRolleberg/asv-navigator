@@ -15,6 +15,8 @@ class BasicDrawPane : public wxPanel
 public:
     BasicDrawPane(wxFrame* parent, int windowSize);
 
+    ~BasicDrawPane();
+
     void paintEvent(wxPaintEvent & evt);
     void paintNow();
 
