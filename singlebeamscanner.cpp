@@ -12,8 +12,8 @@
 
 //FOR GUI
 #include "view.hpp"
-IMPLEMENT_APP_NO_MAIN(View);
-IMPLEMENT_WX_THEME_SUPPORT;
+//IMPLEMENT_APP_NO_MAIN(View);
+//IMPLEMENT_WX_THEME_SUPPORT;
 
 
 SingleBeamScanner::SingleBeamScanner(Data* dataptr, Polygon* polygonptr, double d, double t)
@@ -21,11 +21,12 @@ SingleBeamScanner::SingleBeamScanner(Data* dataptr, Polygon* polygonptr, double 
   std::cout << "scanner:SingleBeamScanner constructor" << std::endl;
   data = dataptr;
   polygon = polygonptr;
-  delay = 1000000;
+  delay = 1000000; //1000000 1s
   delta = d;
   tol = t;
 
-  showGUI = true;
+  stop = false;
+  showGUI = false;
   GUI = NULL;
 
 
@@ -191,8 +192,9 @@ void SingleBeamScanner::startScan()
     region = NULL;
   }
 
-  while(false)
+  while(!stop)
   {
+    std::cout << "in the loop" << std::endl;
     //(rework regions) TODO kanske senare
 
     //if regions left in list pick the closest accessible one
@@ -210,6 +212,7 @@ void SingleBeamScanner::startScan()
       if(c.x == -1 || c.y==-1 || c.region == nullptr)
       {
         std::cout << "No accessible regions left to scan\n" << std::endl;
+        stop = true;
         break; //no path found -> nothing left to scan
       }
     }
@@ -259,8 +262,6 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
   double dy;
   double targetLine = targetY;
 
-  bool stop = false;
-
   //start sweeping
   while(!stop)
   {
@@ -270,12 +271,12 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
     double y = data->getY();
     double depth = 1;
 
-
+    /*
     if(!data->hasCorrectPath(data->yTOlat(lastTargetY),data->xTOlon(lastTargetX),data->yTOlat(targetY),data->xTOlon(targetX),2)){
       std::cout << "wrong path, sending path again" << std::endl;
       data->setBoatWaypoint_local(lastTargetX,lastTargetY,targetX,targetY,targetSpeed);
     }
-
+    */
     if(showGUI)
     {
       GUI->drawPath(x,y);
@@ -295,6 +296,8 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
       std::cout << std::endl;
       return false;
     }
+
+    polygon->updateView();
 
     std::cout << "Distance to target: " << sqrt(dx*dx + dy*dy) << std::endl;
     //target reached -> choose new target
@@ -331,7 +334,7 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
       if(targetY > region->yMax || targetY < region->yMin || !region->contains(targetX,targetY))
       {
         std::cout << "Scanning completed, min/max y reached" << std::endl;
-        stop = true;
+        //stop = true;
         break;
         //kex.setSpeed(0);
       }
@@ -344,7 +347,7 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
         usleep(delay);
       }
 
-      /*
+
       //DEBUG
       //change status of elements
       double DX = (lastTargetX-targetX);
@@ -356,7 +359,7 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
       {
           updateDepth(targetX + DX*i,targetY + DY*i, 2, false);
       }
-      */
+
 
     }
     //close to land
@@ -418,7 +421,6 @@ bool SingleBeamScanner::updateDepth(double x, double y, double depth, bool follo
   {
     std::cout << "Not implemented" << std::endl;
   }
-
   return true;
 }
 

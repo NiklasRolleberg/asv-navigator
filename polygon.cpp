@@ -9,6 +9,11 @@
 #include "element.hpp"
 #include "segment.hpp"
 
+//FOR GUI
+#include "view.hpp"
+IMPLEMENT_APP_NO_MAIN(View);
+IMPLEMENT_WX_THEME_SUPPORT;
+
 Polygon::Polygon(std::vector<double> *lat, std::vector<double> *lon)
 {
     std::cout << "Polygon constructor" << std::endl;
@@ -23,12 +28,19 @@ Polygon::Polygon(std::vector<double> *lat, std::vector<double> *lon)
         std::cout << "Latitude: " << latitude->at(i) << std::endl;
     }
     */
+
+    showGUI = true;
+    GUI = NULL;
 }
 
 Polygon::~Polygon()
 {
     //std::cout << "polygon destructor called" << std::endl;
     //delete element matrix
+    showGUI = false;
+    if (GUI != NULL)
+      delete GUI;
+    GUI = NULL;
 
     if(matrix != NULL)
     {
@@ -199,6 +211,13 @@ void Polygon::initialize()
   //TODO (add elements-pointers to the polygon segment objects)
   for(int i=0;i<polygonSegments.size();i++)
     addBoundaryElements(polygonSegments.at(i));
+
+    if(showGUI)
+    {
+      GUI = new View();//a1,a2
+      GUI->start(500,matrix,nx,ny);//,&polygonSegments);
+      GUI->update();
+    }
 }
 
 void Polygon::addBoundaryElements(PolygonSegment* ps)
@@ -589,4 +608,12 @@ void Polygon::saveMatrix()
   delete logfile1;
   delete logfile2;
   delete logfile3;
+}
+
+
+void Polygon::updateView()
+{
+  std::cout << "polygon::update view" << std::endl;
+  if(showGUI && GUI != NULL)
+    GUI->update();
 }

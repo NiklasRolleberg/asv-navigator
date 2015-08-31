@@ -7,6 +7,7 @@
 #include "element.hpp"
 #include "segment.hpp"
 
+#include "view.hpp"
 
 struct Point {
 	double x, y;
@@ -36,6 +37,9 @@ private:
     void addBoundaryElements(PolygonSegment* ps);
     PolygonSegment* createSegmentFromElements(std::set<Element*>);
     double cross(const Point &O, const Point &A, const Point &B);
+
+		bool showGUI;
+		View* GUI;
 
 public:
 
@@ -90,7 +94,8 @@ public:
 		/**Creates a nx x ny matrix with costs for all accessible elements with cost=0 at cx,cy*/
 		double** createCostMatrix(int cx, int cy);
 
-
+		/**update the window*/
+		void updateView();
 
 };
 

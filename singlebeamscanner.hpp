@@ -24,6 +24,7 @@ private:
     double delta;
     double tol;
     int delay;
+    bool stop;
 
     bool showGUI;
     View* GUI;
