@@ -10,12 +10,6 @@
 #include <iomanip>
 
 
-//FOR GUI
-#include "view.hpp"
-//IMPLEMENT_APP_NO_MAIN(View);
-//IMPLEMENT_WX_THEME_SUPPORT;
-
-
 SingleBeamScanner::SingleBeamScanner(Data* dataptr, Polygon* polygonptr, double d, double t)
 {
   std::cout << "scanner:SingleBeamScanner constructor" << std::endl;
@@ -26,31 +20,12 @@ SingleBeamScanner::SingleBeamScanner(Data* dataptr, Polygon* polygonptr, double 
   tol = t;
 
   stop = false;
-  showGUI = false;
-  GUI = NULL;
-
-
-
-  //GUI = new View();//a1,a2
-  //GUI->start( 500, 200 );
-
-  /*
-  for(int i=0;i<10;i++)
-  {
-    GUI->drawPath(rand()%200,rand()%200);
-    GUI->update();
-    usleep(500000);
-  }
-  usleep(1000000);
-  */
-  //delete GUI;
 }
 
 
 SingleBeamScanner::~SingleBeamScanner()
 {
   std::cout << "scanner:SingleBeamScanner destructor" << std::endl;
-  delete GUI;
 }
 
 
@@ -67,14 +42,6 @@ void SingleBeamScanner::startScan()
   data->writeToLog(s.str());
 
   std::cout << "scanner:SingleBeamScanner: starting scan" << std::endl;
-
-  if(showGUI)
-  {
-    GUI = new View();//a1,a2
-    GUI->start( 500, std::max(polygon->maxX,polygon->maxY) );
-    GUI->drawPolygon(polygon->getXBoundaries(),polygon->getYBoundaries());
-    GUI->update();
-  }
 
     //real coordinates
     /*
@@ -277,12 +244,6 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
       data->setBoatWaypoint_local(lastTargetX,lastTargetY,targetX,targetY,targetSpeed);
     }
     */
-    if(showGUI)
-    {
-      GUI->drawPath(x,y);
-      GUI->update();
-    }
-
 
     dx = targetX-x;
     dy = targetY-y;
@@ -297,7 +258,7 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
       return false;
     }
 
-    polygon->updateView();
+    polygon->updateView(x,y);
 
     std::cout << "Distance to target: " << sqrt(dx*dx + dy*dy) << std::endl;
     //target reached -> choose new target

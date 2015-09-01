@@ -11,7 +11,7 @@
 
 //FOR GUI
 #include "view.hpp"
-IMPLEMENT_APP_NO_MAIN(View);
+IMPLEMENT_APP_NO_MAIN(PathView);
 IMPLEMENT_WX_THEME_SUPPORT;
 
 Polygon::Polygon(std::vector<double> *lat, std::vector<double> *lon)
@@ -214,8 +214,11 @@ void Polygon::initialize()
 
     if(showGUI)
     {
-      GUI = new View();//a1,a2
-      GUI->start(500,matrix,nx,ny);//,&polygonSegments);
+      GUI = new PathView();//a1,a2
+      GUI->start(500,std::max(maxX,maxY),matrix,nx,ny);//,&polygonSegments);
+
+      GUI->drawPolygon(getXBoundaries(),getYBoundaries());
+
       GUI->update();
     }
 }
@@ -611,9 +614,12 @@ void Polygon::saveMatrix()
 }
 
 
-void Polygon::updateView()
+void Polygon::updateView(double currentX, double currentY)
 {
   std::cout << "polygon::update view" << std::endl;
   if(showGUI && GUI != NULL)
-    GUI->update();
+  {
+    GUI->drawPath(currentX,currentY);
+  	GUI->update();
+  }
 }

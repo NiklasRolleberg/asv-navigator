@@ -26,9 +26,6 @@ private:
     int delay;
     bool stop;
 
-    bool showGUI;
-    View* GUI;
-
     /**Update values in the element matrix*/
     bool updateDepth(double x, double y, double depth, bool followingLand);
 

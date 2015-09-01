@@ -37,14 +37,13 @@ public:
 };
 
 
-class View: public wxApp
+class PathView: public wxApp
 {
     bool OnInit();
     void init();
 
     //1 = boat path
     //2 = matrix
-    int type;
 
     Element*** matrix;
     //std::vector<PolygonSegment*>*regions;
@@ -52,9 +51,10 @@ class View: public wxApp
 
     std::thread* uiThread;
 
-    wxFrame *frame;
-    BasicDrawPane * drawPane;
-    //Polygon* polygon;
+    wxFrame *pathFrame;
+    wxFrame *matrixFrame;
+    BasicDrawPane * pathDrawPane;
+    BasicDrawPane * matrixDrawPane;
 
     int argc;
     char **argv;
@@ -66,15 +66,12 @@ class View: public wxApp
     double lastPosy;
 
 public:
-  View();
-  View(int argc, char *argv[]);
-  ~View();
-
-  /**Start view for showing boat path*/
-  void start(int windowSize, int maxXY);
+  PathView();
+  PathView(int argc, char *argv[]);
+  ~PathView();
 
   /**Start view for showing matrix*/
-  void start(int windowSize, Element*** m, int nx, int ny);//, std::vector<PolygonSegment*>* polygonSegments);
+  void start(int windowSize, int maxXY, Element*** m, int nx, int ny);//, std::vector<PolygonSegment*>* polygonSegments);
 
   void update();
 

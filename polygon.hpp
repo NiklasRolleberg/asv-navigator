@@ -39,7 +39,7 @@ private:
     double cross(const Point &O, const Point &A, const Point &B);
 
 		bool showGUI;
-		View* GUI;
+		PathView* GUI;
 
 public:
 
@@ -95,10 +95,8 @@ public:
 		double** createCostMatrix(int cx, int cy);
 
 		/**update the window*/
-		void updateView();
+		void updateView(double currentX, double currentY);
 
 };
-
-
 
 #endif // POLYGON_H
