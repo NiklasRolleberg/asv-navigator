@@ -16,8 +16,10 @@ class BasicDrawPane : public wxPanel
    wxBitmap bmp;
    int windowSize;
    Element*** matrix;
+   std::vector<PolygonSegment*>*regions;
    int nx,ny;
    bool drawMatrix;
+   double scale;
 
 public:
     BasicDrawPane(wxFrame* parent, int windowSize);
@@ -33,6 +35,8 @@ public:
 
     void setMatrix(Element***,int nx,int ny);
 
+    void setRegionContainer(std::vector<PolygonSegment*>* regions, double maxXY);
+
     DECLARE_EVENT_TABLE()
 };
 
@@ -46,7 +50,7 @@ class PathView: public wxApp
     //2 = matrix
 
     Element*** matrix;
-    //std::vector<PolygonSegment*>*regions;
+    std::vector<PolygonSegment*>*regions;
     int nx,ny;
 
     std::thread* uiThread;
@@ -71,7 +75,7 @@ public:
   ~PathView();
 
   /**Start view for showing matrix*/
-  void start(int windowSize, int maxXY, Element*** m, int nx, int ny);//, std::vector<PolygonSegment*>* polygonSegments);
+  void start(int windowSize, int maxXY, Element*** m, int nx, int ny, std::vector<PolygonSegment*>* polygonSegments);
 
   void update();
 

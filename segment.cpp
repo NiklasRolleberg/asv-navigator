@@ -130,8 +130,10 @@ double PolygonSegment::findX(double y, bool right)
   return min;
 }
 
-double PolygonSegment::findY(double x, bool top)
+double PolygonSegment::findY(double y, bool top)
 {
+
+  //This function is exactly like findX, but with all x changed to y
 
   int l1[] = {-1,-1};
   int l2[] = {-1,-1};
@@ -142,11 +144,11 @@ double PolygonSegment::findY(double x, bool top)
   int l21 = -1;
   int l22 = -1;
 
-  int l = xPoints.size();
+  int l = yPoints.size();
   for(int i=0; i < l; i++)
   {
-    if(((xPoints.at((i+1)%l) >= x) && (xPoints.at(i) <= x))
-    || ((xPoints.at((i+1)%l) <= x) && (xPoints.at(i) >= x)))
+    if(((xPoints.at((i+1)%l) >= y) && (xPoints.at(i) <= y))
+    || ((xPoints.at((i+1)%l) <= y) && (xPoints.at(i) >= y)))
     {
       //interpolate
       if(l11 == -1)
@@ -165,48 +167,48 @@ double PolygonSegment::findY(double x, bool top)
   /*error return some default value*/
   if(l11 == -1 || l12 == -1 || l21 == -1 || l22 == -1)
   {
-    double meanY = 0;
+    double meanX = 0;
     for(int i=0;i<yPoints.size();i++)
     {
-      meanY += yPoints.at(i);
+      meanX += yPoints.at(i);
     }
-    meanY /= yPoints.size();
-    return meanY;
+    meanX /= yPoints.size();
+    return meanX;
   }
 
-  //interpolate
-  double x0 = xPoints.at(l11);
-  double y0 = yPoints.at(l11);
-  double x1 = xPoints.at(l12);
-  double y1 = yPoints.at(l12);
-
-  //how far is x on the line
-  double p = (x-x0) / (x1-x0);
-  double pY1 = (1-p)*y0 + p*y1;
-
-  //System.out.println("p1=" + p);
-  x0 = xPoints.at(l21);
-  y0 = yPoints.at(l21);
-  x1 = xPoints.at(l22);
-  y1 = yPoints.at(l22);
+  //interpolate x
+  double x0 = yPoints.at(l11);
+  double y0 = xPoints.at(l11);
+  double x1 = yPoints.at(l12);
+  double y1 = xPoints.at(l12);
 
   //how far is y on the line
-  p = (x-x0) / (x1-x0);
-  double pY2 = (1-p)*x0 + p*x1;
+  double p = (y-y0) / (y1-y0);
+  double pX1 = (1-p)*x0 + p*x1;
+
+  //System.out.println("p1=" + p);
+  x0 = yPoints.at(l21);
+  y0 = xPoints.at(l21);
+  x1 = yPoints.at(l22);
+  y1 = xPoints.at(l22);
+
+  //how far is y on the line
+  p = (y-y0) / (y1-y0);
+  double pX2 = (1-p)*x0 + p*x1;
   //System.out.println("p2=" + p);
 
   double max;
   double min;
 
-  if(pY1>pY2)
+  if(pX1>pX2)
   {
-    max = pY1;
-    min = pY2;
+    max = pX1;
+    min = pX2;
   }
   else
   {
-    max = pY2;
-    min = pY1;
+    max = pX2;
+    min = pX1;
   }
 
   if(top)
@@ -251,7 +253,7 @@ double PolygonSegment::maxY()
 
 double PolygonSegment::minY()
 {
-  double temp = std::numeric_limits<double>::min();
+  double temp = std::numeric_limits<double>::max();
   for (double value : yPoints)
   {
     if (value < temp)

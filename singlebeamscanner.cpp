@@ -211,9 +211,23 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
   bool goToNextLine = true;
   bool skipRest = false; //true -> the boat has to find a new waypoint
   double targetY = data->getY();
-  double targetX = region->findX(targetY, !goToRight);
-  double targetSpeed = 5;
 
+
+  //if the boat has drifted outside the region, change targetY to a point just inside the boundary;
+  if(targetY>=region->yMax)
+    targetY = region->yMax-0.5*delta;
+
+  if(targetY<=region->yMin)
+    targetY = region->yMin+0.5*delta;
+
+  /*
+  std::cout << "TargetY: " << targetY << std::endl;
+  std::cout << "ymin:    " << region->yMin << std::endl;
+  */
+
+  double targetX = region->findX(targetY, !goToRight);
+
+  double targetSpeed = 3;
   double lastTargetX = data->getX();
   double lastTargetY = data->getY();
 
@@ -222,7 +236,7 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
 
   //north or south
   int updown = 1;
-  if(targetY > (region->yMax/2.0))
+  if((targetY-region->yMin) > ((region->yMax-region->yMin)/2.0))
     updown = -1;
 
   double dx;
@@ -295,6 +309,19 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
       if(targetY > region->yMax || targetY < region->yMin || !region->contains(targetX,targetY))
       {
         std::cout << "Scanning completed, min/max y reached" << std::endl;
+        /*
+        if(targetY > region->yMax )
+          std::cout << "MAX" << std::endl;
+        if(targetY < region->yMin )
+          std::cout << "MIN" << std::endl;
+        if(!region->contains(targetX,targetY))
+          std::cout << "OUTSIDE" << std::endl;
+        std::cout << "Updown: " << updown << std::endl;
+        std::cout << "TargetY: " << targetY << std::endl;
+        std::cout << "ymax:    " << region->yMax << std::endl;
+        std::cout << "ymin:    " << region->yMin << std::endl;
+        */
+
         //stop = true;
         break;
         //kex.setSpeed(0);
@@ -435,6 +462,7 @@ Closest SingleBeamScanner::findClosest(int startX,int startY)
   Element* target = NULL;
   PolygonSegment* targetRegion = NULL;
   double min = std::numeric_limits<double>::max();
+  //std::cout << "findClosest: regions.size() " << polygon->polygonSegments.size() << std::endl;
 
   for(int i=0;i<polygon->polygonSegments.size();i++)
   {
@@ -444,10 +472,10 @@ Closest SingleBeamScanner::findClosest(int startX,int startY)
       double c1 = cost[e->getIndexX()][e->getIndexY()];
       double targeted = polygon->matrix[e->getIndexX()][e->getIndexY()]->getTimesTargeted();
       double c2 = (c1 +1) * targeted;
-      //std::cout << "cost: " << c << " index:" << e->getIndexX() << "," << e->getIndexY() << std::endl;
       if(c2<min && c1 != -1 && targeted < 2 )
       {
         std::cout << "targeted: " << targeted << std::endl;
+        //std::cout << "cost: " << c2 << " index:" << e->getIndexX() << "," << e->getIndexY() << std::endl;
         min = c2;
         target = e;
         targetRegion = polygon->polygonSegments.at(i);
@@ -466,6 +494,12 @@ Closest SingleBeamScanner::findClosest(int startX,int startY)
 
   if(target== NULL)
     return Closest(-1,-1,nullptr);
+
+  //DEBUG
+  polygon->matrix[target->getIndexX()][target->getIndexY()]->setStatus(2);
+  polygon->updateView(data->getX(),data->getY());
+  usleep(1000000);
+
 
   polygon->matrix[target->getIndexX()][target->getIndexY()]->targeted();
   return Closest(target->getX(),target->getY(),targetRegion);

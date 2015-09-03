@@ -16,7 +16,7 @@ PathView::PathView()
   lastPosy = 0;
 
   matrix = NULL;
-  //regions = NULL;
+  regions = NULL;
 }
 
 
@@ -29,7 +29,7 @@ PathView::PathView(int a1, char** a2)
   //argc = a1;
   //argv = a2;
   matrix = NULL;
-  //regions = NULL;
+  regions = NULL;
 
 
   //TODO save stuff
@@ -59,11 +59,11 @@ PathView::~PathView()
   }
 }
 
-void PathView::start(int ws, int max, Element*** m, int x, int y)//, std::vector<PolygonSegment*>* polygonSegments)
+void PathView::start(int ws, int max, Element*** m, int x, int y, std::vector<PolygonSegment*>* polygonSegments)
 {
 
   matrix = m;
-  //regions = polygonSegments;
+  regions = polygonSegments;
   nx = x;
   ny = y;
   windowSize = ws;
@@ -107,6 +107,7 @@ bool PathView::OnInit()
   matrixFrame->SetAutoLayout(true);
 
   matrixDrawPane->setMatrix(matrix,nx,ny);
+  matrixDrawPane->setRegionContainer(regions, maxXY);
 
   pathFrame->Show();
   matrixFrame->Show();
@@ -171,6 +172,8 @@ BasicDrawPane::BasicDrawPane(wxFrame* parent, int ws) : wxPanel(parent)
   windowSize = ws;
   bmp = wxBitmap(windowSize, windowSize, -1);
   drawMatrix = false;
+  matrix = NULL;
+  regions = NULL;
 }
 
 BasicDrawPane::~BasicDrawPane()
@@ -207,38 +210,72 @@ void BasicDrawPane::paintNow()
 
 void BasicDrawPane::render(wxDC&  dc)
 {
-    if(!drawMatrix)
-      dc.DrawBitmap(bmp, 0, 0, false);
+  if(!drawMatrix)
+    dc.DrawBitmap(bmp, 0, 0, false);
 
-    if(drawMatrix)
-    {
-      double dx = windowSize/nx;
-      double dy = windowSize/ny;
+  if(drawMatrix)
+  {
+    double dx = windowSize/nx;
+    double dy = windowSize/ny;
 
-      for(int j=0;j<ny;j++) {
-        for(int i=0;i<nx;i++) {
-          // draw a rectangle
-          if(matrix[i][j]->getStatus() == 0)
-            dc.SetBrush(*wxBLACK_BRUSH); // not scanned
+    for(int j=0;j<ny;j++) {
+      for(int i=0;i<nx;i++) {
+        // draw a rectangle
+        if(matrix[i][j]->getStatus() == 0)
+          dc.SetBrush(*wxBLACK_BRUSH); // not scanned
 
-          if(matrix[i][j]->getStatus() == 1)
-              dc.SetBrush(*wxGREEN_BRUSH); // scanned
+        if(matrix[i][j]->getStatus() == 1)
+            dc.SetBrush(*wxGREEN_BRUSH); // scanned
 
-          if(matrix[i][j]->getStatus() == 5)
-            dc.SetBrush(*wxGREY_BRUSH); // outside
+        if(matrix[i][j]->getStatus() == 2)
+            dc.SetBrush(*wxRED_BRUSH); // land
 
-          dc.SetPen( wxPen( wxColor(255,255,255), 1 ) );
-          dc.DrawRectangle( i*dx, windowSize-(j+1)*dy, dx, dy );
-        }
+        if(matrix[i][j]->getStatus() == 3)
+            dc.SetBrush(*wxYELLOW_BRUSH); // probably land
+
+        if(matrix[i][j]->getStatus() == 5)
+          dc.SetBrush(*wxGREY_BRUSH); // outside
+
+        dc.SetPen( wxPen( wxColor(255,255,255), 1 ) );
+        dc.DrawRectangle( i*dx, windowSize-(j+1)*dy, dx, dy );
       }
-
     }
+
+    //draw regions
+    if(regions == NULL)
+      return;
+
+    for(int i=0;i<regions->size();i++)
+    {
+      PolygonSegment* ps = regions->at(i);
+
+      int s = ps->xPoints.size();
+      for(int j=0;j<s;j++)
+      {
+        double x1 = scale*ps->xPoints[j];
+        double y1 = scale*ps->yPoints[j];
+        double x2 = scale*ps->xPoints[(j+1) % s];
+        double y2 = scale*ps->yPoints[(j+1) % s];
+
+        // draw a line
+        dc.SetPen( wxPen( wxColor(0,0,0), 3 ) ); // black line, 3 pixels thick
+        //dc.DrawLine( 300, 100, 700, 300 ); // draw line across the rectangle
+        dc.DrawLine(x1,windowSize - y1, x2, windowSize-y2);
+      }
+    }
+  }
 }
 
 void BasicDrawPane::setMatrix(Element*** m, int x, int y)
 {
-    matrix = m;
-    nx = x;
-    ny = y;
-    drawMatrix = true;
+  matrix = m;
+  nx = x;
+  ny = y;
+  drawMatrix = true;
+}
+
+void BasicDrawPane::setRegionContainer(std::vector<PolygonSegment*>* r, double max)
+{
+  regions = r;
+  scale = (double)windowSize / max;
 }

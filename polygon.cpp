@@ -215,7 +215,9 @@ void Polygon::initialize()
     if(showGUI)
     {
       GUI = new PathView();//a1,a2
-      GUI->start(500,std::max(maxX,maxY),matrix,nx,ny);//,&polygonSegments);
+      std::vector<PolygonSegment*>* pointer;
+      pointer = &polygonSegments;
+      GUI->start(500,std::max(maxX,maxY),matrix,nx,ny,pointer);
 
       GUI->drawPolygon(getXBoundaries(),getYBoundaries());
 
@@ -228,22 +230,35 @@ void Polygon::addBoundaryElements(PolygonSegment* ps)
   std::cout << "add boundary elements to polygonsegment" << std::endl;
   //works for convex segments
 
+  /*
+  std::cout << "info about ps:" << std::endl;
+  std::cout << "xMin: " << ps->xMin << std::endl;
+  std::cout << "xMax: " << ps->xMax << std::endl;
+  std::cout << "yMin: " << ps->yMin << std::endl;
+  std::cout << "yMax: " << ps->yMax << std::endl;
+  */
   double y = ps->yMin;
 
   while(y < ps->yMax)
   {
     double xpos1 = ps->findX(y, true);
     double xpos2 = ps->findX(y, false);
-    int xIndex1 = (int) round((xpos1 - ps->xMin) / delta);
-    int xIndex2 = (int) round((xpos2 - ps->xMin) / delta);
-    int yIndex = (int)  round((y - ps->yMin) / delta);
+    int xIndex1 = (int) round((xpos1 - minX) / delta);
+    int xIndex2 = (int) round((xpos2 - minX) / delta);
+    int yIndex = (int)  round((y - minY) / delta);
 
     if(yIndex<ny && yIndex>=0)
     {
       if(xIndex1<nx && xIndex1>=0)
+      {
         ps->addBoundaryElement(matrix[xIndex1][yIndex]);
+        //matrix[xIndex1][yIndex]->setStatus(3); //DEBUG
+      }
       if(xIndex2<nx && xIndex2>=0)
+      {
         ps->addBoundaryElement(matrix[xIndex2][yIndex]);
+        //matrix[xIndex2][yIndex]->setStatus(3); //DEBUG
+      }
     }
     y+=delta/2.0;
   }
@@ -253,16 +268,22 @@ void Polygon::addBoundaryElements(PolygonSegment* ps)
   {
     double ypos1 = ps->findY(x, true);
     double ypos2 = ps->findY(x, false);
-    int xIndex = (int)  round((x - ps->xMin) / delta);
-    int yIndex1 =(int)  round((ypos1 - ps->yMin) / delta);
-    int yIndex2 =(int)  round((ypos2 - ps->yMin) / delta);
+    int xIndex = (int)  round((x - minX) / delta);
+    int yIndex1 =(int)  round((ypos1 - minY) / delta);
+    int yIndex2 =(int)  round((ypos2 - minY) / delta);
 
     if(xIndex<nx && xIndex>=0)
     {
       if(yIndex1<ny && yIndex1>=0)
+      {
         ps->addBoundaryElement(matrix[xIndex][yIndex1]);
+        //matrix[xIndex][yIndex1]->setStatus(3); //DEBUG
+      }
       if(yIndex2<ny && yIndex2>=0)
+      {
         ps->addBoundaryElement(matrix[xIndex][yIndex2]);
+        //matrix[xIndex][yIndex2]->setStatus(3); //DEBUG
+      }
     }
     x+=delta/2.0;
   }
@@ -318,7 +339,10 @@ void Polygon::generateRegions()
     for(int j=0;j<ny;j++)
     {
       if(matrix[i][j]->getStatus() == 0)
+      {
         not_scanned.insert(matrix[i][j]);
+        //matrix[i][j]->setStatus(2);
+      }
     }
   }
   std::cout << not_scanned.size() << " unscanned elements found" << std::endl;
@@ -387,6 +411,9 @@ void Polygon::generateRegions()
     }
   }
 
+  //DEBUG
+  //GUI->update();
+  //usleep(10000000);
 
 }
 
