@@ -236,8 +236,11 @@ void BasicDrawPane::render(wxDC&  dc)
         if(matrix[i][j]->getStatus() == 5)
           dc.SetBrush(*wxGREY_BRUSH); // outside
 
+        double x1 = scale*matrix[i][j]->getX();
+        double y1 = scale*matrix[i][j]->getY();
+        double d = std::min(dx,dy);
         dc.SetPen( wxPen( wxColor(255,255,255), 1 ) );
-        dc.DrawRectangle( i*dx, windowSize-(j+1)*dy, dx, dy );
+        dc.DrawRectangle( x1-(d/2), windowSize-y1-(d/2), d, d );
       }
     }
 

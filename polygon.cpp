@@ -212,17 +212,25 @@ void Polygon::initialize()
   for(int i=0;i<polygonSegments.size();i++)
     addBoundaryElements(polygonSegments.at(i));
 
-    if(showGUI)
-    {
-      GUI = new PathView();//a1,a2
-      std::vector<PolygonSegment*>* pointer;
-      pointer = &polygonSegments;
-      GUI->start(500,std::max(maxX,maxY),matrix,nx,ny,pointer);
+  /*
+  std::vector<PolygonSegment*>* tri = triangulateRegion(polygonSegments.at(0));
+  //removeRegion(polygonSegments.at(0));
+  if(tri != NULL)
+  {
+    for(int i=0;i<tri->size();i++)
+      polygonSegments.push_back(tri->at(i));
+  }
+*/
+  if(showGUI)
+  {
+    GUI = new PathView();//a1,a2
+    std::vector<PolygonSegment*>* pointer;
+    pointer = &polygonSegments;
+    GUI->start(500,std::max(maxX,maxY),matrix,nx,ny,pointer);
 
-      GUI->drawPolygon(getXBoundaries(),getYBoundaries());
-
-      GUI->update();
-    }
+    GUI->drawPolygon(getXBoundaries(),getYBoundaries());
+    GUI->update();
+  }
 }
 
 void Polygon::addBoundaryElements(PolygonSegment* ps)
@@ -507,6 +515,121 @@ double Polygon::cross(const Point &O, const Point &A, const Point &B)
 	return (long)(A.x - O.x) * (B.y - O.y) - (long)(A.y - O.y) * (B.x - O.x);
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////
+std::vector<PolygonSegment*>* Polygon::triangulateRegion(PolygonSegment* ps)
+{
+  std::cout << "EarClipping!" << std::endl;
+
+  //(1) check the number of points
+  //(2) check rotation
+  //(3) use ear clipping to split polygon into traingles
+  //(4) create new polygonsegments and add boundary elements
+
+  //(1)
+  if(ps->xPoints.size()<4)
+    return NULL;
+
+  //(2) try to use the "cross" function
+  std::vector<double> xVertex;
+  std::vector<double> yVertex;
+  std::vector<PolygonSegment*>* list = new std::vector<PolygonSegment*>();
+
+  //add coordinates
+  for(int i=0;i<ps->xPoints.size();i++)
+  {
+    xVertex.push_back(ps->xPoints[i]);
+    yVertex.push_back(ps->yPoints[i]);
+  }
+
+  //Ear clipping method
+  int index = 0;
+  int triangle[] = {index, index+1, index+2};
+  while(true)
+  {
+    bool ear = true;
+    //Check if triangle = ear
+    double triangleX[3];
+    double triangleY[3];
+
+
+    for(int i=0;i<3;i++)
+    {
+      triangleX[i] = xVertex[triangle[i]];
+      triangleY[i] = yVertex[triangle[i]];
+    }
+    for(int i=0; i<xVertex.size(); i++)
+    {
+      if(i == triangle[0] || i == triangle[1] || i == triangle[2])
+        continue;
+
+      //TODO FIXA DETTA
+      if(false)//insideTriangle(triangleX, triangleY, xVertex.get(i), yVertex.get(i)))
+      {
+        //System.out.println("No ear");
+        ear = false;
+      }
+    }
+
+    Point A(triangleX[0],triangleY[0]);
+    Point B(triangleX[1],triangleY[1]);
+    Point C(triangleX[2],triangleY[2]);
+    std::cout << "Earclipping cross: " << cross(A, B, C) << std::endl;
+    if(cross(A, B, C) > 0) //TODO testa saker
+    {
+      //System.out.println("No ear");
+      ear = false;
+    }
+
+    //if triangle is an ear, remove the ear and create a SearchCell
+    if(ear)
+    {
+      //System.out.println("Ear found");
+      std::vector<double>* X = new std::vector<double>();
+      std::vector<double>* Y = new std::vector<double>();
+
+      for(int j=0;j<3;j++)
+      {
+        X->push_back(xVertex.at(triangle[j]));
+        Y->push_back(yVertex.at(triangle[j]));
+      }
+
+      list->push_back(new PolygonSegment(X,Y));
+      //System.out.println("Removing vertexes");
+      xVertex.erase(xVertex.begin()+triangle[1]);
+      yVertex.erase(yVertex.begin()+triangle[1]);
+      index = triangle[1];
+      //System.out.println("Remaining vertexes: " + xVertex.size());
+    }
+    if(!ear)
+    {
+      index++;
+    }
+
+    if(xVertex.size() < 4)
+    {
+      //System.out.println("Earclipping done!");
+      std::vector<double>* X = new std::vector<double>();
+      std::vector<double>* Y = new std::vector<double>();
+
+      for(int j=0;j<xVertex.size();j++)
+      {
+        X->push_back(xVertex.at(j));
+        Y->push_back(yVertex.at(j));
+      }
+      list->push_back(new PolygonSegment(X,Y));
+      break;
+    }
+
+    triangle[0] = index % xVertex.size();
+    triangle[1] = (index+1) % xVertex.size();
+    triangle[2] = (index+2) % xVertex.size();
+
+    std::cout << "EarClipping: list size " << list->size() << std::endl;
+  }
+
+  return list;
+}
+/////////////////////////////////////////////////////////////////////////////////////////
 
 double** Polygon::createCostMatrix(int cx, int cy)
 {

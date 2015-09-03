@@ -35,6 +35,7 @@ private:
     std::vector<double>* yPoints;// = nullptr;
 
     void addBoundaryElements(PolygonSegment* ps);
+		std::vector<PolygonSegment*>* triangulateRegion(PolygonSegment* ps);
     PolygonSegment* createSegmentFromElements(std::set<Element*>);
     double cross(const Point &O, const Point &A, const Point &B);
 
