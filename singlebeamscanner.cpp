@@ -252,12 +252,12 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
     double y = data->getY();
     double depth = 1;
 
-    /*
+
     if(!data->hasCorrectPath(data->yTOlat(lastTargetY),data->xTOlon(lastTargetX),data->yTOlat(targetY),data->xTOlon(targetX),2)){
       std::cout << "wrong path, sending path again" << std::endl;
       data->setBoatWaypoint_local(lastTargetX,lastTargetY,targetX,targetY,targetSpeed);
     }
-    */
+    
 
     dx = targetX-x;
     dy = targetY-y;
@@ -335,7 +335,7 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
         usleep(delay);
       }
 
-
+      /*
       //DEBUG
       //change status of elements
       double DX = (lastTargetX-targetX);
@@ -347,7 +347,7 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
       {
           updateDepth(targetX + DX*i,targetY + DY*i, 2, false);
       }
-
+      */
 
     }
     //close to land
@@ -495,11 +495,12 @@ Closest SingleBeamScanner::findClosest(int startX,int startY)
   if(target== NULL)
     return Closest(-1,-1,nullptr);
 
+  /*
   //DEBUG
   polygon->matrix[target->getIndexX()][target->getIndexY()]->setStatus(2);
   polygon->updateView(data->getX(),data->getY());
   usleep(1000000);
-
+  */
 
   polygon->matrix[target->getIndexX()][target->getIndexY()]->targeted();
   return Closest(target->getX(),target->getY(),targetRegion);

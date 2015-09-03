@@ -377,6 +377,9 @@ void Polygon::generateRegions()
   //expand with known neighbours
   for(int i=0;i<clusters.size();i++)
   {
+    if(clusters.at(i).size() < 2)
+      continue;
+
     std::set<Element*> neighbours;
     for(std::set<Element*>::iterator it=clusters.at(i).begin(); it!=clusters.at(i).end(); ++it)
     {

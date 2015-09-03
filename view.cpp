@@ -98,7 +98,7 @@ bool PathView::OnInit()
   //for matrix view
   //matrixFrame
   wxBoxSizer* sizer2 = new wxBoxSizer(wxHORIZONTAL);
-  matrixFrame = new wxFrame((wxFrame *)NULL, -1,  wxT("matrix"), wxPoint(50,50), wxSize(windowSize,windowSize+25));
+  matrixFrame = new wxFrame((wxFrame *)NULL, -1,  wxT("matrix"), wxPoint(550,50), wxSize(windowSize,windowSize+25));
   //matrixFrame = new wxFrame((wxFrame *)pathFrame, -1,  wxT("matrix"), wxPoint(50,50), wxSize(windowSize,windowSize+25));
   matrixDrawPane = new BasicDrawPane( (wxFrame*) matrixFrame , windowSize);
   sizer2->Add(matrixDrawPane, 1, wxEXPAND);
