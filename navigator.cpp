@@ -87,7 +87,7 @@ void Navigator::goToCoordinates(Task* task)
     double startLat = data->getLat();
     double startLon = data->getLon();
 
-    data->setBoatWaypoint_real(startLat,startLon,lat, lon,500);
+    data->setBoatWaypoint_real(startLat,startLon,lat, lon,1.6);
     double d = data->calculateDistance(lat,lon, data->getLat(), data->getLon());
     while(d > tol)
     {
@@ -97,7 +97,7 @@ void Navigator::goToCoordinates(Task* task)
 
       if(!data->hasCorrectPath(startLat,startLon,lat,lon,2)) {
         std::cout << "incorrect path. resending path" << std::endl;
-        data->setBoatWaypoint_real(startLat,startLon,lat, lon,500);
+        data->setBoatWaypoint_real(startLat,startLon,lat, lon,1.6);
       }
 
     }

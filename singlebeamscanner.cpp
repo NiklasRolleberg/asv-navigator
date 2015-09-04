@@ -227,7 +227,7 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
 
   double targetX = region->findX(targetY, !goToRight);
 
-  double targetSpeed = 3;
+  double targetSpeed = 1.6;
   double lastTargetX = data->getX();
   double lastTargetY = data->getY();
 
@@ -235,9 +235,9 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
   data->setBoatWaypoint_local(lastTargetX,lastTargetY,targetX,targetY,targetSpeed);
 
   //north or south
-  int updown = 1;
+  double updown = 0.8;
   if((targetY-region->yMin) > ((region->yMax-region->yMin)/2.0))
-    updown = -1;
+    updown = -0.8;
 
   double dx;
   double dy;
@@ -257,7 +257,7 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
       std::cout << "wrong path, sending path again" << std::endl;
       data->setBoatWaypoint_local(lastTargetX,lastTargetY,targetX,targetY,targetSpeed);
     }
-    
+
 
     dx = targetX-x;
     dy = targetY-y;
@@ -361,7 +361,7 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
 //TODO Gör om
 bool SingleBeamScanner::gotoRegion(Closest target)
 {
-  data->setBoatWaypoint_local(0,0,target.x,target.y,10);
+  data->setBoatWaypoint_local(data->getX(),data->getY(),target.x,target.y,10);
   double dx = data->getX() - target.x;
   double dy = data->getY() - target.y;
   double d = sqrt(dx*dx+dy*dy);
@@ -371,6 +371,7 @@ bool SingleBeamScanner::gotoRegion(Closest target)
     dx = data->getX() - target.x;
     dy = data->getY() - target.y;
     d = sqrt(dx*dx+dy*dy);
+    polygon->updateView(data->getX(),data->getY());
   }
   return true; //false = failed
 }
