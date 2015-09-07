@@ -115,10 +115,10 @@ public:
     bool hasCorrectPath(double lat0, double lon0, double lat1, double lon1, double tol);
 
     /**Set waypoint for the boat*/
-    void setBoatWaypoint_real(double lat0, double lon0,double lat1, double lon1, double speed);
+    void setBoatWaypoint_real(double lat0, double lon0,double lat1, double lon1, double speed, bool noStartPos);
 
     /**Set waypoint for the boat*/
-    void setBoatWaypoint_local(double x0, double y0, double x1, double y1, double speed);
+    void setBoatWaypoint_local(double x0, double y0, double x1, double y1, double speed, bool noStartPos);
 
     /**Set waypoint for the boat*/
     void setBoatSpeed(double speed);
