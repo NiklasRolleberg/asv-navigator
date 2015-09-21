@@ -267,7 +267,7 @@ void Data::threadLoop()
     //if(i)
       //data_transmitterptr->sendMessage("$MSGCP,*00");
     i = (i==false);
-    usleep(data_delay);
+    usleep(data_delay/2);
     std::queue<std::string>* messages = data_transmitterptr->getMessages();
 
     for(int i=0;i< messages->size();i++)
@@ -275,6 +275,7 @@ void Data::threadLoop()
       processMessage(messages->front());
       messages->pop();
     }
+    usleep(data_delay/2);
   }
   std::cout << "Data loop done" << std::endl;
 }

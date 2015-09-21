@@ -29,7 +29,7 @@ Polygon::Polygon(std::vector<double> *lat, std::vector<double> *lon)
     }
     */
 
-    showGUI = true;
+    showGUI = false;
     GUI = NULL;
 }
 
@@ -40,7 +40,7 @@ Polygon::~Polygon()
     showGUI = false;
     if (GUI != NULL)
       delete GUI;
-    GUI = NULL;
+    //GUI = NULL;
 
     if(matrix != NULL)
     {
