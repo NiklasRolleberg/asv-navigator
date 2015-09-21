@@ -269,7 +269,7 @@ void Data::threadLoop()
     i = (i==false);
     usleep(data_delay/2);
     std::queue<std::string>* messages = data_transmitterptr->getMessages();
-
+    //std::cout << messages->size() << " messages rescieved" << std::endl;
     for(int i=0;i< messages->size();i++)
     {
       processMessage(messages->front());

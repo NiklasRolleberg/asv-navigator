@@ -539,7 +539,7 @@ Closest SingleBeamScanner::findClosest(int startX,int startY)
   delete[] cost;
   std::cout << "cost matrix deleted" << std::endl;
   */
-  
+
   //TODO return the one with the lowest value
 
   if(target== NULL)
