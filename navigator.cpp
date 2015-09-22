@@ -84,19 +84,19 @@ void Navigator::goToCoordinates(Task* task)
     double lat = task->getTargetLat();
     double lon = task->getTargetLon();
 
-    data->setBoatWaypoint_real(0,0,lat, lon,1.6,false);//----------------------------
+    data->setBoatWaypoint_real(0,0,lat, lon,1.6,true);
     double d = data->calculateDistance(lat,lon, data->getLat(), data->getLon());
     while(d > tol)
     {
       usleep(1000000);
       d = data->calculateDistance(lat,lon, data->getLat(), data->getLon());
       std::cout << "GOTO-TASK:  distance to target: " << d << std::endl;
-      /*
+
       if(!data->hasCorrectPath(0,0,lat,lon,2)) {
         std::cout << "incorrect path. resending path" << std::endl;
         data->setBoatWaypoint_real(0,0,lat, lon,1.6,true);
       }
-      */
+
     }
     std::cout << "Target reached, task completed" << std::endl;
 }

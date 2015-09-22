@@ -15,7 +15,7 @@ SingleBeamScanner::SingleBeamScanner(Data* dataptr, Polygon* polygonptr, double 
   std::cout << "scanner:SingleBeamScanner constructor" << std::endl;
   data = dataptr;
   polygon = polygonptr;
-  delay = 1000000; //1000000 1s
+  delay = 100000; //1000000 1s
   delta = d;
   tol = t;
 
@@ -283,12 +283,12 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
     double y = data->getY();
     double depth = 1;
 
-    /*
+
     if(!data->hasCorrectPath(data->yTOlat(lastTargetY),data->xTOlon(lastTargetX),data->yTOlat(targetY),data->xTOlon(targetX),2)){
       std::cout << "wrong path, sending path again" << std::endl;
       data->setBoatWaypoint_local(lastTargetX,lastTargetY,targetX,targetY,targetSpeed,false);
     }
-    */
+
 
     dx = targetX-x;
     dy = targetY-y;
@@ -366,10 +366,10 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
         usleep(delay);
       }
 
-
+      /*
       //DEBUG
       //update depth of elements
-      if(rand()>0.2)
+      if(true)
       {
         double DX = (lastTargetX-targetX);
         double DY = (lastTargetY-targetY);
@@ -381,7 +381,7 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
             updateDepth(targetX + DX*i,targetY + DY*i, 2, false);
         }
       }
-
+      */
     }
     //close to land
     //TODO add land following
@@ -493,9 +493,18 @@ bool SingleBeamScanner::gotoRegion(Closest target)
       }
       std::cout << "new target: (" << targetX << "," << targetY << ")" << std::endl;
       //------------------------
-      data->setBoatWaypoint_local(0,0,targetX,targetY,1.6,false); //------------------------
+      data->setBoatWaypoint_local(0,0,targetX,targetY,1.6,true);
       polygon->updateView(data->getX(),data->getY());
     }
+
+    if(rand()<0.3)
+    {
+      if(!data->hasCorrectPath(0,0,data->yTOlat(targetY),data->xTOlon(targetX),2)){
+        std::cout << "wrong path, sending path again" << std::endl;
+        data->setBoatWaypoint_local(0,0,targetX,targetY,1.6,true);
+      }
+    }
+
     usleep(delay);
   }
 
