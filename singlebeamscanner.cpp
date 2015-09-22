@@ -283,12 +283,12 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
     double y = data->getY();
     double depth = 1;
 
-
+    /*
     if(!data->hasCorrectPath(data->yTOlat(lastTargetY),data->xTOlon(lastTargetX),data->yTOlat(targetY),data->xTOlon(targetX),2)){
       std::cout << "wrong path, sending path again" << std::endl;
       data->setBoatWaypoint_local(lastTargetX,lastTargetY,targetX,targetY,targetSpeed,false);
     }
-
+    */
 
     dx = targetX-x;
     dy = targetY-y;
@@ -366,19 +366,21 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
         usleep(delay);
       }
 
-      /*
+
       //DEBUG
-      //change status of elements
-      double DX = (lastTargetX-targetX);
-      double DY = (lastTargetY-targetY);
-      double D = sqrt(DX*DX+DY*DY);
-      DX = DX/D;
-      DY = DY/D;
-      for(int i=0;i<D;i++)
+      //update depth of elements
+      if(rand()>0.2)
       {
-          updateDepth(targetX + DX*i,targetY + DY*i, 2, false);
+        double DX = (lastTargetX-targetX);
+        double DY = (lastTargetY-targetY);
+        double D = sqrt(DX*DX+DY*DY);
+        DX = DX/D;
+        DY = DY/D;
+        for(int i=0;i<D;i++)
+        {
+            updateDepth(targetX + DX*i,targetY + DY*i, 2, false);
+        }
       }
-      */
 
     }
     //close to land
@@ -390,9 +392,10 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
 }
 
 //TODO Gör om
+/*
 bool SingleBeamScanner::gotoRegion(Closest target)
 {
-  data->setBoatWaypoint_local(0,0,target.x,target.y,1.6,true); //---------------------------------
+  data->setBoatWaypoint_local(0,0,target.x,target.y,1.6,false); //---------------------------------
   double dx = data->getX() - target.x;
   double dy = data->getY() - target.y;
   double d = sqrt(dx*dx+dy*dy);
@@ -404,6 +407,109 @@ bool SingleBeamScanner::gotoRegion(Closest target)
     d = sqrt(dx*dx+dy*dy);
     polygon->updateView(data->getX(),data->getY());
   }
+  return true; //false = failed
+}*/
+bool SingleBeamScanner::gotoRegion(Closest target)
+{
+  int x = (int) round((target.x - polygon->minX) / polygon->delta);
+  int y = (int) round((target.y - polygon->minY) / polygon->delta);
+  if(x<0)
+    x = 0;
+  if(x>=polygon->nx)
+    x = polygon->nx-1;
+  if(y<0)
+    y = 0;
+  if(y>=polygon->ny)
+    y = polygon->ny-1;
+
+
+  std::cout << "gotoRegion: " << x << "," << y << std::endl;
+  //Create cost matrix
+  double** cost = polygon->createCostMatrix(x, y);
+
+  double targetX = target.x;
+  double targetY = target.y;
+
+  bool findNext = true;
+  while(true)
+  {
+    std::cout << "gotoRegion: i loopen" << std::endl;
+    x = (int) round((data->getX() - polygon->minX) / polygon->delta);
+    y = (int) round((data->getY() - polygon->minY) / polygon->delta);
+
+    if(x<0)
+      x = 0;
+    if(x>=polygon->nx)
+      x = polygon->nx-1;
+    if(y<0)
+      y = 0;
+    if(y>=polygon->ny)
+      y = polygon->ny-1;
+
+    std::cout << "boat index: (" << x << "," << y << ")" << std::endl;
+
+    double dx = targetX - data->getX();
+    double dy = targetY - data->getY();
+
+    //target reached, pick a new target
+    if(sqrt(dx*dx + dy*dy) < tol || findNext)
+    {
+      findNext = false;
+      //distance += sqrt(dx*dx + dy*dy);
+
+      double tx = (data->getX() - target.x);
+      double ty = (data->getY() - target.y);
+      if(sqrt(tx*tx+ty*ty) < 2.0)
+      {
+        std::cout << "Reached (" << data->getX() << "," << data->getY() << ")" << std::endl;
+        std::cout << "Target (" << target.x << "," << target.y << ")" << std::endl;
+        std::cout << "distance to goal: " << sqrt(tx*tx+ty*ty) << std::endl;
+        std::cout << "tx: " << tx << std::endl;
+        std::cout << "ty: " << ty << std::endl;
+        break;
+      }
+
+      //------------------------
+      //find next waypoint
+      int xIndex[] = {x+1, x-1, x+0, x+0, x+1, x-1, x+1, x-1};
+      int yIndex[] = {y+0, y+0, y+1, y-1, y+1, y-1, y-1, y+1};
+      double min = std::numeric_limits<double>::max();
+      for(int i=0;i<8;i++)
+      {
+        if(xIndex[i] < 0 || xIndex[i] >= polygon->nx)
+          continue;
+        if(yIndex[i] < 0 || yIndex[i] >= polygon->ny)
+          continue;
+        if(cost[xIndex[i]][yIndex[i]] == -1)
+          continue;
+
+        if(cost[xIndex[i]][yIndex[i]] < min)
+        {
+          min = cost[xIndex[i]][yIndex[i]];
+          targetX = polygon->minX + delta*xIndex[i];
+          targetY = polygon->minY + delta*yIndex[i];
+          std::cout << "min: " << min << std::endl;
+        }
+      }
+      std::cout << "new target: (" << targetX << "," << targetY << ")" << std::endl;
+      //------------------------
+      data->setBoatWaypoint_local(0,0,targetX,targetY,1.6,false); //------------------------
+      polygon->updateView(data->getX(),data->getY());
+    }
+    usleep(delay);
+  }
+
+  //delete cost matrix
+  std::cout << "deleting cost matrix" << std::endl;
+  //delete the matrix
+  for (int i = polygon->nx-1; i >= 0; --i)
+  {
+    delete[] cost[i];
+  }
+  delete[] cost;
+  std::cout << "cost matrix deleted" << std::endl;
+
+
   return true; //false = failed
 }
 
@@ -441,7 +547,7 @@ bool SingleBeamScanner::updateDepth(double x, double y, double depth, bool follo
   {
     std::cout << "Not implemented" << std::endl;
   }
-  return true;
+  return true;double** cost = polygon->createCostMatrix(ix, iy);
 }
 
 
@@ -456,7 +562,7 @@ Closest SingleBeamScanner::findClosest(int startX,int startY)
     if(polygon->polygonSegments.at(i)->contains(startX,startY))
     {
       std::cout << "boat is allready inside a polygonsegment" << std::endl;
-      Closest(startX,startY,polygon->polygonSegments.at(i));
+      return Closest(startX,startY,polygon->polygonSegments.at(i));
     }
   }
 
@@ -493,9 +599,11 @@ Closest SingleBeamScanner::findClosest(int startX,int startY)
 
       if(e->getStatus() != 1)
       {
+        //e->setStatus(2);
         cost[i][j] = -1;
         continue;
       }
+      //e->setStatus(2);
       double c1 = cost[e->getIndexX()][e->getIndexY()];
       if(c1 == -1)
       {
@@ -505,18 +613,26 @@ Closest SingleBeamScanner::findClosest(int startX,int startY)
 
       //double targeted = polygon->matrix[e->getIndexX()][e->getIndexY()]->getTimesTargeted();
       double targeted = e->getTimesTargeted();
-      double c2 = (c1 +1) * targeted;
-      if(c2<min && targeted < 2 )
+      //double c2 = (c1 +1) * targeted;
+      if(c1<min && targeted < 2 )
       {
         std::cout << "targeted: " << targeted << std::endl;
         //std::cout << "cost: " << c2 << " index:" << e->getIndexX() << "," << e->getIndexY() << std::endl;
-        min = c2;
+        min = c1;
         target = e;
         targetRegion = polygon->polygonSegments.at(i);
       }
     }
   }
-  /*
+
+  if(target != NULL)
+  {
+    std::cout << "target:(" << target->getIndexX() << "," << target->getIndexY() << ")" << " cost: " << cost[target->getIndexX()][target->getIndexY()] << std::endl;
+  } else
+  {
+    std::cout << "target = NULL" << std::endl;
+  }
+
   std::cout << "Cost matrix:" << std::endl;
   for(int j=0;j<polygon->ny;j++)
   {
@@ -526,11 +642,10 @@ Closest SingleBeamScanner::findClosest(int startX,int startY)
     }
     std::cout << cost[polygon->nx-1][j] << std::endl;
   }
-  */
-  std::cout << "deleting cost matrix" << std::endl;
+
 
   //TODO fixa så det funkar
-  /*
+  std::cout << "deleting cost matrix" << std::endl;
   //delete the matrix
   for (int i = polygon->nx-1; i >= 0; --i)
   {
@@ -538,7 +653,7 @@ Closest SingleBeamScanner::findClosest(int startX,int startY)
   }
   delete[] cost;
   std::cout << "cost matrix deleted" << std::endl;
-  */
+
 
   //TODO return the one with the lowest value
 

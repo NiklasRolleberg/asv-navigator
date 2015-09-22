@@ -29,7 +29,7 @@ Polygon::Polygon(std::vector<double> *lat, std::vector<double> *lon)
     }
     */
 
-    showGUI = false;
+    showGUI = true;
     GUI = NULL;
 }
 
