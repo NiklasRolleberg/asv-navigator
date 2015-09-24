@@ -15,7 +15,7 @@ SingleBeamScanner::SingleBeamScanner(Data* dataptr, Polygon* polygonptr, double 
   std::cout << "scanner:SingleBeamScanner constructor" << std::endl;
   data = dataptr;
   polygon = polygonptr;
-  delay = 100000; //1000000 1s
+  delay = 500000; //1000000 1s
   delta = d;
   tol = t;
 

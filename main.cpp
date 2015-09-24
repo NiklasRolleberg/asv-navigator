@@ -38,8 +38,8 @@ int main()
   transmitter->start();
 
   // (2) Create the navigator, and pass the transmitter to
-  double delta = 3;
-  double tol = 2;//delta / 3.0;
+  double delta = 5;
+  double tol = 4;//delta / 3.0;
 
   Navigator* navigator = new Navigator(transmitter,delta,tol);
 
