@@ -35,10 +35,10 @@ int main()
   std::cout << "\n---------starting mission-----------\n"<< std::endl;
 
   Transmitter* transmitter = new Transmitter(2);
-  transmitter->start();
+  //transmitter->start();
 
   // (2) Create the navigator, and pass the transmitter to
-  double delta = 5;
+  double delta = 7;
   double tol = 4;//delta / 3.0;
 
   Navigator* navigator = new Navigator(transmitter,delta,tol);

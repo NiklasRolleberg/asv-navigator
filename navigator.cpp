@@ -33,7 +33,8 @@ void Navigator::start()
 {
     std::cout << "Navigator: Mission started" << std::endl;
     //start data collection from the boat
-    data->start();
+
+    //data->start();---------------------------------------------------------------------- VIKTIG
 
     std::cout << std::endl;
     Task* t = nullptr;

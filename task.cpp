@@ -55,7 +55,7 @@ Task::Task(std::string incMessage)
 Task::~Task()
 {
     //std::cout << "TASK destructor called" << std::endl;
-    if(polygon_ptr != nullptr)
+    if(polygon_ptr != nullptr && polygon_ptr != NULL)
         delete polygon_ptr;
     std::cout << "Task destructor" << std::endl;
 }

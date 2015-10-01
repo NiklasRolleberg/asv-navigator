@@ -8,9 +8,6 @@ class PolygonSegment
 {
 private:
 
-    //std::vector<double> xPoints;// = nullptr;
-    //std::vector<double> yPoints;// = nullptr;
-
     std::vector<Element*> boundaries;
     std::vector<Element*> contained; //kanske ej behövs
 

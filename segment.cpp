@@ -14,15 +14,13 @@ PolygonSegment::PolygonSegment(std::vector<double> *x, std::vector<double> *y)
     xPoints.push_back(x->at(i));
     yPoints.push_back(y->at(i));
   }
+  //delete x; <-memory leak if not included
+  //delete y;
   //std::cout << "PolygonSegment size: " << xPoints.size() << std::endl;
   xMax = maxX();
   xMin = minX();
   yMax = maxY();
   yMin = minY();
-
-  //Kanske funkar..
-  //std::cout << "min/max calculated:\n" << "maxX: " << xMax << ", minX: " << xMin<< "\nmaxY: " << yMax << ", minY: " << yMin << std::endl;
-  //std::cout << "testing findX (y=mean), left: " << findX((yMax-yMin)/2,false) << " right: " << findX((yMax-yMin)/2,true) << std::endl;
 
 }
 

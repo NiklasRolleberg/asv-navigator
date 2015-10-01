@@ -40,7 +40,6 @@ Polygon::~Polygon()
     showGUI = false;
     if (GUI != NULL)
       delete GUI;
-    //GUI = NULL;
 
     if(matrix != NULL)
     {
@@ -48,14 +47,14 @@ Polygon::~Polygon()
       {
         for (int j = 0; j < ny; ++j)
         {
-          delete matrix[i][j];
+          delete matrix[i][j]; //OK
         }
       }
       for (int i = 0; i < nx; ++i)
       {
-        delete matrix[i];
+        delete[] matrix[i]; //OK
       }
-      delete matrix;
+      delete[] matrix; // OK
       std::cout << "Matrix deleted" << std::endl;
     }
 
@@ -640,8 +639,9 @@ double** Polygon::createCostMatrix(int cx, int cy)
     return NULL;
 
   double** g_score = new double*[nx];
+  //double g_score[nx][ny];
   double f_score[nx][ny];
-
+  //std::cout << "(1)" << std::endl;
   for (int i = 0; i < nx; ++i)
   {
     g_score[i] = new double[ny];
@@ -650,10 +650,12 @@ double** Polygon::createCostMatrix(int cx, int cy)
     for(int j=0;j<ny;j++)
       g_score[i][j] = -1;
 
+  //std::cout << "(2)" << std::endl;
 
   std::set<Element*> openSet;
   std::set<Element*> closedSet;
 
+  //std::cout << "(3)" << std::endl;
   openSet.insert(matrix[cx][cy]);
 
   g_score[cx][cy] = 0;
@@ -669,6 +671,7 @@ double** Polygon::createCostMatrix(int cx, int cy)
     Element* current = NULL;
     for(std::set<Element*>::iterator it=openSet.begin(); it!=openSet.end(); ++it)
     {
+      //std::cout << "it:" << &(*it) << std::endl;
       int ix = (*it)->getIndexX();
       int iy = (*it)->getIndexY();
       if(f_score[ix][iy] <= min)
@@ -699,28 +702,39 @@ double** Polygon::createCostMatrix(int cx, int cy)
 
       double dx = n->getX()-current->getX();
       double dy = n->getY()-current->getY();
-      //std::cout << "(" << n->getIndexX() << "," << n->getIndexY() << ")" << std::endl;
-      //std::cout << "(" << dx << "," << dy << ")" << std::endl;
+      //std::cout << "n: " << n << std::endl;
+      //std::cout << "index: (" << n->getIndexX() << "," << n->getIndexY() << ")" << std::endl;
+      //std::cout << "(dx,dy): (" << dx << "," << dy << ")" << std::endl;
       double tentative_g_score;
+/*fel*/
+      //std::cout << "F:(0)" << std::endl;
 
       if (g_score[current->getIndexX()][current->getIndexY()] != -1)
         tentative_g_score = g_score[current->getIndexX()][current->getIndexY()] + sqrt(dx*dx + dy*dy);
       else
         tentative_g_score = sqrt(dx*dx + dy*dy);
 
+      //std::cout << "F:(1)" << std::endl;
+
       if (openSet.find(n) == openSet.end() || tentative_g_score < g_score[n->getIndexX()][n->getIndexY()])
       {
+        //std::cout << "F:(2)" << std::endl;
         g_score[n->getIndexX()][n->getIndexY()] = tentative_g_score;
         f_score[n->getIndexX()][n->getIndexY()] = tentative_g_score;
-
+        //std::cout << "F:(3)" << std::endl;
         if(openSet.find(n) == openSet.end())
         {
-          openSet.insert(n);
+          //std::cout << "polygon.cpp:729 openset.insert()" << n << std::endl;
+          openSet.insert(n); //funkar nog
+          //std::cout << "polygon.cpp:731 insert done" << n << std::endl;
         }
       }
+/*fel*/
+      //std::cout << "(4)" << std::endl;
     }
+    //std::cout << "(5)" << std::endl;
   }
-
+  std::cout << "costmatrix created" << std::endl;
   return g_score;
 }
 

@@ -42,123 +42,7 @@ void SingleBeamScanner::startScan()
   data->writeToLog(s.str());
 
   std::cout << "scanner:SingleBeamScanner: starting scan" << std::endl;
-
-    //real coordinates
-    /*
-    //first test: make the boat run on the edges of the polygon
-    std::vector<double>* lat = polygon->getLatBoundaries();
-    std::vector<double>* lon = polygon->getLonBoundaries();
-
-    double boatLat = data->getLat();
-    double boatLon = data->getLon();
-
-    //1) find closest node.
-    int index = -1;
-    double minimum = std::numeric_limits<double>::max();
-    //std::cout << minimum << std::endl;
-    double d = 0;
-    for(int i=0;i< lat->size();i++)
-    {
-        d = data->calculateDistance(boatLat,boatLon,lat->at(i), lon->at(i));
-        //std::cout << d << std::endl;
-        if(d<minimum)
-        {
-            index = i;
-            minimum = d;
-        }
-    }
-
-    std::cout << "scanner:minimum found: " << minimum << " at index " << index << std::endl;
-
-    //
-    double targetLat = lat->at(index);
-    double targetLon = lon->at(index);
-    double lastTargetLat = 0;
-    double lastTargetLon = 0;
-    double targetSpeed = 30;
-
-    data->setBoatWaypoint_real(lastTargetLat, lastTargetLon, targetLat, targetLon, targetSpeed,false);
-    //data->setBoatSpeed(targetSpeed);
-
-    //std::cout << targetLat << " " << targetLon << std::endl;
-
-    int lap = 0; //0
-    while(lap < 4)
-    {
-        usleep(750000);
-        d = data->calculateDistance(data->getLat(),data->getLon(),targetLat, targetLon);
-        std::cout << "scanner:distance to target " << d << std::endl;
-
-        if(!data->hasCorrectPath(lastTargetLat, lastTargetLon, targetLat, targetLon, targetSpeed))
-        {
-          std::cout << "resending path" << std::endl;
-          data->setBoatWaypoint_real(lastTargetLat, lastTargetLon, targetLat, targetLon, targetSpeed,false);
-        }
-
-        if(d < tol)
-        {
-            std::cout << "scanner:waypoint reached, picking the next one" << std::endl;
-            index++;
-            if(index >= lat->size())
-            {
-                index = 0;
-                lap++;
-            }
-
-            lastTargetLat = targetLat;
-            lastTargetLon = targetLon;
-
-            targetLat = lat->at(index);
-            targetLon = lon->at(index);
-            data->setBoatWaypoint_real(lastTargetLat, lastTargetLon, targetLat, targetLon, targetSpeed,alse);
-            //data->setBoatSpeed(targetSpeed);
-        }
-    }
-*/
- //-------------------------------------------------------------------------------------
-
   std::cout << "sweeping pattern, delta = " << delta << "\n" << std::endl;
-
-  /*
-  //DEBUG
-  for(int i=0;i<polygon->nx;i++)
-  {
-    for(int j=0;j<polygon->ny;j++)
-    {
-      //if(i == polygon->nx/2)
-        polygon->matrix[i][j]->setStatus(1);
-      //else
-      //polygon->matrix[i][j]->setStatus(0);
-    }
-  }
-
-  //polygon->removeRegion(polygon->polygonSegments.at(0));
-
-  //create region
-  //polygon->generateRegions();
-
-  double** cost = polygon->createCostMatrix(polygon->nx/2, polygon->ny/2);
-
-  std::cout << "Cost matrix:" << std::endl;
-  for(int j=0;j<polygon->ny;j++)
-    {
-      for(int i=0;i<polygon->nx-1;i++)
-      {
-        std::cout << cost[i][j] << ", ";
-      }
-    std::cout << cost[polygon->nx-1][j] << std::endl;
-  }
-
-  //delete the matrix
-  for (int i = polygon->nx-1; i >= 0; --i)
-  {
-    delete[] cost[i];
-  }
-  delete[] cost;
-
-  return;
-  */
-
 
   //Start scanning the first region
   int index = -1;
@@ -224,7 +108,7 @@ void SingleBeamScanner::startScan()
     }
 
     std::cout << "new region reached\n" << std::endl;
-
+    
     //scan that region
     scanRegion(c.region);
     polygon->removeRegion(c.region);
@@ -238,6 +122,7 @@ void SingleBeamScanner::startScan()
 
 bool SingleBeamScanner::scanRegion(PolygonSegment* region)
 {
+  std::cout << "scanRegion" << std::endl;
   bool goToRight = false;//(Math.random() < 0.5); //traveling from left side to right
   bool goToNextLine = true;
   bool skipRest = false; //true -> the boat has to find a new waypoint
@@ -366,7 +251,7 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
         usleep(delay);
       }
 
-      /*
+
       //DEBUG
       //update depth of elements
       if(true)
@@ -381,7 +266,7 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
             updateDepth(targetX + DX*i,targetY + DY*i, 2, false);
         }
       }
-      */
+
     }
     //close to land
     //TODO add land following
@@ -391,24 +276,6 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
   return true;
 }
 
-//TODO Gör om
-/*
-bool SingleBeamScanner::gotoRegion(Closest target)
-{
-  data->setBoatWaypoint_local(0,0,target.x,target.y,1.6,false); //---------------------------------
-  double dx = data->getX() - target.x;
-  double dy = data->getY() - target.y;
-  double d = sqrt(dx*dx+dy*dy);
-  while(d > tol)
-  {
-    usleep(1000000);
-    dx = data->getX() - target.x;
-    dy = data->getY() - target.y;
-    d = sqrt(dx*dx+dy*dy);
-    polygon->updateView(data->getX(),data->getY());
-  }
-  return true; //false = failed
-}*/
 bool SingleBeamScanner::gotoRegion(Closest target)
 {
   int x = (int) round((target.x - polygon->minX) / polygon->delta);
@@ -523,6 +390,7 @@ bool SingleBeamScanner::gotoRegion(Closest target)
 }
 
 
+
 bool SingleBeamScanner::updateDepth(double x, double y, double depth, bool followingLand)
 {
   //find index
@@ -556,7 +424,7 @@ bool SingleBeamScanner::updateDepth(double x, double y, double depth, bool follo
   {
     std::cout << "Not implemented" << std::endl;
   }
-  return true;double** cost = polygon->createCostMatrix(ix, iy);
+  return true;
 }
 
 
@@ -605,11 +473,11 @@ Closest SingleBeamScanner::findClosest(int startX,int startY)
     for(int j = 0;j<polygon->polygonSegments.at(i)->getBoundaryElements()->size();j++)
     {
       Element* e = polygon->polygonSegments.at(i)->getBoundaryElements()->at(j);
-
+      std::cout << "i,j" << i << "," << j << std::endl;
       if(e->getStatus() != 1)
       {
         //e->setStatus(2);
-        cost[i][j] = -1;
+        //cost[i][j] = -1;
         continue;
       }
       //e->setStatus(2);
