@@ -633,7 +633,7 @@ std::vector<PolygonSegment*>* Polygon::triangulateRegion(PolygonSegment* ps)
 double** Polygon::createCostMatrix(int cx, int cy)
 {
 
-  std::cout << "createCostMatrix: (" << cx << "," << cy << ")" << std::endl;
+  //std::cout << "createCostMatrix: (" << cx << "," << cy << ")" << std::endl;
 
   if(!localSet)
     return NULL;

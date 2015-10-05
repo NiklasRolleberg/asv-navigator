@@ -60,6 +60,7 @@ Transmitter::Transmitter(int arg0)
     //(*logfile) << "LOG TEST" << std::endl;
     //logfile->close();
 
+    listenThread = nullptr;
 
     /* BOOST
     std::string port = "/dev/ttyACM0";//"/dev/ttyUSB0";
@@ -97,7 +98,8 @@ Transmitter::~Transmitter()
   delete listenThread;
   //std::cout << "Closong serial port " << std::endl;
   //delete serial; BOOST
-  close(serialPort); //NO BOOST
+  if(serialPort != -1)
+    close(serialPort); //NO BOOST
   std::cout << "Transmitter destructor" << std::endl;
 }
 void Transmitter::start()

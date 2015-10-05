@@ -403,7 +403,6 @@ void Data::setBoatWaypoint_real(double lat0, double lon0,double lat1, double lon
     boat_longitude = lon1;
     boat_xpos = lonTOx(lon1);
     boat_ypos = latTOy(lat1);
-    return;
 
     //std::cout << "Data: Set real waypoint, real coordinates: (" << lat0 << "," << lon0 << ") -> ("<< lat1 <<","<< lon1 << ")" << std::endl;
     std::stringstream s;

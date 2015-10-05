@@ -108,7 +108,7 @@ void SingleBeamScanner::startScan()
     }
 
     std::cout << "new region reached\n" << std::endl;
-    
+
     //scan that region
     scanRegion(c.region);
     polygon->removeRegion(c.region);
@@ -117,7 +117,7 @@ void SingleBeamScanner::startScan()
 
   std::cout <<"SweepingPattern done" << std::endl;
   polygon->saveMatrix();
-  usleep(10000000);
+  usleep(3000000);
 }
 
 bool SingleBeamScanner::scanRegion(PolygonSegment* region)
@@ -240,7 +240,6 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
 
         //stop = true;
         break;
-        //kex.setSpeed(0);
       }
 
       std::cout << "TARGET: " << targetX << " " << targetY <<std::endl;
@@ -266,7 +265,6 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
             updateDepth(targetX + DX*i,targetY + DY*i, 2, false);
         }
       }
-
     }
     //close to land
     //TODO add land following
@@ -473,11 +471,11 @@ Closest SingleBeamScanner::findClosest(int startX,int startY)
     for(int j = 0;j<polygon->polygonSegments.at(i)->getBoundaryElements()->size();j++)
     {
       Element* e = polygon->polygonSegments.at(i)->getBoundaryElements()->at(j);
-      std::cout << "i,j" << i << "," << j << std::endl;
+      //std::cout << "i,j" << i << "," << j << std::endl;
       if(e->getStatus() != 1)
       {
         //e->setStatus(2);
-        //cost[i][j] = -1;
+        //cost[e->getIndexX()][e->getIndexY()] = -1; //kanske onödig
         continue;
       }
       //e->setStatus(2);
@@ -490,12 +488,12 @@ Closest SingleBeamScanner::findClosest(int startX,int startY)
 
       //double targeted = polygon->matrix[e->getIndexX()][e->getIndexY()]->getTimesTargeted();
       double targeted = e->getTimesTargeted();
-      //double c2 = (c1 +1) * targeted;
-      if(c1<min && targeted < 2 )
+      double c2 = (c1 +1) * (targeted+1);
+      if(c2<min && targeted < 2 )
       {
         std::cout << "targeted: " << targeted << std::endl;
         //std::cout << "cost: " << c2 << " index:" << e->getIndexX() << "," << e->getIndexY() << std::endl;
-        min = c1;
+        min = c2;
         target = e;
         targetRegion = polygon->polygonSegments.at(i);
       }
@@ -510,6 +508,7 @@ Closest SingleBeamScanner::findClosest(int startX,int startY)
     std::cout << "target = NULL" << std::endl;
   }
 
+  /*
   std::cout << "Cost matrix:" << std::endl;
   for(int j=0;j<polygon->ny;j++)
   {
@@ -519,7 +518,7 @@ Closest SingleBeamScanner::findClosest(int startX,int startY)
     }
     std::cout << cost[polygon->nx-1][j] << std::endl;
   }
-
+  */
 
   //TODO fixa så det funkar
   std::cout << "deleting cost matrix" << std::endl;
@@ -536,13 +535,6 @@ Closest SingleBeamScanner::findClosest(int startX,int startY)
 
   if(target== NULL)
     return Closest(-1,-1,nullptr);
-
-  /*
-  //DEBUG
-  polygon->matrix[target->getIndexX()][target->getIndexY()]->setStatus(2);
-  polygon->updateView(data->getX(),data->getY());
-  usleep(1000000);
-  */
 
   polygon->matrix[target->getIndexX()][target->getIndexY()]->targeted();
   return Closest(target->getX(),target->getY(),targetRegion);
