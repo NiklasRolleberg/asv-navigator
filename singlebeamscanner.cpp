@@ -90,28 +90,45 @@ void SingleBeamScanner::startScan()
 
       polygon->generateRegions();
 
-      c = findClosest(data->getX(),data->getY());
-      if(c.x == -1 || c.y==-1 || c.region == nullptr)
+      //check if the boat is inside a region allready
+      index = -1;
+      for(int i=0;i<polygon->polygonSegments.size();i++)
       {
-        std::cout << "No accessible regions left to scan\n" << std::endl;
-        stop = true;
-        break; //no path found -> nothing left to scan
+        if(polygon->polygonSegments.at(i)->contains(data->getX(),data->getY()))
+          index = i;
+      }
+
+      if(index =! -1)
+      {
+        std::cout << "boat is allready inside a region" << std::endl;
+        //scan the region
+        scanRegion(polygon->polygonSegments.at(index));
+        polygon->removeRegion(polygon->polygonSegments.at(index));
+      }
+      else
+      {
+        //find closest region
+        c = findClosest(data->getX(),data->getY());
+        if(c.x == -1 || c.y==-1 || c.region == nullptr)
+        {
+          std::cout << "No accessible regions left to scan\n" << std::endl;
+          stop = true;
+          break; //no path found -> nothing left to scan
+        }
+        std::cout << "new region found" << std::endl;
+
+        //go to that region
+        if(!gotoRegion(c)) {
+          std::cout << "go to region failed" << std::endl;
+          continue; //continue with something else
+        }
+        std::cout << "new region reached\n" << std::endl;
+
+        //scan that region
+        scanRegion(c.region);
+        polygon->removeRegion(c.region);
       }
     }
-
-    std::cout << "new region found" << std::endl;
-
-    //go to that region
-    if(!gotoRegion(c)) {
-      std::cout << "go to region failed" << std::endl;
-      continue; //continue with something else
-    }
-
-    std::cout << "new region reached\n" << std::endl;
-
-    //scan that region
-    scanRegion(c.region);
-    polygon->removeRegion(c.region);
   }
 
 
