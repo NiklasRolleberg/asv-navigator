@@ -14,12 +14,13 @@ private:
     Mission* mission_ptr;// = nullptr;
     double delta;
     double tol;
+    int update_delay; //delay for scanner and goto algotithms
 
 public:
     Navigator(){};
 
     /**Constructor*/
-    Navigator(Transmitter* transmitter, double d,double tol);
+    Navigator(Transmitter* transmitter, int data_delay,int scanner_delay, double d,double tol);
 
     /**Destructor*/
     ~Navigator();

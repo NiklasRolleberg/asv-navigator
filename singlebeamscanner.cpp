@@ -10,12 +10,12 @@
 #include <iomanip>
 
 
-SingleBeamScanner::SingleBeamScanner(Data* dataptr, Polygon* polygonptr, double d, double t)
+SingleBeamScanner::SingleBeamScanner(Data* dataptr, Polygon* polygonptr,int inputdelay, double d, double t)
 {
   std::cout << "scanner:SingleBeamScanner constructor" << std::endl;
   data = dataptr;
   polygon = polygonptr;
-  delay = 500000; //1000000 1s
+  delay = inputdelay; //1000000 1s
   delta = d;
   tol = t;
 
@@ -250,7 +250,7 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
         usleep(delay);
       }
 
-
+      /*
       //DEBUG
       //update depth of elements
       if(true)
@@ -265,6 +265,7 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
             updateDepth(targetX + DX*i,targetY + DY*i, 2, false);
         }
       }
+      */
     }
     //close to land
     //TODO add land following

@@ -8,13 +8,14 @@
 #include "singlebeamscanner.hpp"
 #include <string>
 
-Navigator::Navigator(Transmitter* transmitter, double d, double t)
+Navigator::Navigator(Transmitter* transmitter,int data_delay, int scanner_delay, double d, double t)
 {
     tr_ptr = transmitter;
     std::cout << "Navigator: constructor" << std::endl;
-    data = new Data(transmitter,1000000,0); // 1000000 1s
+    data = new Data(transmitter,data_delay,0); // 1000000 1s
     delta = d;
     tol = t;
+    update_delay = scanner_delay;
 }
 
 Navigator::~Navigator()
@@ -34,7 +35,7 @@ void Navigator::start()
     std::cout << "Navigator: Mission started" << std::endl;
     //start data collection from the boat
 
-    //data->start();---------------------------------------------------------------------- VIKTIG
+    data->start();
 
     std::cout << std::endl;
     Task* t = nullptr;
@@ -89,7 +90,7 @@ void Navigator::goToCoordinates(Task* task)
     double d = data->calculateDistance(lat,lon, data->getLat(), data->getLon());
     while(d > tol)
     {
-      usleep(1000000);
+      usleep(update_delay);
       d = data->calculateDistance(lat,lon, data->getLat(), data->getLon());
       std::cout << "GOTO-TASK:  distance to target: " << d << std::endl;
 
@@ -107,7 +108,7 @@ void Navigator::scanPolygon(Task* task)
 {
     std::cout << "Navigator: execute scan polygon task" << std::endl;
     data->setLocalCoordinateSystem(task->getPolygon(),delta);
-    SingleBeamScanner scanner = SingleBeamScanner(data, task->getPolygon(),delta, tol);
+    SingleBeamScanner scanner = SingleBeamScanner(data, task->getPolygon(),update_delay,delta, tol);
     std::cout << "start scanning" << std::endl;
     scanner.startScan();
     //usleep(2000000);

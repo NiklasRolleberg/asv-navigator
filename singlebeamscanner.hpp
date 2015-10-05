@@ -40,7 +40,7 @@ private:
 
 public:
     /**Constructor*/
-    SingleBeamScanner(Data* data, Polygon* polygon,double delta,double tol);
+    SingleBeamScanner(Data* data, Polygon* polygon,int delay, double delta,double tol);
 
     /**Destructor*/
     ~SingleBeamScanner();
