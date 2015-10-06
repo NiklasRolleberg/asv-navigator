@@ -86,8 +86,7 @@ void SingleBeamScanner::startScan()
     if(c.x == -1 || c.y==-1 || c.region == nullptr)
     {
       //no path found try generating new regions
-      //TODO remove all old regions
-
+      polygon->removeAllRegions();
       polygon->generateRegions();
 
       //check if the boat is inside a region allready
@@ -140,7 +139,8 @@ void SingleBeamScanner::startScan()
 bool SingleBeamScanner::scanRegion(PolygonSegment* region)
 {
   std::cout << "scanRegion" << std::endl;
-  bool goToRight = false;//(Math.random() < 0.5); //traveling from left side to right
+  bool goToRight = (region->findX(data->getY(),false) - data->getX())
+                    > (0.5)*(region->findX(data->getY(),false) - region->findX(data->getY(),true)); //traveling from left side to right
   bool goToNextLine = true;
   bool skipRest = false; //true -> the boat has to find a new waypoint
   double targetY = data->getY();
@@ -171,6 +171,16 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
   double updown = 0.8;
   if((targetY-region->yMin) > ((region->yMax-region->yMin)/2.0))
     updown = -0.8;
+
+
+  //adapt updown if the region is located at the top or bottom of the polygon
+  if(targetY+delta*updown > region->yMax || targetY+delta*updown < region->yMin)
+  {
+    //std::cout << "INTE BRA!" << std::endl;
+    updown*=0.6;
+    std::cout << "UPDOWN adapted: " << updown << std::endl;
+  }
+
 
   double dx;
   double dy;
@@ -538,7 +548,6 @@ Closest SingleBeamScanner::findClosest(int startX,int startY)
   }
   */
 
-  //TODO fixa så det funkar
   std::cout << "deleting cost matrix" << std::endl;
   //delete the matrix
   for (int i = polygon->nx-1; i >= 0; --i)

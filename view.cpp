@@ -6,6 +6,7 @@
 #include "polygon.hpp"
 #include "element.hpp"
 #include "segment.hpp"
+#include <ctime>
 
 
 PathView::PathView()
@@ -68,6 +69,7 @@ void PathView::start(int ws, int max, Element*** m, int x, int y, std::vector<Po
   ny = y;
   windowSize = ws;
   maxXY = max;
+  lastUpdate = clock();
   if(uiThread == NULL)
     uiThread = new std::thread(&PathView::init,this);
   usleep(500000);
@@ -152,10 +154,20 @@ void PathView::drawLine(int startx, int starty, int stopx,int stopy,int width, i
 
 void PathView::update()
 {
-  if(pathFrame != NULL)
-    pathFrame->Refresh();
-  if(matrixFrame != NULL)
-    matrixFrame->Refresh();
+
+  //Do stuff
+
+  clock_t time = clock() - lastUpdate;
+  double ms =  (((double) time / CLOCKS_PER_SEC) * 1000); //cpu-time
+  //std::cout << "ms:" << ms << std::endl;
+  if(ms > 1)
+  {
+    lastUpdate = clock();
+    if(pathFrame != NULL)
+      pathFrame->Refresh();
+    if(matrixFrame != NULL)
+      matrixFrame->Refresh();
+  }
 }
 
 

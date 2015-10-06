@@ -8,6 +8,7 @@
 //#include "polygon.hpp"
 #include "element.hpp"
 #include "segment.hpp"
+#include <ctime>
 
 
 class BasicDrawPane : public wxPanel
@@ -68,6 +69,8 @@ class PathView: public wxApp
 
     double lastPosx;
     double lastPosy;
+
+    clock_t lastUpdate;
 
 public:
   PathView();

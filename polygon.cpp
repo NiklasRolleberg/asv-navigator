@@ -706,8 +706,6 @@ double** Polygon::createCostMatrix(int cx, int cy)
       //std::cout << "index: (" << n->getIndexX() << "," << n->getIndexY() << ")" << std::endl;
       //std::cout << "(dx,dy): (" << dx << "," << dy << ")" << std::endl;
       double tentative_g_score;
-/*fel*/
-      //std::cout << "F:(0)" << std::endl;
 
       if (g_score[current->getIndexX()][current->getIndexY()] != -1)
         tentative_g_score = g_score[current->getIndexX()][current->getIndexY()] + sqrt(dx*dx + dy*dy);
