@@ -38,7 +38,7 @@ int main()
   transmitter->start();
 
   // (2) Create the navigator, and pass the transmitter to
-  double delta = 5;
+  double delta = 3;
   double tol = delta / 3.0;
 
   int delay_data = 1000000;

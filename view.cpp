@@ -264,13 +264,13 @@ void BasicDrawPane::render(wxDC&  dc)
     {
       PolygonSegment* ps = regions->at(i);
 
-      int s = ps->xPoints.size();
+      int s = ps->xPoints->size();
       for(int j=0;j<s;j++)
       {
-        double x1 = scale*ps->xPoints[j];
-        double y1 = scale*ps->yPoints[j];
-        double x2 = scale*ps->xPoints[(j+1) % s];
-        double y2 = scale*ps->yPoints[(j+1) % s];
+        double x1 = scale*ps->xPoints->at(j);
+        double y1 = scale*ps->yPoints->at(j);
+        double x2 = scale*ps->xPoints->at((j+1) % s);
+        double y2 = scale*ps->yPoints->at((j+1) % s);
 
         // draw a line
         dc.SetPen( wxPen( wxColor(0,0,0), 3 ) ); // black line, 3 pixels thick

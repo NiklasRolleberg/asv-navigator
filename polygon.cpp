@@ -16,71 +16,71 @@ IMPLEMENT_WX_THEME_SUPPORT;
 
 Polygon::Polygon(std::vector<double> *lat, std::vector<double> *lon)
 {
-    std::cout << "Polygon constructor" << std::endl;
-    latitude = lat;
-    longitude = lon;
-    xPoints = NULL;
-    yPoints = NULL;
-    localSet = false;
-    matrix = NULL;
-    /*
-    for(int i=0;i<latitude->size();i++) {
-        std::cout << "Latitude: " << latitude->at(i) << std::endl;
-    }
-    */
+  std::cout << "Polygon constructor" << std::endl;
+  latitude = lat;
+  longitude = lon;
+  xPoints = NULL;
+  yPoints = NULL;
+  localSet = false;
+  matrix = NULL;
+  /*
+  for(int i=0;i<latitude->size();i++) {
+      std::cout << "Latitude: " << latitude->at(i) << std::endl;
+  }
+  */
 
-    showGUI = true;
-    GUI = NULL;
+  showGUI = true;
+  GUI = NULL;
 }
 
 Polygon::~Polygon()
 {
-    //std::cout << "polygon destructor called" << std::endl;
-    //delete element matrix
-    showGUI = false;
-    if (GUI != NULL)
-      delete GUI;
+  //std::cout << "polygon destructor called" << std::endl;
+  //delete element matrix
+  showGUI = false;
+  if (GUI != NULL)
+    delete GUI;
 
-    if(matrix != NULL)
+  if(matrix != NULL)
+  {
+    for (int i = 0; i < nx; ++i)
     {
-      for (int i = 0; i < nx; ++i)
+      for (int j = 0; j < ny; ++j)
       {
-        for (int j = 0; j < ny; ++j)
-        {
-          delete matrix[i][j]; //OK
-        }
+        delete matrix[i][j]; //OK
       }
-      for (int i = 0; i < nx; ++i)
-      {
-        delete[] matrix[i]; //OK
-      }
-      delete[] matrix; // OK
-      std::cout << "Matrix deleted" << std::endl;
     }
-
-
-    while(polygonSegments.size() > 0)
+    for (int i = 0; i < nx; ++i)
     {
-      //remove polygonSegment
-      delete polygonSegments.at(0);
-      polygonSegments.erase (polygonSegments.begin()+0);
-      //std::cout << "vecor size:" << polygonSegments.size() << std::endl;
+      delete[] matrix[i]; //OK
     }
+    delete[] matrix; // OK
+    std::cout << "Matrix deleted" << std::endl;
+  }
 
-    //std::cout << "polygonSegments deleted" << std::endl;
+
+  while(polygonSegments.size() > 0)
+  {
+    //remove polygonSegment
+    delete polygonSegments.at(0);
+    polygonSegments.erase (polygonSegments.begin()+0);
+    //std::cout << "vecor size:" << polygonSegments.size() << std::endl;
+  }
+
+  //std::cout << "polygonSegments deleted" << std::endl;
 
 
-    delete xPoints;
-    delete yPoints;
+  delete xPoints;
+  delete yPoints;
 
-    //std::cout << "x&y deleted" << std::endl;
+  //std::cout << "x&y deleted" << std::endl;
 
-    delete latitude;
-    delete longitude;
+  delete latitude;
+  delete longitude;
 
-    //std::cout << "latlong deleted" << std::endl;
+  //std::cout << "latlong deleted" << std::endl;
 
-    std::cout << "Polygon destructor" << std::endl;
+  std::cout << "Polygon destructor" << std::endl;
 }
 
 std::vector<double>* Polygon::getLonBoundaries()
@@ -93,7 +93,6 @@ std::vector<double>* Polygon::getLatBoundaries()
     return latitude;
 }
 
-       //void setLocalBoundaries(std::vector<double>*x,std::vector<double>*y)
 void Polygon::setLocalBoundaries(std::vector<double>*x,std::vector<double>*y)
 {
   std::cout << "Polygon set local boundaries" << std::endl;
@@ -149,7 +148,15 @@ void Polygon::initialize()
   std::cout << "delta=" << delta << "-> grid size is: " << nx << "x" << ny << std::endl;
 
   //(1) create a polygon-segment object for the entire polygon (searchCell in kexet)
-  polygonSegments.push_back(new PolygonSegment(xPoints,yPoints));
+  //create new vectors for the polygonsegment
+  std::vector<double>* xPoints_copy = new std::vector<double>();
+  std::vector<double>* yPoints_copy = new std::vector<double>();
+  for(int i=0;i<xPoints->size();i++)
+  {
+    xPoints_copy->push_back(xPoints->at(i));
+    yPoints_copy->push_back(yPoints->at(i));
+  }
+  polygonSegments.push_back(new PolygonSegment(xPoints_copy,yPoints_copy));
 
   //TODO (2) (check if the segment is convex, if not it should be triangulated) kanske senare iaf
 
@@ -525,7 +532,7 @@ std::vector<PolygonSegment*>* Polygon::triangulateRegion(PolygonSegment* ps)
   //(4) create new polygonsegments and add boundary elements
 
   //(1)
-  if(ps->xPoints.size()<4)
+  if(ps->xPoints->size()<4)
     return NULL;
 
   //(2) try to use the "cross" function
@@ -534,10 +541,10 @@ std::vector<PolygonSegment*>* Polygon::triangulateRegion(PolygonSegment* ps)
   std::vector<PolygonSegment*>* list = new std::vector<PolygonSegment*>();
 
   //add coordinates
-  for(int i=0;i<ps->xPoints.size();i++)
+  for(int i=0;i<ps->xPoints->size();i++)
   {
-    xVertex.push_back(ps->xPoints[i]);
-    yVertex.push_back(ps->yPoints[i]);
+    xVertex.push_back((*ps->xPoints)[i]);
+    yVertex.push_back((*ps->yPoints)[i]);
   }
 
   //Ear clipping method

@@ -18,8 +18,8 @@ public:
     double yMax;
     double yMin;
 
-    std::vector<double> xPoints;// = nullptr;
-    std::vector<double> yPoints;// = nullptr;
+    std::vector<double> *xPoints;// = nullptr;
+    std::vector<double> *yPoints;// = nullptr;
 
     /**Constructor*/
     PolygonSegment(std::vector<double> *x, std::vector<double> *y);

@@ -8,14 +8,17 @@ PolygonSegment::PolygonSegment(std::vector<double> *x, std::vector<double> *y)
 {
   std::cout << "PolygonSegment Constructor" << std::endl;
 
+  xPoints = x;
+  yPoints = y;
 
+  /*
   for(int i=0;i<x->size() && i<y->size();i++)
   {
     xPoints.push_back(x->at(i));
     yPoints.push_back(y->at(i));
   }
-  //delete x; <-memory leak if not included
-  //delete y;
+  */
+
   //std::cout << "PolygonSegment size: " << xPoints.size() << std::endl;
   xMax = maxX();
   xMin = minX();
@@ -27,6 +30,8 @@ PolygonSegment::PolygonSegment(std::vector<double> *x, std::vector<double> *y)
 /**Destructor*/
 PolygonSegment::~PolygonSegment()
 {
+  delete xPoints;
+  delete yPoints;
   std::cout << "PolygonSegment Destructor" << std::endl;
 }
 
@@ -54,11 +59,11 @@ double PolygonSegment::findX(double y, bool right)
   int l21 = -1;
   int l22 = -1;
 
-  int l = yPoints.size();
+  int l = yPoints->size();
   for(int i=0; i < l; i++)
   {
-    if(((yPoints.at((i+1)%l) >= y) && (yPoints.at(i) <= y))
-    || ((yPoints.at((i+1)%l) <= y) && (yPoints.at(i) >= y)))
+    if(((yPoints->at((i+1)%l) >= y) && (yPoints->at(i) <= y))
+    || ((yPoints->at((i+1)%l) <= y) && (yPoints->at(i) >= y)))
     {
       //interpolate
       if(l11 == -1)
@@ -78,29 +83,29 @@ double PolygonSegment::findX(double y, bool right)
   if(l11 == -1 || l12 == -1 || l21 == -1 || l22 == -1)
   {
     double meanX = 0;
-    for(int i=0;i<xPoints.size();i++)
+    for(int i=0;i<xPoints->size();i++)
     {
-      meanX += xPoints.at(i);
+      meanX += xPoints->at(i);
     }
-    meanX /= xPoints.size();
+    meanX /= xPoints->size();
     return meanX;
   }
 
   //interpolate x
-  double x0 = xPoints.at(l11);
-  double y0 = yPoints.at(l11);
-  double x1 = xPoints.at(l12);
-  double y1 = yPoints.at(l12);
+  double x0 = xPoints->at(l11);
+  double y0 = yPoints->at(l11);
+  double x1 = xPoints->at(l12);
+  double y1 = yPoints->at(l12);
 
   //how far is y on the line
   double p = (y-y0) / (y1-y0);
   double pX1 = (1-p)*x0 + p*x1;
 
   //System.out.println("p1=" + p);
-  x0 = xPoints.at(l21);
-  y0 = yPoints.at(l21);
-  x1 = xPoints.at(l22);
-  y1 = yPoints.at(l22);
+  x0 = xPoints->at(l21);
+  y0 = yPoints->at(l21);
+  x1 = xPoints->at(l22);
+  y1 = yPoints->at(l22);
 
   //how far is y on the line
   p = (y-y0) / (y1-y0);
@@ -142,11 +147,11 @@ double PolygonSegment::findY(double y, bool top)
   int l21 = -1;
   int l22 = -1;
 
-  int l = yPoints.size();
+  int l = yPoints->size();
   for(int i=0; i < l; i++)
   {
-    if(((xPoints.at((i+1)%l) >= y) && (xPoints.at(i) <= y))
-    || ((xPoints.at((i+1)%l) <= y) && (xPoints.at(i) >= y)))
+    if(((xPoints->at((i+1)%l) >= y) && (xPoints->at(i) <= y))
+    || ((xPoints->at((i+1)%l) <= y) && (xPoints->at(i) >= y)))
     {
       //interpolate
       if(l11 == -1)
@@ -166,29 +171,29 @@ double PolygonSegment::findY(double y, bool top)
   if(l11 == -1 || l12 == -1 || l21 == -1 || l22 == -1)
   {
     double meanX = 0;
-    for(int i=0;i<yPoints.size();i++)
+    for(int i=0;i<yPoints->size();i++)
     {
-      meanX += yPoints.at(i);
+      meanX += yPoints->at(i);
     }
-    meanX /= yPoints.size();
+    meanX /= yPoints->size();
     return meanX;
   }
 
   //interpolate x
-  double x0 = yPoints.at(l11);
-  double y0 = xPoints.at(l11);
-  double x1 = yPoints.at(l12);
-  double y1 = xPoints.at(l12);
+  double x0 = yPoints->at(l11);
+  double y0 = xPoints->at(l11);
+  double x1 = yPoints->at(l12);
+  double y1 = xPoints->at(l12);
 
   //how far is y on the line
   double p = (y-y0) / (y1-y0);
   double pX1 = (1-p)*x0 + p*x1;
 
   //System.out.println("p1=" + p);
-  x0 = yPoints.at(l21);
-  y0 = xPoints.at(l21);
-  x1 = yPoints.at(l22);
-  y1 = xPoints.at(l22);
+  x0 = yPoints->at(l21);
+  y0 = xPoints->at(l21);
+  x1 = yPoints->at(l22);
+  y1 = xPoints->at(l22);
 
   //how far is y on the line
   p = (y-y0) / (y1-y0);
@@ -219,7 +224,7 @@ double PolygonSegment::findY(double y, bool top)
 double PolygonSegment::maxX()
 {
   double temp = std::numeric_limits<double>::min();
-  for (double value : xPoints)
+  for (double value : (*xPoints))
   {
     if (value > temp)
       temp = value;
@@ -230,7 +235,7 @@ double PolygonSegment::maxX()
 double PolygonSegment::minX()
 {
   double temp = std::numeric_limits<double>::max();
-  for (double value : xPoints)
+  for (double value : (*xPoints))
   {
     if (value < temp)
       temp = value;
@@ -241,7 +246,7 @@ double PolygonSegment::minX()
 double PolygonSegment::maxY()
 {
   double temp = std::numeric_limits<double>::min();
-  for (double value : yPoints)
+  for (double value : (*yPoints))
   {
     if (value > temp)
       temp = value;
@@ -252,7 +257,7 @@ double PolygonSegment::maxY()
 double PolygonSegment::minY()
 {
   double temp = std::numeric_limits<double>::max();
-  for (double value : yPoints)
+  for (double value : (*yPoints))
   {
     if (value < temp)
       temp = value;
