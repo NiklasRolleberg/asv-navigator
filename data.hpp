@@ -23,7 +23,9 @@ private:
     double boat_ypos;
     double boat_heading_local;
     double boat_speed;
-    double boat_depth;
+    double boat_sonar_depth;
+    double boat_sonar_front_right;
+    double boat_sonar_front_left;
 
     bool data_stop; //= false; //false
     int data_delay; //= 500000; //0.5s
@@ -110,6 +112,12 @@ public:
 
     /**Get Depth*/
     double getDepth();
+
+    /**Get depth to the right*/
+    double getDepth_Right();
+
+    /**Get depth to the left*/
+    double getDepth_Left();
 
     /** true if the distance between the boats path and the coordinates given is less than tol */
     bool hasCorrectPath(double lat0, double lon0, double lat1, double lon1, double tol);

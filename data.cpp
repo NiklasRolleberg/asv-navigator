@@ -37,7 +37,9 @@ Data::Data(Transmitter* transmitter,int delay, int arg3)
     boat_ypos = 0;
     boat_heading_local = 0;
     boat_speed = 0;
-    boat_depth = 0;
+    boat_sonar_depth = 10;
+    boat_sonar_front_right = 11;
+    boat_sonar_front_left = 12;
     localEnabled = false;
     data_threadptr = nullptr;
 }
@@ -246,7 +248,17 @@ double Data::getSpeed()
 double Data::getDepth()
 {
     //std::cout << "Data getDepth" << std::endl;
-    return boat_depth;
+    return boat_sonar_depth;
+}
+
+double Data::getDepth_Right()
+{
+  return boat_sonar_front_right;
+}
+
+double Data::getDepth_Left()
+{
+  return boat_sonar_front_left;
 }
 
 bool Data::hasCorrectPath(double lat0, double lon0, double lat1, double lon1, double tol)
@@ -395,7 +407,7 @@ void Data::processMessage(std::string m)
 
 void Data::setBoatWaypoint_real(double lat0, double lon0,double lat1, double lon1, double speed, bool noStartPos)
 {
-    /*
+
     //DEBUG - makes it possible to run the full program without the boat
     boat_targetLat = lat1;
     boat_targetLon = lon1;
@@ -403,7 +415,7 @@ void Data::setBoatWaypoint_real(double lat0, double lon0,double lat1, double lon
     boat_longitude = lon1;
     boat_xpos = lonTOx(lon1);
     boat_ypos = latTOy(lat1);
-    */
+
     //std::cout << "Data: Set real waypoint, real coordinates: (" << lat0 << "," << lon0 << ") -> ("<< lat1 <<","<< lon1 << ")" << std::endl;
     std::stringstream s;
 

@@ -790,7 +790,7 @@ void Polygon::saveMatrix()
 
 void Polygon::updateView(double currentX, double currentY)
 {
-  std::cout << "polygon::update view" << std::endl;
+  //std::cout << "polygon::update view" << std::endl;
   if(showGUI && GUI != NULL)
   {
     GUI->drawPath(currentX,currentY);

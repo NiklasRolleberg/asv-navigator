@@ -160,6 +160,7 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
 
   double targetX = region->findX(targetY, !goToRight);
 
+  double original_targetSpeed = 1.6;
   double targetSpeed = 1.6;
   double lastTargetX = data->getX();
   double lastTargetY = data->getY();
@@ -185,6 +186,7 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
   double dx;
   double dy;
   double targetLine = targetY;
+  double lastDepth = data->getDepth();
 
   //start sweeping
   while(!stop)
@@ -193,7 +195,12 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
 
     double x = data->getX();
     double y = data->getY();
-    double depth = 1;
+    double depth = data->getDepth();
+    double depthChange = depth -lastDepth;
+    lastDepth = depth;
+
+    double depth_right = data->getDepth_Right();
+    double depth_left = data->getDepth_Left();
 
 
     if(!data->hasCorrectPath(data->yTOlat(lastTargetY),data->xTOlon(lastTargetX),data->yTOlat(targetY),data->xTOlon(targetX),2)){
@@ -277,7 +284,7 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
         usleep(delay);
       }
 
-      /*
+
       //DEBUG
       //update depth of elements
       if(true)
@@ -292,15 +299,120 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
             updateDepth(targetX + DX*i,targetY + DY*i, 2, false);
         }
       }
-      */
+
+    }
+
+    //display depth data for debugging
+    std::cout << "Depth      : " << depth << std::endl;
+    std::cout << "Depth_right: " << depth_right << std::endl;
+    std::cout << "Depth_left : " << depth_left << std::endl;
+
+    //TODO adapt speed proportional to depth and depth change
+    if(depth < 5 || depth_right < 5 || depth_left < 5 )
+    {
+      targetSpeed = 0.1;
+      data->setBoatSpeed(targetSpeed);
+    }
+    else if(depthChange < -4)
+    {
+      targetSpeed = targetSpeed - depthChange * targetSpeed;
+      data->setBoatSpeed(targetSpeed);
+    }
+    else if(targetSpeed != original_targetSpeed)
+    {
+      targetSpeed  =original_targetSpeed;
+      data->setBoatSpeed(targetSpeed);
     }
     //close to land
-    //TODO add land following
+    if(depth < 3 || depth_right < 3 || depth_left < 3)
+    {
+      followLand(targetLine,targetLine+delta,region);
+    }
 
   }
   std::cout << std::endl;
   return true;
 }
+
+
+bool SingleBeamScanner::followLand(double line1, double line2, PolygonSegment* region)
+{
+  std::cout << "Follow land" << std::endl;
+
+  double targetDepth = 5;
+
+  //PID controller
+  double KP = 0.2; //Proportional gain
+  double KI = 1.0 / 5000; //integral gain (not realy needed for this)
+  double KD = 300; //derivative gain
+
+  //long time = System.currentTimeMillis();
+  double Integral = 0;
+
+  double depth = data->getDepth();
+  double depth_right = data->getDepth_Right();
+  double depth_left = data->getDepth_Left();
+
+  double lastError = std::min(depth,std::min(depth_right,depth_left)); //data->getDepth() - targetDepth;
+  double maxAngle = 3.1415 / 8;
+
+
+  usleep(delay);
+
+  double mean = (line1 + line2) / 2;
+
+  while(abs(mean - data->getY()) < abs(delta*0.55) && !stop)
+  {
+    /*
+    //stop the boat from going outside the polygon
+    if(outOfBounds(data->getPosX(), data->getPosY()))
+    {
+      if(data->getPosX() < ((region.maxX()-region.minX())/2))
+        data->setWaypoint(region->findX(data->getY(),false), data->getY());
+      else
+        data->setWaypoint(region->findX(data->getY(),true), data->getY());
+      std::cout << "follow land: out of bounds" << std::endl;
+      return true;
+    }
+
+
+    double timeStep = (System.currentTimeMillis() - time);
+    time = System.currentTimeMillis();
+    double error = data.getDepth() - targetDepth;
+    double derivative = (error - lastError) / timeStep;
+    lastError = error;
+    Integral += error * timeStep;
+
+    //reduce integral value to prevent oscillations
+    if(Integral > 0)
+      Integral = Math.min(Integral, 200);
+    else
+      Integral = Math.max(Integral, -200);
+    double turnAngle = KP * error + KI*Integral + KD * derivative;
+
+    if(turnAngle > 0)
+      turnAngle = Math.min(maxAngle,turnAngle);
+    else
+      turnAngle = Math.max(-maxAngle,turnAngle);
+
+    //for boat with two front sonars
+    if(data.getRightSonar() > data.getLeftSonar())
+    {
+      turnAngle *= -1;
+    }
+    xte.setWaypoint(data.getPosX() + Math.cos(data.getHeading() - turnAngle) * 50, data.getPosY() + Math.sin(data.getHeading()- turnAngle) * 50);
+    sleep(dt);
+    */
+  }
+
+  //close to upper line
+  if(abs(data->getY()-line1) < abs(delta/2))
+    return false;
+  //close to line below
+  return true;
+}
+
+
 
 bool SingleBeamScanner::gotoRegion(Closest target)
 {
