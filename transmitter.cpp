@@ -115,6 +115,10 @@ void Transmitter::listenToSerialPort()
 {
   std::cout << "Listen to serial port loop started" << std::endl;
 
+  //std::cout << "\t\t test message added" << std::endl;
+  //std::string temp = "$MSGPS,59.2968636,18.2265682,1.48,104.24,*74";
+  //messageQueue->push(temp);
+
   char c;
   std::string message;
 
@@ -177,8 +181,8 @@ void Transmitter::abort()
   listen = false;
   //serial->cancel(); BOOST
   if(listenThread != nullptr)
-  if(listenThread->joinable())
-  listenThread->join();
+    if(listenThread->joinable())
+      listenThread->join();
 }
 
 

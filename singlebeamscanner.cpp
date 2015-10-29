@@ -284,7 +284,7 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
         usleep(delay);
       }
 
-
+      /*
       //DEBUG
       //update depth of elements
       if(true)
@@ -299,7 +299,7 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
             updateDepth(targetX + DX*i,targetY + DY*i, 2, false);
         }
       }
-
+      */
     }
 
     //display depth data for debugging
@@ -340,6 +340,7 @@ bool SingleBeamScanner::followLand(double line1, double line2, PolygonSegment* r
   std::cout << "Follow land" << std::endl;
 
   double targetDepth = 5;
+  double targetSpeed = 0.1;
 
   //PID controller
   double KP = 0.2; //Proportional gain
@@ -363,46 +364,47 @@ bool SingleBeamScanner::followLand(double line1, double line2, PolygonSegment* r
 
   while(abs(mean - data->getY()) < abs(delta*0.55) && !stop)
   {
-    /*
     //stop the boat from going outside the polygon
-    if(outOfBounds(data->getPosX(), data->getPosY()))
+    if(region->contains(data->getX(), data->getY()))
     {
-      if(data->getPosX() < ((region.maxX()-region.minX())/2))
-        data->setWaypoint(region->findX(data->getY(),false), data->getY());
+      if(data->getX() < ((region->maxX()-region->minX())/2))
+        data->setBoatWaypoint_local(0,0,region->findX(data->getY(),false),data->getY(),targetSpeed,true);
       else
-        data->setWaypoint(region->findX(data->getY(),true), data->getY());
+        data->setBoatWaypoint_local(0,0,region->findX(data->getY(),true),data->getY(),targetSpeed,true);
       std::cout << "follow land: out of bounds" << std::endl;
       return true;
     }
 
 
-    double timeStep = (System.currentTimeMillis() - time);
-    time = System.currentTimeMillis();
-    double error = data.getDepth() - targetDepth;
+    double timeStep = delay/1000000.0;//(System.currentTimeMillis() - time);
+    //time = System.currentTimeMillis();
+
+    double error = std::min(data->getDepth(),std::min(data->getDepth_Left(),data->getDepth_Right())) - targetDepth;
     double derivative = (error - lastError) / timeStep;
     lastError = error;
     Integral += error * timeStep;
 
     //reduce integral value to prevent oscillations
     if(Integral > 0)
-      Integral = Math.min(Integral, 200);
+      Integral = std::min(Integral, 200.0);
     else
-      Integral = Math.max(Integral, -200);
+      Integral = std::max(Integral, -200.0);
     double turnAngle = KP * error + KI*Integral + KD * derivative;
 
     if(turnAngle > 0)
-      turnAngle = Math.min(maxAngle,turnAngle);
+      turnAngle = std::min(maxAngle,turnAngle);
     else
-      turnAngle = Math.max(-maxAngle,turnAngle);
+      turnAngle = std::max(-maxAngle,turnAngle);
 
     //for boat with two front sonars
-    if(data.getRightSonar() > data.getLeftSonar())
+    if(data->getDepth_Right() > data->getDepth_Left())
     {
       turnAngle *= -1;
     }
-    xte.setWaypoint(data.getPosX() + Math.cos(data.getHeading() - turnAngle) * 50, data.getPosY() + Math.sin(data.getHeading()- turnAngle) * 50);
-    sleep(dt);
-    */
+    double target_x = data->getX() + cos(data->getHeading()-turnAngle) * 10;
+    double target_y = data->getY() + sin(data->getHeading()-turnAngle) * 10;
+    data->setBoatWaypoint_local(0,0,target_x,target_y,targetSpeed,true);
+    sleep(delay);
   }
 
   //close to upper line

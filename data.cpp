@@ -315,7 +315,7 @@ void Data::processMessage(std::string m)
     }
   }
 
-
+  /**MSGPS*/
   if(startIndex != -1 && (m.length() - startIndex) > 6)
   {
     if(m.substr(startIndex+1,5) == "MSGPS")
@@ -348,15 +348,57 @@ void Data::processMessage(std::string m)
     	  longitude += m[i];
     	}
 
-    	//std::cout << "LATITUDE: " << latitude  << "\n" << "LONGITUDE: " << longitude << std::endl;
+      //TODO find speed
+      firstIndex = lastIndex;
+    	std::string speed = "";
+    	for(int i=firstIndex+1; i<m.length() ;i++)
+    	{
+    	  if(m[i] == ',')
+    	  {
+    	    lastIndex = i;
+    	    break;
+    	  }
+    	  speed += m[i];
+    	}
+
+      //TODO find heading
+      firstIndex = lastIndex;
+    	std::string heading = "";
+    	for(int i=firstIndex+1; i<m.length() ;i++)
+    	{
+    	  if(m[i] == ',' || m[i] == '*')
+    	  {
+    	    lastIndex = i;
+    	    break;
+    	  }
+    	  heading += m[i];
+    	}
+
 
     	boat_latitude = strtod(latitude.c_str(),NULL);
     	boat_longitude = strtod(longitude.c_str(),NULL);
+      boat_heading_real = strtod(heading.c_str(),NULL);
+
+      std::cout << "\n\nLATITUDE: " << latitude  << std::endl;
+      std::cout << "LONGITUDE: " << longitude << std::endl;
+      std::cout << "Speed: " << speed << std::endl;
+      std::cout << "Heading: " << heading << std::endl;
+
+      std::cout << "\nLATITUDE: " << boat_latitude  << std::endl;
+      std::cout << "LONGITUDE: " << boat_longitude << std::endl;
+      std::cout << "Speed: " << boat_speed << std::endl;
+      std::cout << "Heading: " << boat_heading_real << std::endl;
 
     	if(localEnabled)
     	{
     	  boat_xpos = lonTOx(boat_longitude);
     	  boat_ypos = latTOy(boat_latitude);
+        boat_heading_local = (boat_heading_real-90) * M_PI/180;
+
+        std::cout << "\nX: " << boat_xpos << std::endl;
+        std::cout << "Y: " << boat_ypos << std::endl;
+        std::cout << "Heading(local): " << boat_heading_local << std::endl;
+
     	  //std::cout << "Local coordinates: (" << boat_xpos << "," << boat_ypos << ")" <<std::endl;
     	}
 
@@ -407,7 +449,7 @@ void Data::processMessage(std::string m)
 
 void Data::setBoatWaypoint_real(double lat0, double lon0,double lat1, double lon1, double speed, bool noStartPos)
 {
-
+  /*
     //DEBUG - makes it possible to run the full program without the boat
     boat_targetLat = lat1;
     boat_targetLon = lon1;
@@ -415,6 +457,7 @@ void Data::setBoatWaypoint_real(double lat0, double lon0,double lat1, double lon
     boat_longitude = lon1;
     boat_xpos = lonTOx(lon1);
     boat_ypos = latTOy(lat1);
+  */
 
     //std::cout << "Data: Set real waypoint, real coordinates: (" << lat0 << "," << lon0 << ") -> ("<< lat1 <<","<< lon1 << ")" << std::endl;
     std::stringstream s;
@@ -448,12 +491,16 @@ void Data::setBoatWaypoint_local(double x0, double y0,double x1, double y1, doub
 
 void Data::setBoatSpeed(double speed)
 {
-    std::cout << "Data: Set speed" << std::endl;
-    /*
+    std::cout << "Data: Set speed: " << speed << std::endl;
+
     std::stringstream s;
-    s << "$MSSTS," << speed << ",checksum";
-    data_transmitterptr->sendMessage(s.str());
-    */
+    //s << "$MSSTS," << speed << ",checksum";
+    //data_transmitterptr->sendMessage(s.str());
+
+    s << "MSSCP," << std::setprecision(10) << speed << ",";
+    s << '*' << std::hex << calculateChecksum(s.str());
+    std::string str = "$" + s.str();
+    data_transmitterptr->sendMessage(str);
 }
 
 double Data::calculateDistance(double lat1,double lon1,double lat2,double lon2)
