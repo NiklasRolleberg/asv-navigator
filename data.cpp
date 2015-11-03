@@ -377,6 +377,7 @@ void Data::processMessage(std::string m)
 
     	boat_latitude = strtod(latitude.c_str(),NULL);
     	boat_longitude = strtod(longitude.c_str(),NULL);
+      boat_speed = strtod(speed.c_str(),NULL);
       boat_heading_real = strtod(heading.c_str(),NULL);
 
       std::cout << "\n\nLATITUDE: " << latitude  << std::endl;
@@ -449,7 +450,7 @@ void Data::processMessage(std::string m)
 
 void Data::setBoatWaypoint_real(double lat0, double lon0,double lat1, double lon1, double speed, bool noStartPos)
 {
-  /*
+    /*
     //DEBUG - makes it possible to run the full program without the boat
     boat_targetLat = lat1;
     boat_targetLon = lon1;
@@ -457,7 +458,7 @@ void Data::setBoatWaypoint_real(double lat0, double lon0,double lat1, double lon
     boat_longitude = lon1;
     boat_xpos = lonTOx(lon1);
     boat_ypos = latTOy(lat1);
-  */
+    */
 
     //std::cout << "Data: Set real waypoint, real coordinates: (" << lat0 << "," << lon0 << ") -> ("<< lat1 <<","<< lon1 << ")" << std::endl;
     std::stringstream s;

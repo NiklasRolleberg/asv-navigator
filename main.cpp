@@ -38,11 +38,11 @@ int main()
   transmitter->start();
 
   // (2) Create the navigator, and pass the transmitter to
-  double delta = 60;
-  double tol = 3;//delta / 3.0;
+  double delta = 6;
+  double tol = 4;//delta / 3.0;
 
   int delay_data = 1000000;
-  int delay_scanner = 10000000;
+  int delay_scanner = 1000000;
   Navigator* navigator = new Navigator(transmitter,delay_data,delay_scanner,delta,tol);
 
   // (3) give the navigator a mission

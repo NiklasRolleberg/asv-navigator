@@ -326,6 +326,10 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
     //close to land
     if(depth < 3 || depth_right < 3 || depth_left < 3)
     {
+      std::cout << "Starting land following" << std::endl;
+      data->setBoatSpeed(0);
+      data->setBoatWaypoint_local(0,0,data->getX(),targetLine+delta,0,true);
+      usleep(1500000);
       followLand(targetLine,targetLine+delta,region);
     }
 
@@ -396,7 +400,6 @@ bool SingleBeamScanner::followLand(double line1, double line2, PolygonSegment* r
     else
       turnAngle = std::max(-maxAngle,turnAngle);
 
-    //for boat with two front sonars
     if(data->getDepth_Right() > data->getDepth_Left())
     {
       turnAngle *= -1;
@@ -404,6 +407,16 @@ bool SingleBeamScanner::followLand(double line1, double line2, PolygonSegment* r
     double target_x = data->getX() + cos(data->getHeading()-turnAngle) * 10;
     double target_y = data->getY() + sin(data->getHeading()-turnAngle) * 10;
     data->setBoatWaypoint_local(0,0,target_x,target_y,targetSpeed,true);
+
+    //update depth
+    if (!updateDepth(data->getX(),data->getY(),data->getDepth(),true))
+    {
+      //this area has been scanened several times before -> abort scan
+      std::cout << "Boat stuck aborting scan" << std::endl;
+      std::cout << std::endl;
+      return false;
+    }
+
     sleep(delay);
   }
 
@@ -562,7 +575,9 @@ bool SingleBeamScanner::updateDepth(double x, double y, double depth, bool follo
   }
   else
   {
-    std::cout << "Not implemented" << std::endl;
+    //std::cout << "Not implemented" << std::endl;
+    polygon->matrix[ix][iy]->updateDepth(depth);
+    polygon->matrix[ix][iy]->setStatus(2); //TODO fixa till
   }
   return true;
 }
