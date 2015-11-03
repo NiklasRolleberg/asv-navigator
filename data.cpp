@@ -295,7 +295,7 @@ void Data::threadLoop()
 
 void Data::processMessage(std::string m)
 {
-  //std::cout << "message rescieved: " << m << std::endl;
+  std::cout << "message rescieved: " << m << std::endl;
   //std::cout << "processMessage" << std::endl;
 
   if(!isValid(m))
@@ -315,7 +315,7 @@ void Data::processMessage(std::string m)
     }
   }
 
-  /**MSGPS*/
+  /**Decode messages*/
   if(startIndex != -1 && (m.length() - startIndex) > 6)
   {
     if(m.substr(startIndex+1,5) == "MSGPS")
@@ -410,7 +410,7 @@ void Data::processMessage(std::string m)
       //$MSCPA,59.34836197,18.07197952,0.00,59.29697418,18.22008705,0.00,500.00,*50
       //TODO extract startlat, startlon,stoplat,stomlon
 
-      int current = 0;;
+      int current = 0;
       for(int i=0;i<5;i++)
       {
         while(current < m.length())
@@ -442,6 +442,78 @@ void Data::processMessage(std::string m)
           boat_targetLon = strtod(nr.c_str(),NULL);
       }
       //std::cout << "targetLat, targetLon " << boat_targetLat << " " <<  boat_targetLon << std::endl;
+    }
+    //Sonar 1
+    else if(m.substr(startIndex+1,2) == "S1")
+    {
+      int firstIndex = startIndex+3;
+      int lastIndex;
+      std::string depth = "";
+      for(int i=firstIndex+1; i<m.length() ;i++)
+      {
+        if(m[i] == ',')
+        {
+          lastIndex = i;
+          break;
+        }
+        depth += m[i];
+      }
+      if(lastIndex-firstIndex != 1)
+        boat_sonar_depth = strtod(depth.c_str(),NULL);
+    }
+    //Sonar 2
+    else if(m.substr(startIndex+1,2) == "S2")
+    {
+      int firstIndex = startIndex+3;
+      int lastIndex;
+      std::string depth = "";
+      for(int i=firstIndex+1; i<m.length() ;i++)
+      {
+        if(m[i] == ',')
+        {
+          lastIndex = i;
+          break;
+        }
+        depth += m[i];
+      }
+      if(lastIndex-firstIndex != 1)
+        boat_sonar_depth = strtod(depth.c_str(),NULL);
+    }
+    //Sonar 3
+    else if(m.substr(startIndex+1,2) == "S3")
+    {
+      int firstIndex = startIndex+3;
+      int lastIndex;
+      std::string depth = "";
+      for(int i=firstIndex+1; i<m.length() ;i++)
+      {
+        if(m[i] == ',')
+        {
+          lastIndex = i;
+          break;
+        }
+        depth += m[i];
+      }
+      if(lastIndex-firstIndex != 1)
+        boat_sonar_front_right = strtod(depth.c_str(),NULL);
+    }
+    //Sonar 4
+    else if(m.substr(startIndex+1,2) == "S4")
+    {
+      int firstIndex = startIndex+3;
+      int lastIndex;
+      std::string depth = "";
+      for(int i=firstIndex+1; i<m.length() ;i++)
+      {
+        if(m[i] == ',')
+        {
+          lastIndex = i;
+          break;
+        }
+        depth += m[i];
+      }
+      if(lastIndex-firstIndex != 1)
+        boat_sonar_front_left = strtod(depth.c_str(),NULL);
     }
   }
   //std::cout << "Unknown message: " << m << std::endl;
