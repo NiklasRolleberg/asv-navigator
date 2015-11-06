@@ -295,7 +295,7 @@ void Data::threadLoop()
 
 void Data::processMessage(std::string m)
 {
-  std::cout << "message rescieved: " << m << std::endl;
+  //std::cout << "message rescieved: " << m << std::endl;
   //std::cout << "processMessage" << std::endl;
 
   if(!isValid(m))
@@ -380,6 +380,7 @@ void Data::processMessage(std::string m)
       boat_speed = strtod(speed.c_str(),NULL);
       boat_heading_real = strtod(heading.c_str(),NULL);
 
+      /*
       std::cout << "\n\nLATITUDE: " << latitude  << std::endl;
       std::cout << "LONGITUDE: " << longitude << std::endl;
       std::cout << "Speed: " << speed << std::endl;
@@ -389,17 +390,17 @@ void Data::processMessage(std::string m)
       std::cout << "LONGITUDE: " << boat_longitude << std::endl;
       std::cout << "Speed: " << boat_speed << std::endl;
       std::cout << "Heading: " << boat_heading_real << std::endl;
-
+      */
     	if(localEnabled)
     	{
     	  boat_xpos = lonTOx(boat_longitude);
     	  boat_ypos = latTOy(boat_latitude);
         boat_heading_local = (boat_heading_real-90) * M_PI/180;
-
+        /*
         std::cout << "\nX: " << boat_xpos << std::endl;
         std::cout << "Y: " << boat_ypos << std::endl;
         std::cout << "Heading(local): " << boat_heading_local << std::endl;
-
+        */
     	  //std::cout << "Local coordinates: (" << boat_xpos << "," << boat_ypos << ")" <<std::endl;
     	}
 
@@ -444,9 +445,9 @@ void Data::processMessage(std::string m)
       //std::cout << "targetLat, targetLon " << boat_targetLat << " " <<  boat_targetLon << std::endl;
     }
     //Sonar 1
-    else if(m.substr(startIndex+1,2) == "S1")
+    else if(m.substr(startIndex+1,8) == "S1,SDDPT")
     {
-      int firstIndex = startIndex+3;
+      int firstIndex = startIndex+9;
       int lastIndex;
       std::string depth = "";
       for(int i=firstIndex+1; i<m.length() ;i++)
@@ -462,9 +463,9 @@ void Data::processMessage(std::string m)
         boat_sonar_depth = strtod(depth.c_str(),NULL);
     }
     //Sonar 2
-    else if(m.substr(startIndex+1,2) == "S2")
+    else if(m.substr(startIndex+1,8) == "S2,SDDPT")
     {
-      int firstIndex = startIndex+3;
+      int firstIndex = startIndex+9;
       int lastIndex;
       std::string depth = "";
       for(int i=firstIndex+1; i<m.length() ;i++)
@@ -477,12 +478,12 @@ void Data::processMessage(std::string m)
         depth += m[i];
       }
       if(lastIndex-firstIndex != 1)
-        boat_sonar_depth = strtod(depth.c_str(),NULL);
+        boat_sonar_front_right = strtod(depth.c_str(),NULL);
     }
     //Sonar 3
-    else if(m.substr(startIndex+1,2) == "S3")
+    else if(m.substr(startIndex+1,8) == "S3,SDDPT")
     {
-      int firstIndex = startIndex+3;
+      int firstIndex = startIndex+9;
       int lastIndex;
       std::string depth = "";
       for(int i=firstIndex+1; i<m.length() ;i++)
@@ -515,6 +516,9 @@ void Data::processMessage(std::string m)
       if(lastIndex-firstIndex != 1)
         boat_sonar_front_left = strtod(depth.c_str(),NULL);
     }
+    std::cout << "right: " << boat_sonar_front_right << std::endl;
+    std::cout << "left : " << boat_sonar_front_left << std::endl;
+    std::cout << "under: " << boat_sonar_depth << std::endl;
   }
   //std::cout << "Unknown message: " << m << std::endl;
 }
@@ -556,7 +560,7 @@ void Data::setBoatWaypoint_real(double lat0, double lon0,double lat1, double lon
 
 void Data::setBoatWaypoint_local(double x0, double y0,double x1, double y1, double speed, bool noStartPos)
 {
-    std::cout << "Data: Set local waypoint, local coordinates:: (" << x0 << "," << y0 << ") -> (" << x1 << "," << y1 << ")" << std::endl;
+    //std::cout << "Data: Set local waypoint, local coordinates:: (" << x0 << "," << y0 << ") -> (" << x1 << "," << y1 << ")" << std::endl;
 
     setBoatWaypoint_real(yTOlat(y0),xTOlon(x0),yTOlat(y1),xTOlon(x1),speed,noStartPos);
 
@@ -564,7 +568,7 @@ void Data::setBoatWaypoint_local(double x0, double y0,double x1, double y1, doub
 
 void Data::setBoatSpeed(double speed)
 {
-    std::cout << "Data: Set speed: " << speed << std::endl;
+    //std::cout << "Data: Set speed: " << speed << std::endl;
 
     std::stringstream s;
     //s << "$MSSTS," << speed << ",checksum";

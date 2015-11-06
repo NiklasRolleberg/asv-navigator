@@ -136,6 +136,7 @@ void SingleBeamScanner::startScan()
   usleep(3000000);
 }
 
+//TODO kanske fixa så att den börjar scanna ävan om den inte
 bool SingleBeamScanner::scanRegion(PolygonSegment* region)
 {
   std::cout << "scanRegion" << std::endl;
@@ -428,7 +429,7 @@ bool SingleBeamScanner::followLand(double line1, double line2, PolygonSegment* r
 }
 
 
-
+//TODO fixa så att båten kommer fram till målet inte bara nästan
 bool SingleBeamScanner::gotoRegion(Closest target)
 {
   int x = (int) round((target.x - polygon->minX) / polygon->delta);
@@ -451,11 +452,17 @@ bool SingleBeamScanner::gotoRegion(Closest target)
   double targetY = target.y;
 
   bool findNext = true;
+
+  double Xpos,Ypos;
+
   while(true)
   {
+    Xpos = data->getX();
+    Ypos = data->getY();
+
     std::cout << "gotoRegion: i loopen" << std::endl;
-    x = (int) round((data->getX() - polygon->minX) / polygon->delta);
-    y = (int) round((data->getY() - polygon->minY) / polygon->delta);
+    x = (int) round((Xpos - polygon->minX) / polygon->delta);
+    y = (int) round((Ypos - polygon->minY) / polygon->delta);
 
     if(x<0)
       x = 0;
@@ -468,8 +475,8 @@ bool SingleBeamScanner::gotoRegion(Closest target)
 
     std::cout << "boat index: (" << x << "," << y << ")" << std::endl;
 
-    double dx = targetX - data->getX();
-    double dy = targetY - data->getY();
+    double dx = targetX - Xpos;
+    double dy = targetY - Ypos;
 
     //target reached, pick a new target
     if(sqrt(dx*dx + dy*dy) < tol || findNext)
@@ -477,9 +484,9 @@ bool SingleBeamScanner::gotoRegion(Closest target)
       findNext = false;
       //distance += sqrt(dx*dx + dy*dy);
 
-      double tx = (data->getX() - target.x);
-      double ty = (data->getY() - target.y);
-      if(sqrt(tx*tx+ty*ty) < 2.0)
+      double tx = (Xpos - target.x);
+      double ty = (Ypos - target.y);
+      if(sqrt(tx*tx+ty*ty) < tol)
       {
         std::cout << "Reached (" << data->getX() << "," << data->getY() << ")" << std::endl;
         std::cout << "Target (" << target.x << "," << target.y << ")" << std::endl;
@@ -513,7 +520,7 @@ bool SingleBeamScanner::gotoRegion(Closest target)
       }
       std::cout << "new target: (" << targetX << "," << targetY << ")" << std::endl;
       //------------------------
-      data->setBoatWaypoint_local(0,0,targetX,targetY,1.6,true);
+      data->setBoatWaypoint_local(0,0,targetX,targetY,4,true); //TODO speed ska nog vara 1.6
       polygon->updateView(data->getX(),data->getY());
     }
 
