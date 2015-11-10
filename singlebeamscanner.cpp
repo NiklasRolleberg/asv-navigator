@@ -325,13 +325,14 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
       data->setBoatSpeed(targetSpeed);
     }
     //close to land
-    if(depth < 3 || depth_right < 3 || depth_left < 3)
+    double t = 5;
+    if(depth < t || depth_right < t || depth_left < t)
     {
       std::cout << "Starting land following" << std::endl;
       data->setBoatSpeed(0);
       data->setBoatWaypoint_local(0,0,data->getX(),targetLine+delta,0,true);
       usleep(1500000);
-      followLand(targetLine,targetLine+delta,region);
+      followLand(targetLine,targetLine+delta*updown,region);
     }
 
   }
@@ -344,13 +345,13 @@ bool SingleBeamScanner::followLand(double line1, double line2, PolygonSegment* r
 {
   std::cout << "Follow land" << std::endl;
 
-  double targetDepth = 5;
-  double targetSpeed = 0.1;
+  double targetDepth = 3;
+  double targetSpeed = 0.5;
 
   //PID controller
-  double KP = 0.2; //Proportional gain
-  double KI = 1.0 / 5000; //integral gain (not realy needed for this)
-  double KD = 300; //derivative gain
+  double KP = 0.1; //Proportional gain
+  double KI = 0;//1.0 / 5000; //integral gain (not realy needed for this)
+  double KD = 0;//300; //derivative gain
 
   //long time = System.currentTimeMillis();
   double Integral = 0;
@@ -367,10 +368,11 @@ bool SingleBeamScanner::followLand(double line1, double line2, PolygonSegment* r
 
   double mean = (line1 + line2) / 2;
 
-  while(abs(mean - data->getY()) < abs(delta*0.55) && !stop)
+  while(true)//abs(mean - data->getY()) < abs(delta*0.55) && !stop)
   {
     //stop the boat from going outside the polygon
-    if(region->contains(data->getX(), data->getY()))
+    /*
+    if(!region->contains(data->getX(), data->getY()))
     {
       if(data->getX() < ((region->maxX()-region->minX())/2))
         data->setBoatWaypoint_local(0,0,region->findX(data->getY(),false),data->getY(),targetSpeed,true);
@@ -379,12 +381,13 @@ bool SingleBeamScanner::followLand(double line1, double line2, PolygonSegment* r
       std::cout << "follow land: out of bounds" << std::endl;
       return true;
     }
-
+    */
 
     double timeStep = delay/1000000.0;//(System.currentTimeMillis() - time);
     //time = System.currentTimeMillis();
 
-    double error = std::min(data->getDepth(),std::min(data->getDepth_Left(),data->getDepth_Right())) - targetDepth;
+    double error = data->getDepth()-targetDepth;//std::min(data->getDepth(),std::min(data->getDepth_Left(),data->getDepth_Right())) - targetDepth;
+    std::cout << "landfollowing error:" << error << std::endl;
     double derivative = (error - lastError) / timeStep;
     lastError = error;
     Integral += error * timeStep;
@@ -405,6 +408,7 @@ bool SingleBeamScanner::followLand(double line1, double line2, PolygonSegment* r
     {
       turnAngle *= -1;
     }
+    std::cout << "turnAngle:" << turnAngle << std::endl;
     double target_x = data->getX() + cos(data->getHeading()-turnAngle) * 10;
     double target_y = data->getY() + sin(data->getHeading()-turnAngle) * 10;
     data->setBoatWaypoint_local(0,0,target_x,target_y,targetSpeed,true);
@@ -418,7 +422,7 @@ bool SingleBeamScanner::followLand(double line1, double line2, PolygonSegment* r
       return false;
     }
 
-    sleep(delay);
+    usleep(delay);
   }
 
   //close to upper line

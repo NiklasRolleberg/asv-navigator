@@ -26,16 +26,16 @@
 #-------- settings --------
 
 # set mode calibration
-#TASK:4
-#DATA:MES:$MSSMC,*00
+TASK:4
+DATA:MES:$MSSMC,*00
 
 # COG threshold
 TASK:4
 DATA:MES:$MSSCT,0.6,*00
 
 # XTE
-TASK:4
-DATA:MES:$MSSXT,0.80,*00
+#TASK:4
+DATA:MES:$MSSXT,0.8,10,STATIC,*00
 
 # Speed reduction factor
 # $MSSSR,radius,factor,*00
@@ -47,7 +47,7 @@ DATA:MES:$MSSSR,15,0.3,*00
 #servo_2: speed
 TASK:4
 DATA:MES:$MSSGA,500,0,0,100,100,0,*00
-
+#DATA:MES:$MSSGA,500,0,0,100,100,0,*00
 
 
 # -------- mission --------
@@ -55,6 +55,18 @@ DATA:MES:$MSSGA,500,0,0,100,100,0,*00
 TASK:1
 DATA:TIM:1000000
 
+#---------fram och tillbaka----------------
+(1) 59.296612, 18.226874
+(2) 59.296313, 18.227443
+
+#->1
+#TASK:2
+#DATA:LAT:59.296612
+#DATA:LON:18.226874
+#->2
+#TASK:2
+#DATA:LAT:59.296313
+#DATA:LON:18.227443
 
 #----------båt (saltsjödunäs)---------------
 
@@ -107,7 +119,18 @@ DATA:LON:18.226637,18.225618,18.227056
 #TASK:3
 #DATA:LAT:59.2970581,59.2958298,59.2966156
 #DATA:LON:18.2197876,18.2219505,18.2233276
+5
 
+#-----------båt landföljningstest--------------
+
+#(1) 59.297374, 18.227673
+#(2) 59.295550, 18.230044
+#(3) 59.294805, 18.226847
+#(4) 59.296224, 18.224229
+
+#TASK:3
+#DATA:LAT:59.297374,59.295550,59.294805,59.296224
+#DATA:LON:18.227673,18.230044,18.226847,18.224229
 
 #----bil (östermalms ip)---------------------
 #TASK:2

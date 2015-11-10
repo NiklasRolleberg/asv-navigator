@@ -275,7 +275,7 @@ void Data::threadLoop()
   bool i = false;
   while(!data_stop)
   {
-    data_transmitterptr->requestData();
+    //data_transmitterptr->requestData();
     //if(i)
       //data_transmitterptr->sendMessage("$MSGCP,*00");
     i = (i==false);
@@ -288,6 +288,7 @@ void Data::threadLoop()
       messages->pop();
     }
     usleep(data_delay/2);
+    //processMessage("$MSSON,HHMMSS,1.1,1.2,1.3,*00");
   }
   std::cout << "Data loop done" << std::endl;
 }
@@ -444,6 +445,77 @@ void Data::processMessage(std::string m)
       }
       //std::cout << "targetLat, targetLon " << boat_targetLat << " " <<  boat_targetLon << std::endl;
     }
+
+    else if(m.substr(startIndex+1,5) == "MSSON")
+    {
+      std::cout << "Sonar message" << std::endl;
+
+      //find time
+      //first ','
+      int firstIndex = startIndex+6;
+      int lastIndex;
+      std::string utcTime = "";
+      for(int i=firstIndex+1; i<m.length() ;i++)
+      {
+        if(m[i] == ',')
+        {
+          lastIndex = i;
+          break;
+        }
+        utcTime += m[i];
+      }
+
+    	//find sonar1 depth
+    	firstIndex = lastIndex;
+    	std::string sonar1 = "";
+    	for(int i=firstIndex+1; i<m.length() ;i++)
+    	{
+    	  if(m[i] == ',')
+    	  {
+    	    lastIndex = i;
+    	    break;
+    	  }
+    	  sonar1 += m[i];
+    	}
+
+      //TODO find sonar2 depth
+      firstIndex = lastIndex;
+    	std::string sonar2 = "";
+    	for(int i=firstIndex+1; i<m.length() ;i++)
+    	{
+    	  if(m[i] == ',')
+    	  {
+    	    lastIndex = i;
+    	    break;
+    	  }
+    	  sonar2 += m[i];
+    	}
+
+      //TODO find sonar3 depth
+      firstIndex = lastIndex;
+    	std::string sonar3 = "";
+    	for(int i=firstIndex+1; i<m.length() ;i++)
+    	{
+    	  if(m[i] == ',' || m[i] == '*')
+    	  {
+    	    lastIndex = i;
+    	    break;
+    	  }
+    	  sonar3 += m[i];
+    	}
+
+      //std::cout << "sonar1: " << sonar1 << std::endl;
+      //std::cout << "sonar2: " << sonar2 << std::endl;
+      //std::cout << "sonar3: " << sonar3 << std::endl;
+      if(sonar1 != "0.00")
+        boat_sonar_depth = strtod(sonar1.c_str(),NULL);
+      if(sonar2 != "0.00")
+        boat_sonar_front_left = strtod(sonar2.c_str(),NULL);
+      if(sonar3 != "0.00")
+        boat_sonar_front_right = strtod(sonar3.c_str(),NULL);
+
+    }
+
     //Sonar 1
     else if(m.substr(startIndex+1,8) == "S1,SDDPT")
     {
@@ -516,9 +588,9 @@ void Data::processMessage(std::string m)
       if(lastIndex-firstIndex != 1)
         boat_sonar_front_left = strtod(depth.c_str(),NULL);
     }
-    std::cout << "right: " << boat_sonar_front_right << std::endl;
-    std::cout << "left : " << boat_sonar_front_left << std::endl;
-    std::cout << "under: " << boat_sonar_depth << std::endl;
+    //std::cout << "right: " << boat_sonar_front_right << std::endl;
+    //std::cout << "left : " << boat_sonar_front_left << std::endl;
+    //std::cout << "under: " << boat_sonar_depth << std::endl;
   }
   //std::cout << "Unknown message: " << m << std::endl;
 }
