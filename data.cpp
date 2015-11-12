@@ -396,7 +396,7 @@ void Data::processMessage(std::string m)
     	{
     	  boat_xpos = lonTOx(boat_longitude);
     	  boat_ypos = latTOy(boat_latitude);
-        boat_heading_local = (boat_heading_real-90) * M_PI/180;
+        boat_heading_local = (360-(boat_heading_real-90)) * M_PI/180;
         /*
         std::cout << "\nX: " << boat_xpos << std::endl;
         std::cout << "Y: " << boat_ypos << std::endl;
@@ -448,7 +448,7 @@ void Data::processMessage(std::string m)
 
     else if(m.substr(startIndex+1,5) == "MSSON")
     {
-      std::cout << "Sonar message" << std::endl;
+      //std::cout << "Sonar message" << std::endl;
 
       //find time
       //first ','

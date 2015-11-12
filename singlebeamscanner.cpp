@@ -198,7 +198,6 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
     double y = data->getY();
     double depth = data->getDepth();
     double depthChange = depth -lastDepth;
-    lastDepth = depth;
 
     double depth_right = data->getDepth_Right();
     double depth_left = data->getDepth_Left();
@@ -326,7 +325,7 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
     }
     //close to land
     double t = 5;
-    if(depth < t || depth_right < t || depth_left < t)
+    if(depth < t && lastDepth < t);//|| depth_right < t || depth_left < t)
     {
       std::cout << "Starting land following" << std::endl;
       data->setBoatSpeed(0);
@@ -334,7 +333,7 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
       usleep(1500000);
       followLand(targetLine,targetLine+delta*updown,region);
     }
-
+    lastDepth = depth;
   }
   std::cout << std::endl;
   return true;
@@ -345,11 +344,11 @@ bool SingleBeamScanner::followLand(double line1, double line2, PolygonSegment* r
 {
   std::cout << "Follow land" << std::endl;
 
-  double targetDepth = 3;
-  double targetSpeed = 0.5;
+  double targetDepth = 3; // m
+  double targetSpeed = 0.5; // m/s
 
   //PID controller
-  double KP = 0.1; //Proportional gain
+  double KP = 1; //Proportional gain
   double KI = 0;//1.0 / 5000; //integral gain (not realy needed for this)
   double KD = 0;//300; //derivative gain
 
@@ -361,7 +360,7 @@ bool SingleBeamScanner::followLand(double line1, double line2, PolygonSegment* r
   double depth_left = data->getDepth_Left();
 
   double lastError = std::min(depth,std::min(depth_right,depth_left)); //data->getDepth() - targetDepth;
-  double maxAngle = 3.1415 / 8;
+  double maxAngle = 3.1415 / 8; //22.5
 
 
   usleep(delay);
@@ -404,13 +403,13 @@ bool SingleBeamScanner::followLand(double line1, double line2, PolygonSegment* r
     else
       turnAngle = std::max(-maxAngle,turnAngle);
 
-    if(data->getDepth_Right() > data->getDepth_Left())
+    if(data->getDepth_Right() < data->getDepth_Left())
     {
       turnAngle *= -1;
     }
-    std::cout << "turnAngle:" << turnAngle << std::endl;
-    double target_x = data->getX() + cos(data->getHeading()-turnAngle) * 10;
-    double target_y = data->getY() + sin(data->getHeading()-turnAngle) * 10;
+    std::cout << "turnAngle:" << (turnAngle * 180.0 / 3.1415) << std::endl;
+    double target_x = data->getX() + cos(data->getHeading()+turnAngle) * 50;
+    double target_y = data->getY() + sin(data->getHeading()+turnAngle) * 50;
     data->setBoatWaypoint_local(0,0,target_x,target_y,targetSpeed,true);
 
     //update depth
