@@ -510,9 +510,9 @@ void Data::processMessage(std::string m)
       if(sonar1 != "0.00")
         boat_sonar_depth = strtod(sonar1.c_str(),NULL);
       if(sonar2 != "0.00")
-        boat_sonar_front_left = strtod(sonar2.c_str(),NULL);
+        boat_sonar_front_right = strtod(sonar2.c_str(),NULL);
       if(sonar3 != "0.00")
-        boat_sonar_front_right = strtod(sonar3.c_str(),NULL);
+        boat_sonar_front_left = strtod(sonar3.c_str(),NULL);
 
     }
 

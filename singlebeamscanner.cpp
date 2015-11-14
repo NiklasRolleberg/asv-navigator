@@ -140,8 +140,8 @@ void SingleBeamScanner::startScan()
 bool SingleBeamScanner::scanRegion(PolygonSegment* region)
 {
   std::cout << "scanRegion" << std::endl;
-  bool goToRight = (region->findX(data->getY(),false) - data->getX())
-                    > (0.5)*(region->findX(data->getY(),false) - region->findX(data->getY(),true)); //traveling from left side to right
+  bool goToRight = false;//(region->findX(data->getY(),false) - data->getX())
+                    //> (0.5)*(region->findX(data->getY(),false) - region->findX(data->getY(),true)); //traveling from left side to right
   bool goToNextLine = true;
   bool skipRest = false; //true -> the boat has to find a new waypoint
   double targetY = data->getY();
@@ -308,7 +308,7 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
     std::cout << "Depth_left : " << depth_left << std::endl;
 
     //TODO adapt speed proportional to depth and depth change
-    if(depth < 5 || depth_right < 5 || depth_left < 5 )
+    if(depth < 2 || depth_right < 2 || depth_left < 2 )
     {
       targetSpeed = 0.1;
       data->setBoatSpeed(targetSpeed);
@@ -316,6 +316,7 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
     else if(depthChange < -4)
     {
       targetSpeed = targetSpeed - depthChange * targetSpeed;
+      targetSpeed = std::max(0.4,targetSpeed);
       data->setBoatSpeed(targetSpeed);
     }
     else if(targetSpeed != original_targetSpeed)
@@ -323,18 +324,21 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
       targetSpeed  =original_targetSpeed;
       data->setBoatSpeed(targetSpeed);
     }
+
     //close to land
-    double t = 5;
-    if(depth < t && lastDepth < t);//|| depth_right < t || depth_left < t)
+    double t = 4;
+    if( depth < t && lastDepth < t);//|| depth_right < t || depth_left < t)
     {
       std::cout << "Starting land following" << std::endl;
       data->setBoatSpeed(0);
-      data->setBoatWaypoint_local(0,0,data->getX(),targetLine+delta,0,true);
+      data->setBoatWaypoint_local(0,0,data->getX(),targetLine+delta*updown,0,true);
       usleep(1500000);
       followLand(targetLine,targetLine+delta*updown,region);
     }
+
     lastDepth = depth;
   }
+
   std::cout << std::endl;
   return true;
 }
@@ -344,11 +348,11 @@ bool SingleBeamScanner::followLand(double line1, double line2, PolygonSegment* r
 {
   std::cout << "Follow land" << std::endl;
 
-  double targetDepth = 3; // m
-  double targetSpeed = 0.5; // m/s
+  double targetDepth = 4; // m
+  double targetSpeed = 0.6; // m/s
 
   //PID controller
-  double KP = 1; //Proportional gain
+  double KP = 0.5; //Proportional gain
   double KI = 0;//1.0 / 5000; //integral gain (not realy needed for this)
   double KD = 0;//300; //derivative gain
 
@@ -360,7 +364,7 @@ bool SingleBeamScanner::followLand(double line1, double line2, PolygonSegment* r
   double depth_left = data->getDepth_Left();
 
   double lastError = std::min(depth,std::min(depth_right,depth_left)); //data->getDepth() - targetDepth;
-  double maxAngle = 3.1415 / 8; //22.5
+  double maxAngle = 3.1415 / 4; //22.5
 
 
   usleep(delay);
@@ -385,7 +389,8 @@ bool SingleBeamScanner::followLand(double line1, double line2, PolygonSegment* r
     double timeStep = delay/1000000.0;//(System.currentTimeMillis() - time);
     //time = System.currentTimeMillis();
 
-    double error = data->getDepth()-targetDepth;//std::min(data->getDepth(),std::min(data->getDepth_Left(),data->getDepth_Right())) - targetDepth;
+    double error = 0.5*(data->getDepth_Right() + data->getDepth_Left()) - targetDepth;
+    //data->getDepth()-targetDepth;//std::min(data->getDepth(),std::min(data->getDepth_Left(),data->getDepth_Right())) - targetDepth;
     std::cout << "landfollowing error:" << error << std::endl;
     double derivative = (error - lastError) / timeStep;
     lastError = error;
@@ -407,6 +412,9 @@ bool SingleBeamScanner::followLand(double line1, double line2, PolygonSegment* r
     {
       turnAngle *= -1;
     }
+
+    //turnAngle = 0;
+
     std::cout << "turnAngle:" << (turnAngle * 180.0 / 3.1415) << std::endl;
     double target_x = data->getX() + cos(data->getHeading()+turnAngle) * 50;
     double target_y = data->getY() + sin(data->getHeading()+turnAngle) * 50;
