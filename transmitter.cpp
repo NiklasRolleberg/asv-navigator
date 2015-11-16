@@ -162,7 +162,7 @@ void Transmitter::listenToSerialPort()
         case '\n':
           messageQueue->push(message);
           //std::cout << "Message rescieved: " << message  << "  rd = " << rd << " queue size: " << messageQueue->size() << std::endl;
-          (*logfile) << "rescieved: " << message << std::endl;
+          (*logfile) << "received: " << message << std::endl;
           message = "";
           break;
         default:

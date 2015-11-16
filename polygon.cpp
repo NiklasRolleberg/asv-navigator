@@ -521,7 +521,7 @@ double Polygon::cross(const Point &O, const Point &A, const Point &B)
 	return (long)(A.x - O.x) * (B.y - O.y) - (long)(A.y - O.y) * (B.x - O.x);
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////
+
 std::vector<PolygonSegment*>* Polygon::triangulateRegion(PolygonSegment* ps)
 {
   std::cout << "EarClipping!" << std::endl;
@@ -635,6 +635,55 @@ std::vector<PolygonSegment*>* Polygon::triangulateRegion(PolygonSegment* ps)
 
   return list;
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+bool Polygon::BFS(Element* e, std::set<Element*> &container)
+{
+  if(e->getStatus() == 1)
+    return true;
+  if(e->getStatus() != 0)
+    return false;
+
+  std::vector <Element*>* neighbours = e->getNeighbours();
+
+  for(int i=0;i<neighbours->size();i++)
+  {
+    Element* n = neighbours->at(i);
+    if(container.find(n) != container.end())
+      continue;
+    container.insert(n);
+    if(BFS(n,container))
+      return true;
+  }
+  return false;
+}
+
+void Polygon::idland()
+{
+  // Finds regions enclosed by land and changes status to 2
+  std::cout << "idland" << std::endl;
+  std::set<Element*> container;
+  for(int i=0; i<nx; i++)
+  {
+    for(int j=0; j<ny; j++)
+    {
+      container.clear();
+      if(matrix[i][j]->getStatus() == 0)
+      {
+        if(!BFS(matrix[i][j], container))
+        {
+          matrix[i][j]->setStatus(2);
+          for(std::set<Element*>::iterator it=container.begin(); it!=container.end(); ++it)
+          {
+            (*it)->setStatus(2);
+          }
+        }
+      }
+    }
+  }
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////
 
 double** Polygon::createCostMatrix(int cx, int cy)

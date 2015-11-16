@@ -37,7 +37,12 @@ private:
     void addBoundaryElements(PolygonSegment* ps);
 		std::vector<PolygonSegment*>* triangulateRegion(PolygonSegment* ps);
     PolygonSegment* createSegmentFromElements(std::set<Element*>);
-    double cross(const Point &O, const Point &A, const Point &B);
+
+		/**vecor cross product*/
+		double cross(const Point &O, const Point &A, const Point &B);
+
+		/** true if element is connected to a scanned element*/
+		bool BFS(Element* e, std::set<Element*> &container);
 
 		bool showGUI;
 		PathView* GUI;
@@ -91,6 +96,9 @@ public:
 
     /**Creates regions from the unscanned elements in the matrix*/
     void generateRegions();
+
+		/**Marks elements contained by land as land*/
+		void idland();
 
 		/**Creates a nx x ny matrix with costs for all accessible elements with cost=0 at cx,cy*/
 		double** createCostMatrix(int cx, int cy);

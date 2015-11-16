@@ -41,6 +41,28 @@ void SingleBeamScanner::startScan()
   //s << std::endl;
   data->writeToLog(s.str());
 
+
+  /*
+  //DEBUG
+  polygon->updateView(1,1);
+  sleep(2);
+  for (int i=0;i<polygon->nx;i++)
+  {
+    for (int j=0;j<polygon->ny;j++)
+    {
+      if(i==14)
+        polygon->matrix[i][j]->setStatus(2);
+    }
+  }
+  polygon->matrix[12][12]->setStatus(1);
+  polygon->updateView(0,0);
+  sleep(5);
+  polygon->idland();
+  polygon->updateView(0,0);
+  sleep(100);
+  */
+
+
   std::cout << "scanner:SingleBeamScanner: starting scan" << std::endl;
   std::cout << "sweeping pattern, delta = " << delta << "\n" << std::endl;
 
@@ -126,6 +148,9 @@ void SingleBeamScanner::startScan()
         //scan that region
         scanRegion(c.region);
         polygon->removeRegion(c.region);
+
+        //identify land
+        polygon->idland();
       }
     }
   }
@@ -140,8 +165,8 @@ void SingleBeamScanner::startScan()
 bool SingleBeamScanner::scanRegion(PolygonSegment* region)
 {
   std::cout << "scanRegion" << std::endl;
-  bool goToRight = false;//(region->findX(data->getY(),false) - data->getX())
-                    //> (0.5)*(region->findX(data->getY(),false) - region->findX(data->getY(),true)); //traveling from left side to right
+  bool goToRight = (region->findX(data->getY(),false) - data->getX())
+                    > (0.5)*(region->findX(data->getY(),false) - region->findX(data->getY(),true)); //traveling from left side to right
   bool goToNextLine = true;
   bool skipRest = false; //true -> the boat has to find a new waypoint
   double targetY = data->getY();
@@ -310,24 +335,24 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
     //TODO adapt speed proportional to depth and depth change
     if(depth < 2 || depth_right < 2 || depth_left < 2 )
     {
-      targetSpeed = 0.1;
+      targetSpeed = 0.5;
       data->setBoatSpeed(targetSpeed);
     }
-    else if(depthChange < -4)
+    else if(depthChange < -2 && depth < 4)
     {
       targetSpeed = targetSpeed - depthChange * targetSpeed;
-      targetSpeed = std::max(0.4,targetSpeed);
+      targetSpeed = std::max(1.0,targetSpeed);
       data->setBoatSpeed(targetSpeed);
     }
     else if(targetSpeed != original_targetSpeed)
     {
-      targetSpeed  =original_targetSpeed;
+      targetSpeed=original_targetSpeed;
       data->setBoatSpeed(targetSpeed);
     }
 
     //close to land
     double t = 4;
-    if( depth < t && lastDepth < t);//|| depth_right < t || depth_left < t)
+    if( depth < t && lastDepth < t || depth_right < t || depth_left < t)
     {
       std::cout << "Starting land following" << std::endl;
       data->setBoatSpeed(0);
@@ -348,33 +373,21 @@ bool SingleBeamScanner::followLand(double line1, double line2, PolygonSegment* r
 {
   std::cout << "Follow land" << std::endl;
 
-  double targetDepth = 4; // m
-  double targetSpeed = 0.6; // m/s
-
-  //PID controller
+  double targetDepth = 3.5; // m
+  double targetSpeed = 1; // m/s
   double KP = 0.5; //Proportional gain
-  double KI = 0;//1.0 / 5000; //integral gain (not realy needed for this)
-  double KD = 0;//300; //derivative gain
 
-  //long time = System.currentTimeMillis();
-  double Integral = 0;
-
-  double depth = data->getDepth();
-  double depth_right = data->getDepth_Right();
-  double depth_left = data->getDepth_Left();
-
-  double lastError = std::min(depth,std::min(depth_right,depth_left)); //data->getDepth() - targetDepth;
-  double maxAngle = 3.1415 / 4; //22.5
-
+  double maxAngle = 3.1415 / 4; //45
+  double turnAngle = 0;
 
   usleep(delay);
-
   double mean = (line1 + line2) / 2;
 
-  while(true)//abs(mean - data->getY()) < abs(delta*0.55) && !stop)
+  while(abs(mean - data->getY()) < abs(delta*0.55) && !stop)
   {
-    //stop the boat from going outside the polygon
     /*
+    //V1 controller style
+    //stop the boat from going outside the polygon
     if(!region->contains(data->getX(), data->getY()))
     {
       if(data->getX() < ((region->maxX()-region->minX())/2))
@@ -384,36 +397,56 @@ bool SingleBeamScanner::followLand(double line1, double line2, PolygonSegment* r
       std::cout << "follow land: out of bounds" << std::endl;
       return true;
     }
-    */
-
-    double timeStep = delay/1000000.0;//(System.currentTimeMillis() - time);
-    //time = System.currentTimeMillis();
 
     double error = 0.5*(data->getDepth_Right() + data->getDepth_Left()) - targetDepth;
-    //data->getDepth()-targetDepth;//std::min(data->getDepth(),std::min(data->getDepth_Left(),data->getDepth_Right())) - targetDepth;
     std::cout << "landfollowing error:" << error << std::endl;
-    double derivative = (error - lastError) / timeStep;
-    lastError = error;
-    Integral += error * timeStep;
+    turnAngle = KP * error;
+    if(data->getDepth_Right() < data->getDepth_Left())
+      turnAngle *= -1;
+    */
 
-    //reduce integral value to prevent oscillations
-    if(Integral > 0)
-      Integral = std::min(Integral, 200.0);
+    // V2 Mathematical style (turnAngle = the angle to the desired depth)
+    //point = [x,y,depth]
+    double d = 1.0/sqrt(2);
+    double PR[] = {data->getX() + d*data->getDepth_Right()*cos(data->getHeading()+(3.1415/4))
+                  ,data->getY() + d*data->getDepth_Right()*sin(data->getHeading()+(3.1415/4))
+                  ,d*data->getDepth_Right()};
+    double PL[] = {data->getX() + d*data->getDepth_Left()*cos(data->getHeading()-(3.1415/4))
+                  ,data->getY() + d*data->getDepth_Left()*sin(data->getHeading()-(3.1415/4))
+                  ,d*data->getDepth_Left()};
+
+    // L = PL + t(PR-PL)
+
+    if(PL[2] == PR[2])
+      turnAngle = 0;
     else
-      Integral = std::max(Integral, -200.0);
-    double turnAngle = KP * error + KI*Integral + KD * derivative;
+    {
+      // get t from calculating the point on the line where depth = targetDepth
+      double t = (targetDepth - PL[2]) / (PR[2] - PL[2]);
 
+      //point on the line
+      //std::cout << "P: " << PL[0] + t*(PR[0]-PL[0]) << ", "
+      //          << PL[1] + t*(PR[1]-PL[1]) << ", "
+      //          << PL[2] + t*(PR[2]-PL[2]) << std::endl;
+
+      double px = PL[0] + t*(PR[0]-PL[0]) - data->getX();
+      double py = PL[1] + t*(PR[1]-PL[1]) - data->getY();
+      double l = sqrt(px*px + py*py);
+      px = px/l;
+      py = py/l;
+      double a  = asin(py);
+      if(px<0)
+        a = 3.1415 - a;
+      turnAngle = a - data->getHeading();
+    }
+
+
+
+    //Limit turnAngle
     if(turnAngle > 0)
       turnAngle = std::min(maxAngle,turnAngle);
     else
       turnAngle = std::max(-maxAngle,turnAngle);
-
-    if(data->getDepth_Right() < data->getDepth_Left())
-    {
-      turnAngle *= -1;
-    }
-
-    //turnAngle = 0;
 
     std::cout << "turnAngle:" << (turnAngle * 180.0 / 3.1415) << std::endl;
     double target_x = data->getX() + cos(data->getHeading()+turnAngle) * 50;
@@ -430,6 +463,7 @@ bool SingleBeamScanner::followLand(double line1, double line2, PolygonSegment* r
     }
 
     usleep(delay);
+    polygon->updateView(data->getX(),data->getY());
   }
 
   //close to upper line
@@ -595,7 +629,21 @@ bool SingleBeamScanner::updateDepth(double x, double y, double depth, bool follo
   {
     //std::cout << "Not implemented" << std::endl;
     polygon->matrix[ix][iy]->updateDepth(depth);
-    polygon->matrix[ix][iy]->setStatus(2); //TODO fixa till
+
+    int indexX[] = {ix , ix+1, ix+1 ,ix+1 ,ix ,ix-1 ,ix-1 ,ix-1};
+    int indexY[] = {iy-1 , iy-1, iy ,iy+1 ,iy+1 ,iy+1 ,iy ,iy-1};
+    for(int k = 0; k < 8;k++)
+    {
+      int i = indexX[k];
+      int j = indexY[k];
+      if(i >= 0 && i < polygon->nx && j >= 0 && j < polygon->ny)
+      {
+        if(polygon->matrix[i][j]->getStatus() != 1)
+        {
+            polygon->matrix[i][j]->setStatus(2);
+        }
+      }
+    }
   }
   return true;
 }
