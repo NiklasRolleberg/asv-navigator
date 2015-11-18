@@ -37,9 +37,9 @@ Data::Data(Transmitter* transmitter,int delay, int arg3)
     boat_ypos = 0;
     boat_heading_local = 0;
     boat_speed = 0;
-    boat_sonar_depth = 1;
-    boat_sonar_front_right = 5;
-    boat_sonar_front_left = 6;
+    boat_sonar_depth = 10;
+    boat_sonar_front_right = 11;
+    boat_sonar_front_left = 12;
     localEnabled = false;
     data_threadptr = nullptr;
 }
@@ -598,8 +598,9 @@ void Data::processMessage(std::string m)
 
 void Data::setBoatWaypoint_real(double lat0, double lon0,double lat1, double lon1, double speed, bool noStartPos)
 {
-    /*
+
     //DEBUG - makes it possible to run the full program without the boat
+    /*
     boat_targetLat = lat1;
     boat_targetLon = lon1;
     boat_latitude = lat1;

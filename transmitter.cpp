@@ -216,7 +216,7 @@ void Transmitter::writeToSerial(std::string message)
 
   (*logfile) << "sent: " << message << std::endl;;
 
-  message+='\n';
+  message+="\r\n";
 
   while(lock)
   {

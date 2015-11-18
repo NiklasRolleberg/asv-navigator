@@ -41,27 +41,27 @@ void SingleBeamScanner::startScan()
   //s << std::endl;
   data->writeToLog(s.str());
 
-
   /*
   //DEBUG
-  polygon->updateView(1,1);
-  sleep(2);
+  //polygon->updateView(1,1);
+  //sleep(1);
   for (int i=0;i<polygon->nx;i++)
   {
     for (int j=0;j<polygon->ny;j++)
     {
-      if(i==14)
+      if(i==j || abs(i-j) == 1)
         polygon->matrix[i][j]->setStatus(2);
     }
   }
-  polygon->matrix[12][12]->setStatus(1);
-  polygon->updateView(0,0);
-  sleep(5);
+  polygon->matrix[5][12]->setStatus(1);
+  //polygon->updateView(0,0);
+  //sleep(1);
   polygon->idland();
-  polygon->updateView(0,0);
-  sleep(100);
+  //polygon->updateView(0,0);
+  //sleep(1);
+  polygon->removeAllRegions();
+  polygon->generateRegions();
   */
-
 
   std::cout << "scanner:SingleBeamScanner: starting scan" << std::endl;
   std::cout << "sweeping pattern, delta = " << delta << "\n" << std::endl;
@@ -325,6 +325,7 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
         }
       }
       */
+
     }
 
     //display depth data for debugging
@@ -437,7 +438,7 @@ bool SingleBeamScanner::followLand(double line1, double line2, PolygonSegment* r
       double a  = asin(py);
       if(px<0)
         a = 3.1415 - a;
-      turnAngle = a - data->getHeading();
+      turnAngle = data->getHeading() - a;
     }
 
 
