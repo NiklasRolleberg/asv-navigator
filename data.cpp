@@ -38,8 +38,8 @@ Data::Data(Transmitter* transmitter,int delay, int arg3)
     boat_heading_local = 0;
     boat_speed = 0;
     boat_sonar_depth = 10;
-    boat_sonar_front_right = 11;
-    boat_sonar_front_left = 12;
+    boat_sonar_front_right = 11;//4.2426;
+    boat_sonar_front_left = 12;//5.6569;
     localEnabled = false;
     data_threadptr = nullptr;
 }
