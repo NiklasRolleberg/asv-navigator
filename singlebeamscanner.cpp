@@ -280,34 +280,22 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
       if(targetY > region->yMax || targetY < region->yMin || !region->contains(targetX,targetY))
       {
         std::cout << "Scanning completed, min/max y reached" << std::endl;
-        /*
-        if(targetY > region->yMax )
-          std::cout << "MAX" << std::endl;
-        if(targetY < region->yMin )
-          std::cout << "MIN" << std::endl;
-        if(!region->contains(targetX,targetY))
-          std::cout << "OUTSIDE" << std::endl;
-        std::cout << "Updown: " << updown << std::endl;
-        std::cout << "TargetY: " << targetY << std::endl;
-        std::cout << "ymax:    " << region->yMax << std::endl;
-        std::cout << "ymin:    " << region->yMin << std::endl;
-        */
-
         //stop = true;
         break;
       }
-
       std::cout << "TARGET: " << targetX << " " << targetY <<std::endl;
+
       if(skipRest)
       {
         std::cout << "skiprest was true" << std::endl;
-        data->setBoatWaypoint_local(lastTargetX,lastTargetY,targetX,targetY,1.6,true); //testa med false
+        lastTargetY = targetY;
+        data->setBoatWaypoint_local(lastTargetX,lastTargetY,targetX,targetY,1.6,false); //testa med false
         skipRest = false;
         usleep(4000000);
       }
       else
       {
-        data->setBoatWaypoint_local(lastTargetX,lastTargetY,targetX,targetY,1.6,false);
+        data->setBoatWaypoint_local(lastTargetX,lastTargetY,targetX,targetY,targetSpeed,false);
       }
       /*
       //DEBUG
@@ -367,7 +355,7 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
       std::cout << "L: " << data->getDepth_Left() << std::endl;
       std::cout << "U: " << data->getDepth() << std::endl;
 
-      data->setBoatSpeed(0);
+      //data->setBoatSpeed(0);
       data->setBoatWaypoint_local(0,0,data->getX(),targetLine+delta*updown,0,true);
       usleep(2500000);
 
@@ -375,7 +363,7 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
       if(followLand(targetLine,targetLine+delta*updown,region))
       {
         targetLine = targetLine+delta*updown;
-        std::cout << "lower line reached" << std::endl;
+        std::cout << "next line reached" << std::endl;
         skipRest = true;
         goToNextLine = false;
         targetY = targetLine;
@@ -383,7 +371,7 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
       else
       {
         targetLine = targetLine;
-        std::cout << "upper line reached" << std::endl;
+        std::cout << "same line reached" << std::endl;
         targetY = targetLine;
         data->setBoatWaypoint_local(lastTargetX,lastTargetY,targetX,targetY,targetSpeed,false);
       }
@@ -512,7 +500,7 @@ bool SingleBeamScanner::followLand(double line1, double line2, PolygonSegment* r
   }
 
   //close to upper line
-  if(abs(data->getY()-line1) < abs(delta/2))
+  if(abs(data->getY()-line1) < abs((line1-line2))/2))
     return false;
   //close to line below
   return true;
