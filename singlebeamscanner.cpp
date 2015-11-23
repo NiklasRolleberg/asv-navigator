@@ -500,7 +500,7 @@ bool SingleBeamScanner::followLand(double line1, double line2, PolygonSegment* r
   }
 
   //close to upper line
-  if(abs(data->getY()-line1) < abs((line1-line2))/2))
+  if(abs(data->getY()-line1) < abs((line1-line2)/2))
     return false;
   //close to line below
   return true;
