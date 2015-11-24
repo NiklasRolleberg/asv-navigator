@@ -196,9 +196,8 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
 
   //north or south
   double updown = 0.8;
-  //if((targetY-region->yMin) > ((region->yMax-region->yMin)/2.0))
- //   updown = -0.8;
-
+  if((targetY-region->yMin) > ((region->yMax-region->yMin)*0.5))
+    updown = -0.8;
 
   //adapt updown if the region is located at the top or bottom of the polygon
   if(targetY+delta*updown > region->yMax || targetY+delta*updown < region->yMin)
@@ -291,7 +290,7 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
         lastTargetY = targetY;
         data->setBoatWaypoint_local(lastTargetX,lastTargetY,targetX,targetY,1.6,false); //testa med false
         skipRest = false;
-        usleep(4000000);
+        usleep(5000000);
       }
       else
       {
@@ -328,9 +327,10 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
       data->setBoatSpeed(targetSpeed);
       std::cout << "Reducing speed to 0.6" << std::endl;
     }
-    else if((data->getDepth() - lastDepth) < -2
-          || data->getDepth_Left() - lastDepth_Left < -2
-          || data->getDepth_Right() - lastDepth_Right < -2)
+    else if((data->getDepth() - lastDepth) < -1
+          || data->getDepth_Left() - lastDepth_Left < -1
+          || data->getDepth_Right() - lastDepth_Right < -1
+          || data->getDepth() < 5)
     {
       std::cout << "Reducing speed to 1" << std::endl;
       targetSpeed = 1;
@@ -344,10 +344,13 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
 
     //close to land
     double t = 5;
-    //if((0.5*(data->getDepth_Right() + data->getDepth_Left())) < t)
-    if(0.5*(data->getDepth() + lastDepth) < t ||
-      0.5*(data->getDepth_Right() + lastDepth_Right) < t ||
-      0.5*(data->getDepth_Left() + lastDepth_Left) < t)
+
+    //if(data->getDepth() < 0 ||
+    //   data->getDepth_Right()  < t ||
+    //   data->getDepth_Left()  <  t )
+    if((0.5*(data->getDepth_Right() + data->getDepth_Left())) < t ||
+      data->getDepth_Right() < 3 ||
+      data->getDepth_Left() < 3)
     {
       std::cout << "Starting land following" << std::endl;
 
@@ -391,19 +394,28 @@ bool SingleBeamScanner::followLand(double line1, double line2, PolygonSegment* r
 {
   std::cout << "Follow land" << std::endl;
 
-  double targetDepth = 3.5; // m
-  double targetSpeed = 0.6; // m/s
+  double targetDepth = 4; // m
+  double targetSpeed = 1; // m/s
   double KP = 0.5; //Proportional gain
 
-  double maxAngle = 3.1415 / 8; //22.5
+  double maxAngle = 3.1415 / 8; //45
   double turnAngle = 0;
 
   usleep(delay);
   double mean = (line1 + line2) / 2;
 
-  while(abs(mean - data->getY()) < abs(delta*0.55) && !stop)
+  std::cout << "Landföljning start!" << std::endl;
+  std::cout << "line1 " << line1 << std::endl;
+  std::cout << "line2 " << line2 << std::endl;
+  std::cout << "mean " << mean << std::endl;
+  std::cout << "Y " << data->getY() << std::endl;
+  std::cout << "delta " << delta << std::endl;
+  std::cout << "abs(mean - data->getY()) " << abs(mean - data->getY()) << std::endl;
+  std::cout << "abs(delta*0.6) " << abs(delta*0.6) << std::endl;
+
+  while(abs(mean - data->getY()) < abs(delta*0.6) && !stop)
   {
-    /*
+
     //V1 controller style
     //stop the boat from going outside the polygon
     if(!region->contains(data->getX(), data->getY()))
@@ -421,8 +433,8 @@ bool SingleBeamScanner::followLand(double line1, double line2, PolygonSegment* r
     turnAngle = KP * error;
     if(data->getDepth_Right() < data->getDepth_Left())
       turnAngle *= -1;
-    */
 
+    /*
     // V2 Mathematical style (turnAngle = the angle to the desired depth)
     //point = [x,y,depth]
     double d = 1.0/sqrt(2);
@@ -468,7 +480,7 @@ bool SingleBeamScanner::followLand(double line1, double line2, PolygonSegment* r
       //std::cout << "a: " << a*180/3.1415 << std::endl;
       //std::cout << "turnAngle: " << turnAngle*180/3.1415 << std::endl;
     }
-
+    */
 
     std::cout << "R: " << data->getDepth_Right() << std::endl;
     std::cout << "L: " << data->getDepth_Left() << std::endl;
@@ -481,9 +493,16 @@ bool SingleBeamScanner::followLand(double line1, double line2, PolygonSegment* r
     else
       turnAngle = std::max(-maxAngle,turnAngle);
 
+    if(data->getDepth_Left() < 1 )
+      turnAngle = -20;
+
+    if(data->getDepth_Right() < 1 )
+      turnAngle = 20;
+
+
     std::cout << "turnAngle:" << (turnAngle * 180.0 / 3.1415) << std::endl;
-    double target_x = data->getX() + cos(data->getHeading()+turnAngle) * 50;
-    double target_y = data->getY() + sin(data->getHeading()+turnAngle) * 50;
+    double target_x = data->getX() + cos(data->getHeading()+turnAngle) * 9;
+    double target_y = data->getY() + sin(data->getHeading()+turnAngle) * 9;
     data->setBoatWaypoint_local(0,0,target_x,target_y,targetSpeed,true);
 
     //update depth

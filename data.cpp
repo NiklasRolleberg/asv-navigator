@@ -633,7 +633,7 @@ void Data::setBoatWaypoint_real(double lat0, double lon0,double lat1, double lon
 
 void Data::setBoatWaypoint_local(double x0, double y0,double x1, double y1, double speed, bool noStartPos)
 {
-    //std::cout << "Data: Set local waypoint, local coordinates:: (" << x0 << "," << y0 << ") -> (" << x1 << "," << y1 << ")" << std::endl;
+    std::cout << "Data: Set local waypoint, local coordinates:: (" << x0 << "," << y0 << ") -> (" << x1 << "," << y1 << ")" << std::endl;
 
     setBoatWaypoint_real(yTOlat(y0),xTOlon(x0),yTOlat(y1),xTOlon(x1),speed,noStartPos);
 
