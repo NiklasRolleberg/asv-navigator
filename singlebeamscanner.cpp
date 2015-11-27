@@ -186,8 +186,8 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
 
   double targetX = region->findX(targetY, !goToRight);
 
-  double original_targetSpeed = 1.6;
-  double targetSpeed = 1.6;
+  double original_targetSpeed = 1.3;
+  double targetSpeed = 1.3;
   double lastTargetX = data->getX();
   double lastTargetY = data->getY();
 
@@ -343,7 +343,7 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
     }
 
     //close to land
-    double t = 5;
+    double t = 3.5;
 
     //if(data->getDepth() < 0 ||
     //   data->getDepth_Right()  < t ||
@@ -493,6 +493,7 @@ bool SingleBeamScanner::followLand(double line1, double line2, PolygonSegment* r
     else
       turnAngle = std::max(-maxAngle,turnAngle);
 
+    //Fullösning
     if(data->getDepth_Left() < 1 )
       turnAngle = -20;
 
