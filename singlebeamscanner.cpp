@@ -349,8 +349,8 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
     //   data->getDepth_Right()  < t ||
     //   data->getDepth_Left()  <  t )
     if((0.5*(data->getDepth_Right() + data->getDepth_Left())) < t ||
-      data->getDepth_Right() < 3 ||
-      data->getDepth_Left() < 3)
+      data->getDepth_Right() < 2 ||
+      data->getDepth_Left() < 2)
     {
       std::cout << "Starting land following" << std::endl;
 
@@ -358,12 +358,27 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
       std::cout << "L: " << data->getDepth_Left() << std::endl;
       std::cout << "U: " << data->getDepth() << std::endl;
 
-      //data->setBoatSpeed(0);
+      double l_before = data->getDepth_Left();
+      double r_before = data->getDepth_Right();
       data->setBoatWaypoint_local(0,0,data->getX(),targetLine+delta*updown,0,true);
       usleep(2500000);
 
+      for(int i = 0;i< 5;i++)
+      {
+        if(data->getDepth_Left() != l_before
+          && data->getDepth_Right() != r_before)
+          {
+            break;
+          }
+          std::cout << "Waiting for sonars to update depth" << std::endl;
+          usleep(1000000);
+      }
+
+      double targetDepth = (0.5*(data->getDepth_Right() + data->getDepth_Left())); //t; //4; // m
+      std::cout << "targetDepth = " << targetDepth << std::endl;
+
       //skiprest = true;
-      if(followLand(targetLine,targetLine+delta*updown,region))
+      if(followLand(targetLine,targetLine+delta*updown,targetDepth,region))
       {
         targetLine = targetLine+delta*updown;
         std::cout << "next line reached" << std::endl;
@@ -390,11 +405,10 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
 }
 
 
-bool SingleBeamScanner::followLand(double line1, double line2, PolygonSegment* region)
+bool SingleBeamScanner::followLand(double line1, double line2, double targetDepth,  PolygonSegment* region)
 {
   std::cout << "Follow land" << std::endl;
 
-  double targetDepth = 4; // m
   double targetSpeed = 1; // m/s
   double KP = 0.5; //Proportional gain
 
@@ -413,7 +427,9 @@ bool SingleBeamScanner::followLand(double line1, double line2, PolygonSegment* r
   std::cout << "abs(mean - data->getY()) " << abs(mean - data->getY()) << std::endl;
   std::cout << "abs(delta*0.6) " << abs(delta*0.6) << std::endl;
 
-  while(abs(mean - data->getY()) < abs(delta*0.6) && !stop)
+  while(abs(mean - data->getY()) < abs(delta*0.6) &&
+       (abs(line1 - data->getY()) < abs(line1 -line2) ) &&
+       !stop)
   {
 
     //V1 controller style
@@ -672,9 +688,10 @@ bool SingleBeamScanner::updateDepth(double x, double y, double depth, bool follo
     if(polygon->matrix != NULL)
     {
       polygon->matrix[ix][iy]->updateDepth(depth);
-      if(polygon->matrix[ix][iy]->getTimesVisited() > 5*delta) //hitta på en bra gräns
+      if(polygon->matrix[ix][iy]->getTimesVisited() > delta*delta
+        && polygon->matrix[ix][iy]->getTimesVisited() > delta*delta > 30 ) //hitta på en bra gräns
       {
-        return true; //ska vara false
+        return false; //ska vara false
       }
     }
   }
@@ -697,6 +714,13 @@ bool SingleBeamScanner::updateDepth(double x, double y, double depth, bool follo
         }
       }
     }
+
+    if(polygon->matrix[ix][iy]->getTimesVisited() > delta*delta
+      && polygon->matrix[ix][iy]->getTimesVisited() > delta*delta > 50 ) //hitta på en bra gräns
+    {
+      return false;
+    }
+
   }
   return true;
 }

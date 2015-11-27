@@ -37,9 +37,9 @@ Data::Data(Transmitter* transmitter,int delay, int arg3)
     boat_ypos = 0;
     boat_heading_local = 0;
     boat_speed = 0;
-    boat_sonar_depth = 10;
-    boat_sonar_front_right = 11;//4.2426;
-    boat_sonar_front_left = 12;//5.6569;
+    boat_sonar_depth = 11;
+    boat_sonar_front_right = 12;//4.2426;
+    boat_sonar_front_left = 13;//5.6569;
     localEnabled = false;
     data_threadptr = nullptr;
 }
@@ -514,6 +514,12 @@ void Data::processMessage(std::string m)
       if(sonar3 != "0.00")
         boat_sonar_front_left = strtod(sonar3.c_str(),NULL);
 
+    }
+
+    //Debug message
+    else if(m.substr(startIndex+1,5) == "DEBUG")
+    {
+      std::cout << m << std::endl;
     }
 
     //Sonar 1

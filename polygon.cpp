@@ -764,7 +764,9 @@ double** Polygon::createCostMatrix(int cx, int cy)
       double tentative_g_score;
 
       if (g_score[current->getIndexX()][current->getIndexY()] != -1)
-        tentative_g_score = g_score[current->getIndexX()][current->getIndexY()] + sqrt(dx*dx + dy*dy);
+        tentative_g_score = g_score[current->getIndexX()][current->getIndexY()]
+                            + sqrt(dx*dx + dy*dy
+                            + 10*(1.0 / current->getDepth())); //higher cost for low depth
       else
         tentative_g_score = sqrt(dx*dx + dy*dy);
 

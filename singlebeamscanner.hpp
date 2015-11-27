@@ -37,7 +37,7 @@ private:
     * true = line under reached
     * false = line above reached
     */
-    bool followLand(double line1, double line2, PolygonSegment* region);
+    bool followLand(double line1, double line2, double targetDepth,  PolygonSegment* region);
 
     /**find the closest element in the closest region*/
     Closest findClosest(int startX,int startY);
