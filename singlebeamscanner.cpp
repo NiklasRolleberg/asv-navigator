@@ -389,15 +389,26 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
           usleep(1000000);
       }
       //data->getDepth()/0.707;////
-      double targetDepth = (0.5*(data->getDepth_Right() + data->getDepth_Left())); //t; //4; // m
+      //double targetDepth = (0.5*(data->getDepth_Right() + data->getDepth_Left())); //t; //4; // m
+      double targetDepth = (data->getDepth()/0.707)-0.1;
+
       std::cout << "targetDepth = " << targetDepth << std::endl;
 
       std::cout << "svängde: " << tempHeading - (data->getHeading()*180.0/3.1415) << std::endl;
 
-      //skiprest = true;
-      if(followLand(targetLine,targetLine+delta*updown,targetDepth,region))
+      double line1 = targetLine;
+      double line2 = targetLine+delta*updown;
+
+      if(!goToNextLine)
       {
-        targetLine = targetLine+delta*updown;
+        line1 = targetLine-delta*updown;
+        double line2 = targetLine;
+      }
+      //skiprest = true;
+      if(followLand(line1,line2,targetDepth,region))
+      {
+        if(goToNextLine)
+          targetLine = targetLine+delta*updown;
         std::cout << "next line reached" << std::endl;
         skipRest = true;
         goToNextLine = false;
