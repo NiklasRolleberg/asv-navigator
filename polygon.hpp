@@ -1,6 +1,10 @@
 #ifndef POLYGON_H
 #define POLYGON_H
 
+#ifndef SHOW_GUI
+#define SHOW_GUI false
+#endif
+
 #include <vector>
 #include <iostream>
 #include <set>
