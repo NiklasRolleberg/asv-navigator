@@ -357,6 +357,12 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
       data->getDepth_Left() < 2) &&
       (0.5*0.707*(data->getDepth_Right() + data->getDepth_Left())) < data->getDepth())
     {
+
+      //Don't enter land following if the boat is outside the polygon
+      if(!region->contains(data->getX(),data->getY()))
+        return false;
+
+
       std::cout << "Starting land following" << std::endl;
 
       std::cout << "R: " << data->getDepth_Right() << std::endl;
