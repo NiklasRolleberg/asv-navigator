@@ -344,18 +344,28 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
     }
 
     //close to land
-    double t = 3.5;
+    double t = 3;
 
     //if(data->getDepth() < 0 ||
     //   data->getDepth_Right()  < t ||
     //   data->getDepth_Left()  <  t )
-    double extra = ((0.5*0.707*(data->getDepth_Right() + data->getDepth_Left())) - data->getDepth());
-    std::cout << "extrasak" << extra << std::endl;
+
+    double fram = (0.5*0.5*(data->getDepth_Right() + data->getDepth_Left()));
+    double bak = data->getDepth();
+    std::cout << "Framför: " << fram << std::endl;
+    std::cout << "Under  : " << bak << std::endl;
+
+    //(0.5*0.707*(data->getDepth_Right() + data->getDepth_Left())) < data->getDepth())
+
+    //if(((0.5*(data->getDepth_Right() + data->getDepth_Left())) < t ||
+    //  data->getDepth_Right() < 1 ||
+    //  data->getDepth_Left() < 1)  &&
+    //  (bak > fram))
 
     if(((0.5*(data->getDepth_Right() + data->getDepth_Left())) < t ||
-      data->getDepth_Right() < 2 ||
-      data->getDepth_Left() < 2) &&
-      (0.5*0.707*(data->getDepth_Right() + data->getDepth_Left())) < data->getDepth())
+      data->getDepth_Right() < 1 ||
+      data->getDepth_Left() < 1)  &&
+      (bak > fram))
     {
 
       //Don't enter land following if the boat is outside the polygon
@@ -396,7 +406,7 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
       }
       //data->getDepth()/0.707;////
       //double targetDepth = (0.5*(data->getDepth_Right() + data->getDepth_Left())); //t; //4; // m
-      double targetDepth = (data->getDepth()/0.707)-0.1;
+      double targetDepth = t;
 
       std::cout << "targetDepth = " << targetDepth << std::endl;
 
@@ -444,9 +454,9 @@ bool SingleBeamScanner::followLand(double line1, double line2, double targetDept
   std::cout << "Follow land" << std::endl;
 
   double targetSpeed = 1; // m/s
-  double KP = 0.8; //Proportional gain
+  double KP = 0.5; //Proportional gain
 
-  double maxAngle = 3.1415 / 4; //45
+  double maxAngle = 3.1415 / 8; //22.5
   double turnAngle = 0;
 
   usleep(delay);
