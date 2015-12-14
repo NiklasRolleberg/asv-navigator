@@ -1,0 +1,88 @@
+# <- this line will be ignored
+# template:
+#TASK:(number) specify the type if task
+#DATA:(data requied for the task, e.g time to sleep/ coordinates)
+
+# -------- examples --------
+
+#example1: create a task that waits for 5s
+#TASK:1
+#DATA:TIM:5000000
+
+#example2: create a go to coordinates task
+#TASK:2
+#DATA:LAT:59.234
+#DATA:LON:18.245
+
+#example3: scan a polygon
+#TASK:3
+#DATA:LAT:51.234,53.234,59.254,59.214
+#DATA:LON:19.235,18.253,17,316,18.937
+
+#example4: send a message
+#TASK:4
+#DATA:MES:$SEND,THIS,MESSAGE,*00
+
+#-------- settings --------
+
+# set mode calibration
+TASK:4
+DATA:MES:$MSSMC,*00
+
+# COG threshold
+TASK:4
+DATA:MES:$MSSCT,0.6,*00
+
+# no external control
+TASK:4
+DATA:MES:$MSTRO,0,*00
+
+# XTE
+TASK:4
+DATA:MES:$MSSXT,0.8,10,DYNAMIC,*00
+
+#
+TASK:4
+DATA:MES:$MSSSC,,0.05,,40,*00
+
+# Speed reduction factor
+# $MSSSR,radius,factor,*00
+TASK:4
+DATA:MES:$MSSSR,15,0.3,*00
+
+#Data rate
+#TASK:4
+#DATA:MES:$MSSOF,2,*00
+
+# $MSSGA,Servo1_P,Servo1_I,Servo1_D,Servo2_P,Servo2_I,Servo2_D,*00
+#servo_1: steering
+#servo_2: speed
+TASK:4
+DATA:MES:$MSSGA,400,0,50,100,100,0,*00
+#DATA:MES:$MSSGA,500,0,0,100,100,0,*00
+
+
+# -------- mission --------
+
+TASK:1
+DATA:TIM:1000000
+
+#----------båt ---------------
+
+TASK:2
+DATA:LAT:59.311302
+DATA:LON:17.987217
+
+TASK:1
+DATA:TIM:1000000
+
+TASK:3
+DATA:LAT:59.311665,59.311548,59.310847,59.311100
+DATA:LON:17.986968,17.988129,17.987857,17.986693
+
+TASK:1
+DATA:TIM:1000000
+
+# STOP
+TASK:4
+DATA:MES:$MSSTO,*00

@@ -288,9 +288,9 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
       {
         std::cout << "skiprest was true" << std::endl;
         lastTargetY = targetY;
-        data->setBoatWaypoint_local(lastTargetX,lastTargetY,targetX,targetY,70,false); //testa med false
+        data->setBoatWaypoint_local(lastTargetX,lastTargetY,targetX,targetY,1.6,false); //testa med false
         skipRest = false;
-        usleep(5000000);
+        usleep(10000000);
       }
       else
       {
@@ -344,13 +344,13 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
     }
 
     //close to land
-    double t = 3;
+    double t = 5;
 
     //if(data->getDepth() < 0 ||
     //   data->getDepth_Right()  < t ||
     //   data->getDepth_Left()  <  t )
 
-    double fram = (0.5*0.5*(data->getDepth_Right() + data->getDepth_Left()));
+    double fram = (0.5*0.707*(data->getDepth_Right() + data->getDepth_Left()));
     double bak = data->getDepth();
     std::cout << "Framför: " << fram << std::endl;
     std::cout << "Under  : " << bak << std::endl;
@@ -405,8 +405,8 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
           usleep(1000000);
       }
       //data->getDepth()/0.707;////
-      //double targetDepth = (0.5*(data->getDepth_Right() + data->getDepth_Left())); //t; //4; // m
-      double targetDepth = t;
+      double targetDepth = (0.5*(data->getDepth_Right() + data->getDepth_Left())); //t; //4; // m
+      //double targetDepth = t;
 
       std::cout << "targetDepth = " << targetDepth << std::endl;
 
@@ -453,8 +453,8 @@ bool SingleBeamScanner::followLand(double line1, double line2, double targetDept
 {
   std::cout << "Follow land" << std::endl;
 
-  double targetSpeed = 1; // m/s
-  double KP = 0.5; //Proportional gain
+  double targetSpeed = 0.6; // m/s
+  double KP = 0.4; //Proportional gain
 
   double maxAngle = 3.1415 / 8; //22.5
   double turnAngle = 0;
