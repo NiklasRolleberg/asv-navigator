@@ -629,7 +629,8 @@ void Data::setBoatWaypoint_real(double lat0, double lon0,double lat1, double lon
       s << "MSSCP,,,," << std::setprecision(10) << lat1 << "," << lon1 << ",,"<< speed << ",";
     else
       s << "MSSCP," << std::setprecision(10) << lat0 << ","<< lon0 << ",0," << lat1 << "," << lon1 << ",0,"<< speed << ",";
-    s << '*' << std::hex << calculateChecksum(s.str());
+    int cs = calculateChecksum(s.str());
+    s << '*' << std::hex << cs;
     std::string str = "$" + s.str();
 
     data_transmitterptr->sendMessage(str); //send path
@@ -675,8 +676,9 @@ double Data::calculateDistance(double lat1,double lon1,double lat2,double lon2)
     return R * c;
 }
 
-int Data::calculateChecksum(std::string s) {
-  int c = 0;
+int Data::calculateChecksum(std::string s)
+{
+    int c = 0;
     for(int i=0;i<s.length();i++)
       c ^= s[i];
     return c;
