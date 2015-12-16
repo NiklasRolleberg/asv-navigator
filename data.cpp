@@ -655,7 +655,8 @@ void Data::setBoatSpeed(double speed)
     //data_transmitterptr->sendMessage(s.str());
 
     s << "MSSDS," << std::setprecision(3) << speed << ",";
-    s << '*' << std::hex << calculateChecksum(s.str());
+    int cs = calculateChecksum(s.str());
+    s << '*' << std::hex << cs;
     std::string str = "$" + s.str();
     data_transmitterptr->sendMessage(str);
 }
