@@ -130,11 +130,20 @@ public:
     /**Get Depth*/
     double getDepth();
 
+    /**change/time*/
+    double getDepth_Slope();
+
     /**Get depth to the right*/
     double getDepth_Right();
 
+    /**change/time*/
+    double getDepth_Right_Slope();
+
     /**Get depth to the left*/
     double getDepth_Left();
+
+    /**change/time*/
+    double getDepth_Left_Slope();
 
     /** true if the distance between the boats path and the coordinates given is less than tol */
     bool hasCorrectPath(double lat0, double lon0, double lat1, double lon1, double tol);

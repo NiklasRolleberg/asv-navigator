@@ -36,9 +36,9 @@ Data::Data(Transmitter* transmitter,int delay, int arg3)
     localEnabled = false;
     data_threadptr = nullptr;
 
-    gradient_depth = new Sonar_gradient(2);
-    gradient_front_right = new Sonar_gradient(2);
-    gradient_front_left = new Sonar_gradient(2);
+    gradient_depth = new Sonar_gradient(5);
+    gradient_front_right = new Sonar_gradient(5);
+    gradient_front_left = new Sonar_gradient(5);
 
 }
 
@@ -254,14 +254,29 @@ double Data::getDepth()
     return boat_sonar_depth;
 }
 
+double Data::getDepth_Slope()
+{
+  return gradient_depth->getGradient();
+}
+
 double Data::getDepth_Right()
 {
   return boat_sonar_front_right;
 }
 
+double Data::getDepth_Right_Slope()
+{
+  return gradient_front_right->getGradient();
+}
+
 double Data::getDepth_Left()
 {
   return boat_sonar_front_left;
+}
+
+double Data::getDepth_Left_Slope()
+{
+  return gradient_front_left->getGradient();
 }
 
 bool Data::hasCorrectPath(double lat0, double lon0, double lat1, double lon1, double tol)
@@ -753,6 +768,7 @@ void Sonar_gradient::addValue(double input)
 {
   if(first)
   {
+    first = false;
     for(int i=0;i<n;i++)
       values[i] = input;
   }
@@ -766,8 +782,16 @@ void Sonar_gradient::addValue(double input)
     values[0] = input;
   }
 
-  //TODO:least square approximation
-
+  //Linear regression
+  double SUMx, SUMy, SUMxy, SUMxx;
+  SUMx = 0; SUMy = 0; SUMxy = 0; SUMxx = 0;
+  for (int i=0; i<n; i++) {
+    SUMx = SUMx + i;
+    SUMy = SUMy + values[i];
+    SUMxy = SUMxy + i*values[i];
+    SUMxx = SUMxx + i*i;
+  }
+  gradient = ( SUMx*SUMy - n*SUMxy ) / ( SUMx*SUMx - n*SUMxx );
 }
 
 double Sonar_gradient::getGradient()
