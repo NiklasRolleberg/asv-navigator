@@ -9,6 +9,19 @@
 #include <limits>
 #include <string>
 
+class Sonar_gradient {
+private:
+    int n;
+    double* values;
+    bool first;
+    double gradient;
+  public:
+    Sonar_gradient(int nr);
+    ~Sonar_gradient();
+    void addValue(double depth);
+    double getGradient();
+};
+
 class Data
 {
 private:
@@ -26,6 +39,10 @@ private:
     double boat_sonar_depth;
     double boat_sonar_front_right;
     double boat_sonar_front_left;
+
+    Sonar_gradient *gradient_depth;
+    Sonar_gradient *gradient_front_right;
+    Sonar_gradient *gradient_front_left;
 
     bool data_stop; //= false; //false
     int data_delay; //= 500000; //0.5s

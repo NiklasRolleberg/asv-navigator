@@ -17,14 +17,7 @@ Data::Data(Transmitter* transmitter,int delay, int arg3)
     std::cout << "Data constructor" << std::endl;
     data_transmitterptr = transmitter;
     data_delay = delay;
-    //Get initial values for variables
 
-    //59.352884, 18.073585
-    //boat_latitude = 59.352884;
-    //boat_longitude = 18.073585;
-
-    //59.300837,18.214686
-    //59.296566, 18.226487
     boat_latitude = 59.296566;
     boat_longitude = 18.226487;
 
@@ -42,12 +35,22 @@ Data::Data(Transmitter* transmitter,int delay, int arg3)
     boat_sonar_front_left = 13;//5.6569;
     localEnabled = false;
     data_threadptr = nullptr;
+
+    gradient_depth = new Sonar_gradient(2);
+    gradient_front_right = new Sonar_gradient(2);
+    gradient_front_left = new Sonar_gradient(2);
+
 }
 
 Data::~Data()
 {
     std::cout << "Data destructor" << std::endl;
     data_stop = true;
+
+    delete gradient_depth;
+    delete gradient_front_left;
+    delete gradient_front_right;
+
     if(data_threadptr != nullptr)
         if(data_threadptr->joinable())
             data_threadptr->join();
@@ -508,12 +511,20 @@ void Data::processMessage(std::string m)
       //std::cout << "sonar2: " << sonar2 << std::endl;
       //std::cout << "sonar3: " << sonar3 << std::endl;
       if(sonar1 != "0.00")
+      {
         boat_sonar_depth = strtod(sonar1.c_str(),NULL);
+        gradient_depth->addValue(boat_sonar_depth);
+      }
       if(sonar2 != "0.00")
+      {
         boat_sonar_front_right = strtod(sonar2.c_str(),NULL);
+        gradient_front_left->addValue(boat_sonar_front_left);
+      }
       if(sonar3 != "0.00")
+      {
         boat_sonar_front_left = strtod(sonar3.c_str(),NULL);
-
+        gradient_front_right->addValue(boat_sonar_front_right);
+      }
     }
 
     //Debug message
@@ -718,5 +729,48 @@ void Data::writeToLog(std::string s)
 
 void Data::sendMessage(std::string s)
 {
-    data_transmitterptr->sendMessage(s);
+  data_transmitterptr->sendMessage(s);
+}
+
+//-----------------------------------------------------------------------------//
+
+Sonar_gradient::Sonar_gradient(int nr)
+{
+  std::cout << "Gradient contructor: " << nr << std::endl;
+  n = nr;
+  values = new double[n];
+  first = true;
+  gradient = 0;
+}
+
+Sonar_gradient::~Sonar_gradient()
+{
+  std::cout << "Gradient destructor" << std::endl;
+  delete[] values;
+}
+
+void Sonar_gradient::addValue(double input)
+{
+  if(first)
+  {
+    for(int i=0;i<n;i++)
+      values[i] = input;
+  }
+  else
+  {
+    //Move all values one step back, exept for the last one
+    for(int i=n-2; i>=0;i--) {
+    	values[i+1] = values[i];
+    }
+    //input the new value at pos 0;
+    values[0] = input;
+  }
+
+  //TODO:least square approximation
+
+}
+
+double Sonar_gradient::getGradient()
+{
+  return gradient;
 }
