@@ -26,6 +26,13 @@ private:
     int delay;
     bool stop;
 
+    double speed_level1;
+    double speed_level2;
+    double speed_level3;
+
+    double depthThreshold;
+    double speed_landfollowing;
+
     /**Update values in the element matrix*/
     bool updateDepth(double x, double y, double depth, bool followingLand);
 

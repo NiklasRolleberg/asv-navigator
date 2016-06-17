@@ -19,6 +19,13 @@ SingleBeamScanner::SingleBeamScanner(Data* dataptr, Polygon* polygonptr,int inpu
   delta = d;
   tol = t;
 
+  speed_level1 = 1;
+  speed_level2 = 0.7;
+  speed_level3 = 0.5;
+
+  depthThreshold = 3;
+  speed_landfollowing = 0.5;
+
   stop = false;
 }
 
@@ -40,28 +47,6 @@ void SingleBeamScanner::startScan()
   }
   //s << std::endl;
   data->writeToLog(s.str());
-
-  /*
-  //DEBUG
-  //polygon->updateView(1,1);
-  //sleep(1);
-  for (int i=0;i<polygon->nx;i++)
-  {
-    for (int j=0;j<polygon->ny;j++)
-    {
-      if(i==j || abs(i-j) == 1)
-        polygon->matrix[i][j]->setStatus(2);
-    }
-  }
-  polygon->matrix[5][12]->setStatus(1);
-  //polygon->updateView(0,0);
-  //sleep(1);
-  polygon->idland();
-  //polygon->updateView(0,0);
-  //sleep(1);
-  polygon->removeAllRegions();
-  polygon->generateRegions();
-  */
 
   std::cout << "scanner:SingleBeamScanner: starting scan" << std::endl;
   std::cout << "sweeping pattern, delta = " << delta << "\n" << std::endl;
@@ -186,8 +171,8 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
 
   double targetX = region->findX(targetY, !goToRight);
 
-  double original_targetSpeed = 1.3;
-  double targetSpeed = 1.3;
+  double original_targetSpeed = speed_level1;
+  double targetSpeed = speed_level1;
   double lastTargetX = data->getX();
   double lastTargetY = data->getY();
 
@@ -288,7 +273,7 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
       {
         std::cout << "skiprest was true" << std::endl;
         lastTargetY = targetY;
-        data->setBoatWaypoint_local(lastTargetX,lastTargetY,targetX,targetY,1.6,false); //testa med false
+        data->setBoatWaypoint_local(lastTargetX,lastTargetY,targetX,targetY,targetSpeed,false); //Här kan det behövas en annan hastighet
         skipRest = false;
         usleep(10000000);
       }
@@ -296,6 +281,7 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
       {
         data->setBoatWaypoint_local(lastTargetX,lastTargetY,targetX,targetY,targetSpeed,false);
       }
+
       /*
       //DEBUG
       //update depth of elements
@@ -312,7 +298,6 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
         }
       }
       */
-
     }
 
     //display depth data for debugging
@@ -324,17 +309,17 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
     //TODO adapt speed proportional to depth and depth change
     if(data->getDepth() < 3 || data->getDepth_Right() < 5 || data->getDepth_Left() < 5 )
     {
-      targetSpeed = 0.6;
+      targetSpeed = speed_level3;
       data->setBoatSpeed(targetSpeed);
-      std::cout << "Reducing speed to 0.6" << std::endl;
+      std::cout << "Reducing speed to " << targetSpeed << std::endl;
     }
     else if((data->getDepth() - lastDepth) < -1
           || data->getDepth_Left() - lastDepth_Left < -1
           || data->getDepth_Right() - lastDepth_Right < -1
           || data->getDepth() < 5)
     {
-      std::cout << "Reducing speed to 1" << std::endl;
-      targetSpeed = 1;
+      std::cout << "Reducing speed to " << speed_level2 << std::endl;
+      targetSpeed = speed_level2;
       data->setBoatSpeed(targetSpeed);
     }
     else if(targetSpeed != original_targetSpeed)
@@ -344,7 +329,7 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
     }
 
     //close to land
-    double t = 5;
+    //double t = depthThreshold;
 
     //if(data->getDepth() < 0 ||
     //   data->getDepth_Right()  < t ||
@@ -362,7 +347,7 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
     //  data->getDepth_Left() < 1)  &&
     //  (bak > fram))
 
-    if(((0.5*(data->getDepth_Right() + data->getDepth_Left())) < t ||
+    if(((0.5*(data->getDepth_Right() + data->getDepth_Left())) < depthThreshold ||
       data->getDepth_Right() < 1 ||
       data->getDepth_Left() < 1)  &&
       (bak > fram))

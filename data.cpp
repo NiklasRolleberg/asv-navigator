@@ -113,8 +113,10 @@ void Data::setLocalCoordinateSystem(Polygon* polygon, double delta)
     maxLon = std::numeric_limits<double>::min();
     dLon = 1;
 
+    std::cout << "Polygon" << polygon << std::endl;
 
     std::vector<double> *latitude = polygon->getLatBoundaries();
+    std::cout << "Polygon-lat length" << latitude->size() << std::endl;
     for(int i=0; i < latitude->size();i++)
     {
       double d = (*latitude)[i];
@@ -631,8 +633,8 @@ void Data::processMessage(std::string m)
 void Data::setBoatWaypoint_real(double lat0, double lon0,double lat1, double lon1, double speed, bool noStartPos)
 {
 
-    //DEBUG - makes it possible to run the full program without the boat
     /*
+    //DEBUG - makes it possible to run the full program without the boat
     boat_targetLat = lat1;
     boat_targetLon = lon1;
     boat_latitude = lat1;
