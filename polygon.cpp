@@ -689,7 +689,7 @@ void Polygon::idland()
 double** Polygon::createCostMatrix(int cx, int cy)
 {
 
-  //std::cout << "createCostMatrix: (" << cx << "," << cy << ")" << std::endl;
+  std::cout << "createCostMatrix: (" << cx << "," << cy << ")" << std::endl;
 
   if(!localSet)
     return NULL;
@@ -740,9 +740,12 @@ double** Polygon::createCostMatrix(int cx, int cy)
     openSet.erase(current);
     closedSet.insert(current);
 
-    if(current == NULL)
-      std::cout << "current is NULL" << std::endl;
-
+    if(current == NULL) {
+      std::cout << "current is NULL. Segmentation fault incoming!" << std::endl;
+      std::cout << "DEBUG" << std::endl;
+      std::cout << "Index: (cx,cy) = (" << cx << "," << cy << ")"<< std::endl;
+      std::cout << "max (x,y) = (" << nx << "," << ny << ")" << std::endl;
+    }
     /*
     std::cout << "current:" << std::endl;
     std::cout << "pos:" << current->getX() << "," << current->getY() << std::endl;
