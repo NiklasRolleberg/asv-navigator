@@ -237,8 +237,36 @@ void BasicDrawPane::render(wxDC&  dc)
           dc.SetBrush(*wxBLACK_BRUSH); // not scanned
 
         if(matrix[i][j]->getStatus() == 1)
-            dc.SetBrush(*wxGREEN_BRUSH); // scanned
+        {
+            //dc.SetBrush(*wxGREEN_BRUSH); // scanned
+            //set color for scanned area
+            int red = 0;
+            int green = 0;
+            int blue = 255;
 
+            if(matrix[i][j]->getDepth() > 10)
+            {
+              green = 20;
+              blue = 20;
+            }
+            else if (matrix[i][j]->getDepth() > 6)
+            {
+              green = 0;
+              blue = 50;
+            }
+            else if (matrix[i][j]->getDepth() > 4)
+            {
+              green = 0;
+              blue = 120;
+            }
+            else if (matrix[i][j]->getDepth() > 2)
+            {
+              green = 0;
+              blue = 200;
+            }
+            wxBrush brush(wxColor(red,green,blue),1);
+            dc.SetBrush(brush);
+        }
         if(matrix[i][j]->getStatus() == 2)
             dc.SetBrush(*wxRED_BRUSH); // land
 
