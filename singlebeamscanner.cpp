@@ -282,7 +282,7 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
         data->setBoatWaypoint_local(lastTargetX,lastTargetY,targetX,targetY,targetSpeed,false);
       }
 
-
+      /*
       //DEBUG
       //update depth of elements
       if(true)
@@ -297,7 +297,7 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
             updateDepth(targetX + DX*i,targetY + DY*i, targetY/10, false);
         }
       }
-
+      */
     }
 
     //display depth data for debugging
