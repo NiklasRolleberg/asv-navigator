@@ -19,12 +19,15 @@ SingleBeamScanner::SingleBeamScanner(Data* dataptr, Polygon* polygonptr,int inpu
   delta = d;
   tol = t;
 
+/*
   speed_level1 = 1;
   speed_level2 = 0.7;
   speed_level3 = 0.5;
+*/
 
   depthThreshold = 3;
   speed_landfollowing = 0.5;
+  minimumTargetDepth = depthThreshold*1.4+1;
 
   stop = false;
 }
@@ -306,6 +309,7 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
     std::cout << "Depth_left : " << data->getDepth_Left() << std::endl;
     std::cout << "Heading: " << (data->getHeading()*180.0/3.1415) << std::endl;
 
+    /*
     //TODO adapt speed proportional to depth and depth change
     if(data->getDepth() < 3 || data->getDepth_Right() < 5 || data->getDepth_Left() < 5 )
     {
@@ -327,7 +331,7 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
       targetSpeed=original_targetSpeed;
       data->setBoatSpeed(targetSpeed);
     }
-
+    */
     //close to land
     //double t = depthThreshold;
 
@@ -389,8 +393,8 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
           std::cout << "Waiting for sonars to update depth" << std::endl;
           usleep(1000000);
       }
-      //data->getDepth()/0.707;////
-      double targetDepth = (0.5*(data->getDepth_Right() + data->getDepth_Left())); //t; //4; // m
+      //data->getDepth()/0.707;//
+      double targetDepth = std::max(minimumTargetDepth,(0.5*(data->getDepth_Right() + data->getDepth_Left()))); //t; //4; // m
       //double targetDepth = t;
 
       std::cout << "targetDepth = " << targetDepth << std::endl;

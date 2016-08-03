@@ -31,6 +31,7 @@ private:
     double speed_level3;
 
     double depthThreshold;
+    double minimumTargetDepth;
     double speed_landfollowing;
 
     /**Update values in the element matrix*/
