@@ -717,10 +717,12 @@ double** Polygon::createCostMatrix(int cx, int cy)
   g_score[cx][cy] = 0;
   f_score[cx][cy] = 0;
 
+  int itteration = 0;
   while(!openSet.empty())
   {
-    //std::cout << "openSet: " << openSet.size() << std::endl;
-    //std::cout << "closedSet: " << closedSet.size() << std::endl;
+    std::cout << "openSet: " << openSet.size() << std::endl;
+    std::cout << "closedSet: " << closedSet.size() << std::endl;
+    std::cout << "itteration" << itteration++ << std::endl;
 
     //find node with lowest f_score value
     double min = std::numeric_limits<double>::max();
@@ -730,15 +732,20 @@ double** Polygon::createCostMatrix(int cx, int cy)
       //std::cout << "it:" << &(*it) << std::endl;
       int ix = (*it)->getIndexX();
       int iy = (*it)->getIndexY();
+      std::cout << "for loop: " << ix << "," << iy << std::endl;
       if(f_score[ix][iy] <= min)
       {
         min = f_score[ix][iy];
         current = (*it);
+        std::cout << "new current!" << current << std::cout;
+
       }
     }
 
+    std::cout << "current innan:" << current << std::endl;
     openSet.erase(current);
     closedSet.insert(current);
+    std::cout << "current efter" << current << std::endl;
 
     if(current == NULL) {
       std::cout << "current is NULL. Segmentation fault incoming!" << std::endl;

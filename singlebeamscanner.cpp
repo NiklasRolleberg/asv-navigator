@@ -25,9 +25,9 @@ SingleBeamScanner::SingleBeamScanner(Data* dataptr, Polygon* polygonptr,int inpu
   speed_level3 = 0.5;
 */
 
-  depthThreshold = 3;
+  depthThreshold = 5;
   speed_landfollowing = 0.5;
-  minimumTargetDepth = depthThreshold*1.4+1;
+  minimumTargetDepth = depthThreshold;
 
   stop = false;
 }
@@ -174,8 +174,8 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
 
   double targetX = region->findX(targetY, !goToRight);
 
-  double original_targetSpeed = speed_level1;
-  double targetSpeed = speed_level1;
+  double original_targetSpeed = 1.3;
+  double targetSpeed = 1.3;
   double lastTargetX = data->getX();
   double lastTargetY = data->getY();
 
@@ -375,6 +375,7 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
       double r_before = data->getDepth_Right();
       double x_t = data->getX();
       double y_t = targetLine+delta*updown;
+      y_t *= 10;
       data->setBoatWaypoint_local(0,0,x_t,y_t,0,true);
       usleep(2500000);
       if(!data->hasCorrectPath(0,0,data->yTOlat(y_t),data->xTOlon(x_t),2)){
