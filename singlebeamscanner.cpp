@@ -146,6 +146,7 @@ void SingleBeamScanner::startScan()
 
   std::cout <<"SweepingPattern done" << std::endl;
   polygon->saveMatrix();
+
   usleep(3000000);
 }
 
@@ -278,7 +279,11 @@ bool SingleBeamScanner::scanRegion(PolygonSegment* region)
         lastTargetY = targetY;
         data->setBoatWaypoint_local(lastTargetX,lastTargetY,targetX,targetY,targetSpeed,false); //Här kan det behövas en annan hastighet
         skipRest = false;
-        usleep(10000000);
+        for(int s = 0;s<10;s++) //10s delay after land following ends
+        {
+          usleep(1000000);
+          updateDepth(data->getX(),data->getY(),data->getDepth(),false);
+        }
       }
       else
       {

@@ -720,9 +720,9 @@ double** Polygon::createCostMatrix(int cx, int cy)
   int itteration = 0;
   while(!openSet.empty())
   {
-    std::cout << "openSet: " << openSet.size() << std::endl;
-    std::cout << "closedSet: " << closedSet.size() << std::endl;
-    std::cout << "itteration" << itteration++ << std::endl;
+    //std::cout << "openSet: " << openSet.size() << std::endl;
+    //std::cout << "closedSet: " << closedSet.size() << std::endl;
+    //std::cout << "itteration: " << itteration++ << std::endl;
 
     //find node with lowest f_score value
     double min = std::numeric_limits<double>::max();
@@ -732,20 +732,21 @@ double** Polygon::createCostMatrix(int cx, int cy)
       //std::cout << "it:" << &(*it) << std::endl;
       int ix = (*it)->getIndexX();
       int iy = (*it)->getIndexY();
-      std::cout << "for loop: " << ix << "," << iy << std::endl;
+      //std::cout << "for loop: " << ix << "," << iy << std::endl;
+      //std::cout << "f_score:" << f_score[ix][iy] << std::endl;
       if(f_score[ix][iy] <= min)
       {
         min = f_score[ix][iy];
         current = (*it);
-        std::cout << "new current!" << current << std::cout;
+        //std::cout << "new current: " << current << std::endl;
 
       }
     }
 
-    std::cout << "current innan:" << current << std::endl;
+    //std::cout << "current innan: " << current << std::endl;
     openSet.erase(current);
     closedSet.insert(current);
-    std::cout << "current efter" << current << std::endl;
+    //std::cout << "current efter: " << current << std::endl;
 
     if(current == NULL) {
       std::cout << "current is NULL. Segmentation fault incoming!" << std::endl;
@@ -755,9 +756,9 @@ double** Polygon::createCostMatrix(int cx, int cy)
     }
     /*
     std::cout << "current:" << std::endl;
-    std::cout << "pos:" << current->getX() << "," << current->getY() << std::endl;
-    std::cout << "index:" << current->getIndexX() << "," << current->getIndexY() << std::endl;
-    std::cout << "nr of neighbours:" << current->getNeighbours()->size() << std::endl;
+    std::cout << "        pos:" << current->getX() << "," << current->getY() << std::endl;
+    std::cout << "        index:" << current->getIndexX() << "," << current->getIndexY() << std::endl;
+    std::cout << "        nr of neighbours:" << current->getNeighbours()->size() << std::endl;
     */
     //itterate through neighbours
     for(int i=0;i<current->getNeighbours()->size();i++)
@@ -768,15 +769,17 @@ double** Polygon::createCostMatrix(int cx, int cy)
 
       double dx = n->getX()-current->getX();
       double dy = n->getY()-current->getY();
-      //std::cout << "n: " << n << std::endl;
-      //std::cout << "index: (" << n->getIndexX() << "," << n->getIndexY() << ")" << std::endl;
-      //std::cout << "(dx,dy): (" << dx << "," << dy << ")" << std::endl;
+      /*
+      std::cout << "n: " << n << std::endl;
+      std::cout << "index: (" << n->getIndexX() << "," << n->getIndexY() << ")" << std::endl;
+      std::cout << "(dx,dy): (" << dx << "," << dy << ")" << std::endl;
+      */
       double tentative_g_score;
 
       if (g_score[current->getIndexX()][current->getIndexY()] != -1)
         tentative_g_score = g_score[current->getIndexX()][current->getIndexY()]
                             + sqrt(dx*dx + dy*dy)
-                            + 10*(1.0 / current->getDepth()); //higher cost for low depth
+                            + 10*(1.0 / std::max(0.1,current->getDepth())); //higher cost for low depth (dela ej med 0!)
       else
         tentative_g_score = sqrt(dx*dx + dy*dy);
 
@@ -795,7 +798,6 @@ double** Polygon::createCostMatrix(int cx, int cy)
           //std::cout << "polygon.cpp:731 insert done" << n << std::endl;
         }
       }
-/*fel*/
       //std::cout << "(4)" << std::endl;
     }
     //std::cout << "(5)" << std::endl;

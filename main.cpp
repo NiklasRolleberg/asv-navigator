@@ -42,7 +42,7 @@ int main()
   double tol = 2;//delta / 3.0;
 
   int delay_data = 50000;
-  int delay_scanner = 100000;
+  int delay_scanner = 500000;
 
   Navigator* navigator = new Navigator(transmitter,delay_data,delay_scanner,delta,tol);
 
