@@ -218,15 +218,16 @@ void Polygon::initialize()
   for(int i=0;i<polygonSegments.size();i++)
     addBoundaryElements(polygonSegments.at(i));
 
-  /*
+
   std::vector<PolygonSegment*>* tri = triangulateRegion(polygonSegments.at(0));
-  //removeRegion(polygonSegments.at(0));
   if(tri != NULL)
   {
+    removeRegion(polygonSegments.at(0));
     for(int i=0;i<tri->size();i++)
       polygonSegments.push_back(tri->at(i));
   }
-*/
+  delete tri;
+
   if(showGUI)
   {
     GUI = new PathView();//a1,a2
@@ -535,16 +536,37 @@ std::vector<PolygonSegment*>* Polygon::triangulateRegion(PolygonSegment* ps)
   if(ps->xPoints->size()<4)
     return NULL;
 
-  //(2) try to use the "cross" function
+  //(2) rotation
+  double sum = 0;
+  int n = ps->xPoints->size();
+  for(int i=0;i<n;i++)
+  {
+    sum += (ps->xPoints->at((i+1)%n)-ps->xPoints->at(i)) * (ps->yPoints->at((i+1)%n)+ps->yPoints->at(i));
+  }
+  std::cout << "SUM:" << sum << std::endl;
+
+  //exit(0);
+
   std::vector<double> xVertex;
   std::vector<double> yVertex;
   std::vector<PolygonSegment*>* list = new std::vector<PolygonSegment*>();
 
   //add coordinates
-  for(int i=0;i<ps->xPoints->size();i++)
+  if(sum>=0) //clockwise
   {
-    xVertex.push_back((*ps->xPoints)[i]);
-    yVertex.push_back((*ps->yPoints)[i]);
+    for(int i=0;i<ps->xPoints->size();i++)
+    {
+      xVertex.push_back((*ps->xPoints)[i]);
+      yVertex.push_back((*ps->yPoints)[i]);
+    }
+  }
+  else //anticlockwise
+  {
+    for(int i=ps->xPoints->size()-1;i>=0;i--)
+    {
+      xVertex.push_back((*ps->xPoints)[i]);
+      yVertex.push_back((*ps->yPoints)[i]);
+    }
   }
 
   //Ear clipping method
