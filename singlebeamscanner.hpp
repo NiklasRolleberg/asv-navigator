@@ -9,10 +9,9 @@
 //FOR GUI
 #include "view.hpp"
 
-struct Closest {
-  Closest(int ix, int iy,PolygonSegment* ptr): x(ix), y(iy),region(ptr){}
-  int x,y;
-  PolygonSegment* region;
+struct Target {
+  Target(int ix, int iy, int s): x(ix), y(iy), status(s){}
+  int x,y,status;
 };
 
 /** Scans the area contained by the polygon */
@@ -31,29 +30,37 @@ private:
     double speed_level3;
 
     double depthThreshold;
-    double minimumTargetDepth;
-    double speed_landfollowing;
 
-    /**Update values in the element matrix*/
-    bool updateDepth(double x, double y, double depth, bool followingLand);
+    /**sends the boat to a new position
+     *  x,y index for element
+     *  ignoredepth: false-> stop and return false if it is shallow
+       *             true -> dont stop if it is shallow, but return false if stuck
+     * return: true ->target reached,
+     *         false-> failed to reach target
+     */
+    bool gotoElement(int x, int y, bool ingoreDepth);
 
-    /**scan a polygonsegment with sweeping pattern*/
-    bool scanRegion(PolygonSegment* region);
+    /** Uses A* to find the best route to the element
+     * return: true : sucess, it arrived as it was supposed to
+     *         false: failed
+     */
+    bool traveltoElement(int x, int y);
 
-    /** follow land
-    * @return
-    * true = line under reached
-    * false = line above reached
-    */
-    bool followLand(double line1, double line2, double targetDepth,  PolygonSegment* region);
+    /** Looks for accessible unscanned elements
+     *  returns: index for best target based on some calculations
+     */
+    Target findFarAway(int currentX,int currentY);
 
-    /**find the closest element in the closest region*/
-    Closest findClosest(int startX,int startY);
+    /** Calculates the values of surrounding elements and return the index for the best one
+     *  returns: index for best target based on some calculations
+     */
+    Target findClose(int currentX,int currentY);
 
-    /**Go to to a new region*/
-    bool gotoRegion(Closest target);
+    double scanValue(int x,int y,int originX,int originY, int recursivedepth);
+    double nearValue(int x,int y,int originX,int originY, int recursivedepth);
+    double headingValue(int x,int y,int originX,int originY);
 
-public:
+    public:
     /**Constructor*/
     SingleBeamScanner(Data* data, Polygon* polygon,int delay, double delta,double tol);
 

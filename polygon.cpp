@@ -218,7 +218,7 @@ void Polygon::initialize()
   for(int i=0;i<polygonSegments.size();i++)
     addBoundaryElements(polygonSegments.at(i));
 
-
+  /*
   std::vector<PolygonSegment*>* tri = triangulateRegion(polygonSegments.at(0));
   if(tri != NULL)
   {
@@ -227,7 +227,8 @@ void Polygon::initialize()
       polygonSegments.push_back(tri->at(i));
   }
   delete tri;
-
+  */
+  
   if(showGUI)
   {
     GUI = new PathView();//a1,a2
