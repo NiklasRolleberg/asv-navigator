@@ -30,6 +30,7 @@ private:
     double speed_level3;
 
     double depthThreshold;
+    double targetSpeed;
 
     /**sends the boat to a new position
      *  x,y index for element
@@ -38,7 +39,7 @@ private:
      * return: true ->target reached,
      *         false-> failed to reach target
      */
-    bool gotoElement(int x, int y, bool ingoreDepth);
+    bool gotoElement(int x, int y, bool ignoreDepth);
 
     /** Uses A* to find the best route to the element
      * return: true : sucess, it arrived as it was supposed to
@@ -55,6 +56,13 @@ private:
      *  returns: index for best target based on some calculations
      */
     Target findClose(int currentX,int currentY);
+
+
+    /** Updates the depth
+     * return: true -> all is good
+     *         false-> boat is probably stuck
+     */
+    bool updateDepth(double x, double y, double depth);
 
     double scanValue(int x,int y,int originX,int originY, int recursivedepth);
     double nearValue(int x,int y,int originX,int originY, int recursivedepth);
