@@ -25,7 +25,7 @@ SingleBeamScanner::SingleBeamScanner(Data* dataptr, Polygon* polygonptr,int inpu
   speed_level3 = 0.5;
 */
 
-  depthThreshold = 5;
+  depthThreshold = 3;
   targetSpeed = 1;
 
   stop = false;
@@ -117,7 +117,7 @@ void SingleBeamScanner::startScan()
       //failed
       polygon->matrix[t.x][t.y] -> setStatus(2); //mark as land
   		polygon->idland(); //mark enclosed areas as land
-      if(!gotoElement(x,y,false)) //go back to previous element
+      if(!gotoElement(x,y,true)) //go back to previous element
       {
         std::cout << "failed to go back to previous element" << std::endl;
         return;
@@ -144,7 +144,10 @@ bool SingleBeamScanner::gotoElement(int x, int y, bool ignoreDepth)
   double targetY = target->getY();
 
   //DEBUG
-  if(x < 5 && !ignoreDepth)
+  int cx = polygon->nx/4;
+  int cy = polygon->ny/4;
+
+  if(sqrt((x-cx)*(x-cx)+(y-cy)*(y-cy))<2 && !ignoreDepth)
     return false;
 
   data->setBoatWaypoint_local(0,0,targetX,targetY,1,true);
@@ -173,7 +176,8 @@ bool SingleBeamScanner::gotoElement(int x, int y, bool ignoreDepth)
     if(d<tol)
       return true;
 
-    if(data->getDepth() < depthThreshold)
+    //if(data->getDepth() < depthThreshold)
+    if(0.5*(data->getDepth_Right()+data->getDepth_Left()) < depthThreshold)
     {
       std::cout << "near land" << std::endl;
       std::cout << "Down    :" << data->getDepth() << std::endl;
@@ -216,7 +220,8 @@ bool SingleBeamScanner::traveltoElement(int x, int y)
   //(2) start at the boats current index and trevel towards lower cost value untill the target is reached
   double** cost = polygon->createCostMatrix(x, y);
 
-  int targetX,targetY;
+  int targetX = -1;
+  int targetY = -1;
 
   while(!stop)
   {
@@ -228,26 +233,33 @@ bool SingleBeamScanner::traveltoElement(int x, int y)
     }
 
     //find next waypoint
-    int xIndex[] = {currentX+1, currentX-1, currentX+0, currentX+0, currentX+1, currentX-1, currentX+1, currentX-1};
-    int yIndex[] = {currentY+0, currentY+0, currentY+1, currentY-1, currentY+1, currentY-1, currentY-1, currentY+1};
+    //int xIndex[] = {currentX+1, currentX-1, currentX+0, currentX+0, currentX+1, currentX-1, currentX+1, currentX-1};
+    //int yIndex[] = {currentY+0, currentY+0, currentY+1, currentY-1, currentY+1, currentY-1, currentY-1, currentY+1}; //diagonalt
+
+    int xIndex[] = {currentX+1, currentX-1, currentX+0, currentX+0};
+    int yIndex[] = {currentY+0, currentY+0, currentY+1, currentY-1};
+
     double min = std::numeric_limits<double>::max();
 
     //std::cout << "Index:" << std::endl;
     //for(int i=0;i<8;i++)
     //  std::cout << "(" << xIndex[i] << "," << yIndex[i] << ")" << std::endl;
 
-    for(int i=0;i<8;i++)
+    for(int i=0;i<4;i++)
     {
+      std::cout << "looking at(" << xIndex[i] << "," << yIndex[i] << ")" << std::endl;
+      std::cout << "current: (" << currentX << "," << currentY << std::endl;
 
       if(xIndex[i] < 0 || xIndex[i] >= polygon->nx)
         continue;
       if(yIndex[i] < 0 || yIndex[i] >= polygon->ny)
         continue;
+      std::cout << "cost: " << cost[xIndex[i]][yIndex[i]] << std::endl;
       if(cost[xIndex[i]][yIndex[i]] == -1)
         continue;
 
       std::cout << "looking at(" << xIndex[i] << "," << yIndex[i] << ")" << " cost: " << cost[xIndex[i]][yIndex[i]] << std::endl;
-      if(cost[xIndex[i]][yIndex[i]] < min)
+      if(cost[xIndex[i]][yIndex[i]] < min && cost[xIndex[i]][yIndex[i]] != -1)
       {
         min = cost[xIndex[i]][yIndex[i]];
         targetX = xIndex[i];
@@ -257,6 +269,9 @@ bool SingleBeamScanner::traveltoElement(int x, int y)
     }
     std::cout << "new target: (" << targetX << "," << targetY << ")" << std::endl;
     //usleep(1000000);
+
+    if(targetX == -1 && targetY == -1)
+      return false; // failed
 
     if(gotoElement(targetX,targetY,true))
     {
@@ -285,10 +300,14 @@ Target SingleBeamScanner::findClose(int x,int y)
 {
   std::cout << "findclose" << std::endl;
   std::vector<Element*> neighbours;
-  int x_arr[] = {x , x+1, x+1 ,x+1 ,x ,x-1 ,x-1 ,x-1};
-  int y_arr[] = {y-1 , y-1, y ,y+1 ,y+1 ,y+1 ,y ,y-1};
+  //int x_arr[] = {x , x+1, x+1 ,x+1 ,x ,x-1 ,x-1 ,x-1};
+  //int y_arr[] = {y-1 , y-1, y ,y+1 ,y+1 ,y+1 ,y ,y-1}; //Diagonalt
 
-  for(int i=0;i<8;i++)
+  int x_arr[] = {x  , x+1, x   ,x-1};
+  int y_arr[] = {y-1, y  , y+1 ,y};
+
+
+  for(int i=0;i<4;i++)
   {
     if(x_arr[i]<0 ||
        x_arr[i]>=polygon->nx ||
@@ -311,7 +330,7 @@ Target SingleBeamScanner::findClose(int x,int y)
   }
 
   //calulate the values of the neighbours
-  double highestValue = 0;//-std::numeric_limits<double>::max();
+  double highestValue = -std::numeric_limits<double>::max();
   bool unscanned = false;
   int index = -1;
 
@@ -323,10 +342,10 @@ Target SingleBeamScanner::findClose(int x,int y)
   {
     Element* n = neighbours.at(i);
 
-    double scanVal = scanweight * scanValue(n->getIndexX(),n->getIndexY(),x,y,6);
+    double scanVal = scanweight * scanValue(n->getIndexX(),n->getIndexY(),x,y,2);
     double nearVal = 0;//nearweight * nearValue(n->getIndexX(),n->getIndexY(),x,y,1);
     double headingVal = headingweight * headingValue(n->getIndexX(),n->getIndexY(),x,y);
-
+    std::cout << "realheading: " << data->getHeading() << std::endl;
     std::cout << "\nscanValue    : " << scanVal << std::endl;
     //std::cout << "nearValue    : " << nearVal << std::endl;
     std::cout << "headingValue : " << headingVal << std::endl;
@@ -343,7 +362,7 @@ Target SingleBeamScanner::findClose(int x,int y)
         unscanned = true;
         std::cout << "unscanned element found" << std::endl;
       }
-      else if(value > highestValue)
+      else if(value > highestValue && scanVal !=0)
       {
         highestValue = value;
         index = i;
@@ -417,11 +436,12 @@ Target SingleBeamScanner::findFarAway(int currentX,int currentY)
   {
     int ix = targets.at(i)->getIndexX();
     int iy = targets.at(i)->getIndexY();
-    if(cost[ix][iy] < lowestCost)
+    if(cost[ix][iy] < lowestCost && (ix!=currentX && iy!=currentY))
     {
       lowestCost = cost[ix][iy];
       best = targets.at(i);
     }
+    std::cout << "Target:(" << ix << "," << iy << "):" << cost[ix][iy] << std::endl;
   }
 
   //delete the matrix
@@ -481,7 +501,7 @@ double SingleBeamScanner::scanValue(int x,int y,int originX,int originY, int rec
   if(recursivedepth == 0)
   {
     if(status == 0)
-      return 1.0 / ((x-originX)*(x-originX) + (y-originY)*(y-originY));
+      return 1.0; // ((x-originX)*(x-originX) + (y-originY)*(y-originY));
     if(status == 1)
       return 0;
     if(status == 5)
@@ -491,24 +511,24 @@ double SingleBeamScanner::scanValue(int x,int y,int originX,int originY, int rec
 
   double a = 0;
   if(status == 0)
-    a = (recursivedepth*recursivedepth+1.0) / ((x-originX)*(x-originX) + (y-originY)*(y-originY));
+    a = 1;//(recursivedepth*recursivedepth+1.0) / ((x-originX)*(x-originX) + (y-originY)*(y-originY));
 
   if(status == 0 || status == 1)
     return a + (
       scanValue(x+1,y, originX,originY, recursivedepth-1) +
       scanValue(x-1,y, originX,originY, recursivedepth-1) +
       scanValue(x,y+1, originX,originY, recursivedepth-1) +
-      scanValue(x,y-1, originX,originY, recursivedepth-1) +
-
+      scanValue(x,y-1, originX,originY, recursivedepth-1))/4;
+      /*
       scanValue(x+1,y-1, originX,originY, recursivedepth-1) + //diagonalt
       scanValue(x-1,y+1, originX,originY, recursivedepth-1) +
       scanValue(x+1,y+1, originX,originY, recursivedepth-1) +
-      scanValue(x-1,y-1, originX,originY, recursivedepth-1));
+      scanValue(x-1,y-1, originX,originY, recursivedepth-1))*/
 
   return 0;
 }
 
-double SingleBeamScanner::nearValue(int x,int y,int originX,int originY, int recursivedepth)
+double SingleBeamScanner::nearValue(int x, int y, int originX, int originY, int recursivedepth)
 {
   return 0;
 }
@@ -524,7 +544,7 @@ double SingleBeamScanner::headingValue(int x,int y, int originX, int originY)
   if(dx<0)
     alpha = M_PI - alpha;
 
-  //std::cout << "calculated heading:" << alpha << std::endl;
+  std::cout << "calculated heading:" << alpha << std::endl;
 
   return -50*abs(boatHeading-alpha);
 

@@ -198,10 +198,14 @@ void Polygon::initialize()
   {
     for (int j = 0; j < ny; ++j)
     {
-      int x[] = {i , i+1, i+1 ,i+1 ,i ,i-1 ,i-1 ,i-1};
-      int y[] = {j-1 , j-1, j ,j+1 ,j+1 ,j+1 ,j ,j-1};
+      //int x[] = {i , i+1, i+1 ,i+1 ,i ,i-1 ,i-1 ,i-1};
+      //int y[] = {j-1 , j-1, j ,j+1 ,j+1 ,j+1 ,j ,j-1}; //Diagonalt
 
-      for(int k=0;k<8;k++)
+      int x[] = {i   ,i+1 ,i   ,i-1 };
+      int y[] = {j-1 ,j   ,j+1 ,j   };
+
+
+      for(int k=0;k<4;k++)
       {
         int ix = x[k];
         int iy = y[k];
@@ -228,7 +232,7 @@ void Polygon::initialize()
   }
   delete tri;
   */
-  
+
   if(showGUI)
   {
     GUI = new PathView();//a1,a2

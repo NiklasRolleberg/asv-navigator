@@ -234,7 +234,7 @@ void BasicDrawPane::render(wxDC&  dc)
       for(int i=0;i<nx;i++) {
         // draw a rectangle
         if(matrix[i][j]->getStatus() == 0)
-          dc.SetBrush(*wxBLACK_BRUSH); // not scanned
+          dc.SetBrush(*wxWHITE_BRUSH); // not scanned
 
         if(matrix[i][j]->getStatus() == 1)
         {
@@ -246,21 +246,25 @@ void BasicDrawPane::render(wxDC&  dc)
 
             if(matrix[i][j]->getDepth() > 10)
             {
+              red = 0;
               green = 20;
               blue = 20;
             }
             else if (matrix[i][j]->getDepth() > 6)
             {
+              red = 0;
               green = 0;
               blue = 50;
             }
             else if (matrix[i][j]->getDepth() > 4)
             {
+              red = 0;
               green = 0;
               blue = 120;
             }
             else if (matrix[i][j]->getDepth() > 2)
             {
+              red = 0;
               green = 0;
               blue = 200;
             }
