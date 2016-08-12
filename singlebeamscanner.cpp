@@ -102,11 +102,13 @@ void SingleBeamScanner::startScan()
       if(t.status!=0)
       {
         std::cout << "no accessible regions left to scan" << std::endl;
+        polygon->saveMatrix();
         return; // scan complete
       }
       if(!traveltoElement(t.x,t.y))
       {
         std::cout << "traveltoElement failed" << std::endl;
+        polygon->saveMatrix();
         return; //abort scan (the boat is probably stuck somwere)
       }
       continue; //goto (2)
@@ -143,10 +145,12 @@ bool SingleBeamScanner::gotoElement(int x, int y, bool ignoreDepth)
   double targetX = target->getX();
   double targetY = target->getY();
 
+  /*
   //DEBUG
   int cx = polygon->nx/4;
   int cy = polygon->ny/4;
-
+  */
+  
   if(sqrt((x-cx)*(x-cx)+(y-cy)*(y-cy))<2 && !ignoreDepth)
     return false;
 
