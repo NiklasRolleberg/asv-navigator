@@ -6,8 +6,21 @@
 #include <vector>
 #include <string>
 
-int main()
+int main(int argc, char* argv[])
 {
+  /*
+  bool createFromFile = false;
+  for(int i=0;i<argc;i++)
+  {
+    if(strcmp("-F",argv[i]) == 0 || strcmp("-f",argv[i]) == 0)
+    {
+      std::cout << "Contruct from saved data" << std::endl;
+      std::string filename = "data/backup.xml";
+      createFromFile = true;
+
+    }
+  }
+  */
   std::cout << "------------------------------------"<< std::endl;
   std::cout << "---------------START----------------"<< std::endl;
   std::cout << "------------------------------------"<< std::endl;
@@ -42,7 +55,7 @@ int main()
   double tol = 2;//delta / 3.0;
 
   int delay_data = 50000;
-  int delay_scanner = 500000;
+  int delay_scanner = 500000; //+0:a
 
   Navigator* navigator = new Navigator(transmitter,delay_data,delay_scanner,delta,tol);
 

@@ -89,6 +89,9 @@ public:
     std::vector<double>* getXBoundaries();
     std::vector<double>* getYBoundaries();
 
+		/**Save all data so the scan can be restarted from this moment*/
+		void saveAll(std::string filename);
+
     /**Save the element matrix for debuging*/
     void saveMatrix();
 

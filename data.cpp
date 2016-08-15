@@ -30,9 +30,9 @@ Data::Data(Transmitter* transmitter,int delay, int arg3)
     boat_ypos = 0;
     boat_heading_local = 0;
     boat_speed = 0;
-    boat_sonar_depth = 11;
-    boat_sonar_front_right = 12;//4.2426;
-    boat_sonar_front_left = 13;//5.6569;
+    boat_sonar_depth = 5;
+    boat_sonar_front_right = 6;//4.2426;
+    boat_sonar_front_left = 7;//5.6569;
     localEnabled = false;
     data_threadptr = nullptr;
 
@@ -633,15 +633,30 @@ void Data::processMessage(std::string m)
 void Data::setBoatWaypoint_real(double lat0, double lon0,double lat1, double lon1, double speed, bool noStartPos)
 {
 
-    /*
+
     //DEBUG - makes it possible to run the full program without the boat
     boat_targetLat = lat1;
     boat_targetLon = lon1;
     boat_latitude = lat1;
     boat_longitude = lon1;
-    boat_xpos = lonTOx(lon1);
-    boat_ypos = latTOy(lat1);
-    */
+    double newX = lonTOx(lon1);
+    double newY = latTOy(lat1);
+    double dx = newX-boat_xpos;
+    double dy = newY-boat_ypos;
+    double alpha;
+    if(dx>0)
+      if(dy>0)
+        alpha = asin(dy/sqrt(dx*dx+dy*dy));
+      else
+        alpha = 2*M_PI+asin(dy/sqrt(dx*dx+dy*dy));
+    else
+      alpha = M_PI-asin(dy/sqrt(dx*dx+dy*dy));
+
+
+    boat_xpos = newX;
+    boat_ypos = newY;
+    boat_heading_local = alpha;
+
 
     //std::cout << "Data: Set real waypoint, real coordinates: (" << lat0 << "," << lon0 << ") -> ("<< lat1 <<","<< lon1 << ")" << std::endl;
     std::stringstream s;

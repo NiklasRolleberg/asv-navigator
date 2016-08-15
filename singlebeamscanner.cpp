@@ -25,7 +25,7 @@ SingleBeamScanner::SingleBeamScanner(Data* dataptr, Polygon* polygonptr,int inpu
   speed_level3 = 0.5;
 */
 
-  depthThreshold = 3;
+  depthThreshold = -3;
   targetSpeed = 1;
 
   stop = false;
@@ -70,6 +70,9 @@ void SingleBeamScanner::startScan()
  //(6) Pick the closest of these elements and go there
   //(6.1) sucsess goto (2)
   //(6.2) failed something is wrong. abort
+
+  //polygon->saveAll("backup/polygondata.xml");
+  //return;
 
   while(!stop)
   {
@@ -150,9 +153,9 @@ bool SingleBeamScanner::gotoElement(int x, int y, bool ignoreDepth)
   int cx = polygon->nx/4;
   int cy = polygon->ny/4;
   */
-  
-  if(sqrt((x-cx)*(x-cx)+(y-cy)*(y-cy))<2 && !ignoreDepth)
-    return false;
+
+  //if(sqrt((x-cx)*(x-cx)+(y-cy)*(y-cy))<2 && !ignoreDepth)
+  //  return false;
 
   data->setBoatWaypoint_local(0,0,targetX,targetY,1,true);
 
@@ -180,8 +183,8 @@ bool SingleBeamScanner::gotoElement(int x, int y, bool ignoreDepth)
     if(d<tol)
       return true;
 
-    //if(data->getDepth() < depthThreshold)
-    if(0.5*(data->getDepth_Right()+data->getDepth_Left()) < depthThreshold)
+    //if(0.5*(data->getDepth_Right()+data->getDepth_Left()) < depthThreshold)
+    if(data->getDepth() < depthThreshold)
     {
       std::cout << "near land" << std::endl;
       std::cout << "Down    :" << data->getDepth() << std::endl;
@@ -327,11 +330,11 @@ Target SingleBeamScanner::findClose(int x,int y)
        neighbours.push_back(polygon->matrix[x_arr[i]][y_arr[i]]);
   }
 
-  std::cout << "neighbours: " << neighbours.size() << std::endl;
-  for(int i=0;i<neighbours.size();i++)
-  {
-    std::cout << "(" << neighbours.at(i)->getIndexX() << "," << neighbours.at(i)->getIndexY() << ")" << std::endl;
-  }
+  //std::cout << "neighbours: " << neighbours.size() << std::endl;
+  //for(int i=0;i<neighbours.size();i++)
+  //{
+    //std::cout << "(" << neighbours.at(i)->getIndexX() << "," << neighbours.at(i)->getIndexY() << ")" << std::endl;
+  //}
 
   //calulate the values of the neighbours
   double highestValue = -std::numeric_limits<double>::max();
@@ -346,12 +349,13 @@ Target SingleBeamScanner::findClose(int x,int y)
   {
     Element* n = neighbours.at(i);
 
-    double scanVal = scanweight * scanValue(n->getIndexX(),n->getIndexY(),x,y,2);
-    double nearVal = 0;//nearweight * nearValue(n->getIndexX(),n->getIndexY(),x,y,1);
+    double scanVal = scanweight * scanValue(n->getIndexX(),n->getIndexY(),x,y,3);
+    double nearVal = nearweight * nearValue(n->getIndexX(),n->getIndexY(),x,y,3);
     double headingVal = headingweight * headingValue(n->getIndexX(),n->getIndexY(),x,y);
-    std::cout << "realheading: " << data->getHeading() << std::endl;
-    std::cout << "\nscanValue    : " << scanVal << std::endl;
-    //std::cout << "nearValue    : " << nearVal << std::endl;
+
+    std::cout << "\nElement      : (" << n->getIndexX() << "," << n->getIndexY() << ")" << std::endl;
+    std::cout << "scanValue    : " << scanVal << std::endl;
+    std::cout << "nearValue    : " << nearVal << std::endl;
     std::cout << "headingValue : " << headingVal << std::endl;
     //std::cout << "highestValue:  " << highestValue << std::endl;
 
@@ -398,6 +402,7 @@ Target SingleBeamScanner::findClose(int x,int y)
 
 Target SingleBeamScanner::findFarAway(int currentX,int currentY)
 {
+  std::cout << "Find far away" << std::endl;
   //(1) (create a costmatrix)
   //(2) (look for unscanned elements)
   //(3) check the cost for the neighbouring elements of the unscanned elements
@@ -518,11 +523,11 @@ double SingleBeamScanner::scanValue(int x,int y,int originX,int originY, int rec
     a = 1;//(recursivedepth*recursivedepth+1.0) / ((x-originX)*(x-originX) + (y-originY)*(y-originY));
 
   if(status == 0 || status == 1)
-    return a + (
+    return (a +
       scanValue(x+1,y, originX,originY, recursivedepth-1) +
       scanValue(x-1,y, originX,originY, recursivedepth-1) +
       scanValue(x,y+1, originX,originY, recursivedepth-1) +
-      scanValue(x,y-1, originX,originY, recursivedepth-1))/4;
+      scanValue(x,y-1, originX,originY, recursivedepth-1))/5;
       /*
       scanValue(x+1,y-1, originX,originY, recursivedepth-1) + //diagonalt
       scanValue(x-1,y+1, originX,originY, recursivedepth-1) +
@@ -534,23 +539,65 @@ double SingleBeamScanner::scanValue(int x,int y,int originX,int originY, int rec
 
 double SingleBeamScanner::nearValue(int x, int y, int originX, int originY, int recursivedepth)
 {
+  if(x<0||x>=polygon->nx ||
+     y<0||y>=polygon->ny ||
+     (x==originX && y == originY))
+     return 0;
+
+  int status = polygon->matrix[x][y]->getStatus();
+
+  if(recursivedepth == 0)
+  {
+    if(status == 0)
+      return 0; // ((x-originX)*(x-originX) + (y-originY)*(y-originY));
+    if(status == 1)
+      return 1;
+    if(status == 5)
+      return 0;
+    return 0;
+  }
+
+  if(status == 1 || status == 0)
+    return (status +
+      scanValue(x+1,y, originX,originY, recursivedepth-1) +
+      scanValue(x-1,y, originX,originY, recursivedepth-1) +
+      scanValue(x,y+1, originX,originY, recursivedepth-1) +
+      scanValue(x,y-1, originX,originY, recursivedepth-1))/5;
+      /*
+      scanValue(x+1,y-1, originX,originY, recursivedepth-1) + //diagonalt
+      scanValue(x-1,y+1, originX,originY, recursivedepth-1) +
+      scanValue(x+1,y+1, originX,originY, recursivedepth-1) +
+      scanValue(x-1,y-1, originX,originY, recursivedepth-1))*/
   return 0;
 }
 
 double SingleBeamScanner::headingValue(int x,int y, int originX, int originY)
 {
   double boatHeading = data->getHeading();
-  //std::cout << "BoatHeading: " << boatHeading << std::endl;
 
-  double dx = (x-originX);
-  double dy = (y-originY);
-  double alpha = asin(dy/sqrt(dx*dx+dy*dy));
-  if(dx<0)
-    alpha = M_PI - alpha;
+  double dx = ((double)x-(double)originX);
+  double dy = ((double)y-(double)originY);
+  double d = sqrt(dx*dx+dy*dy);
+  double alpha;
+  if(dx>0)
+    if(dy>0)
+      alpha = asin(dy/d);
+    else
+      alpha = 2*M_PI+asin(dy/d);
+  else
+    alpha = M_PI-asin(dy/d);
 
-  std::cout << "calculated heading:" << alpha << std::endl;
+  double anticlockwise = std::max(boatHeading,alpha) - std::min(boatHeading,alpha);
+  double clockwise = (2*M_PI) - anticlockwise;
+  double diff = std::min(anticlockwise,clockwise);
 
-  return -50*abs(boatHeading-alpha);
+  //std::cout << "\nanticlockwise: " << anticlockwise*180/M_PI << std::endl;
+  //std::cout << "    clockwise: " << clockwise*180/M_PI << std::endl;
+  //std::cout << "            BoatHeading: " << boatHeading*180/M_PI << std::endl;
+  //std::cout << "Heading to this element: " << alpha*180/M_PI << std::endl;
+  //std::cout << "                   diff: " << diff*180/M_PI << std::endl;
 
-  return 0;
+  return -diff/M_PI;
+
+  //return 0;
 }

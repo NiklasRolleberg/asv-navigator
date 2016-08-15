@@ -26,12 +26,12 @@ private:
   int indexY;
   double posX;
   double posY;
-  double accumulatedDepth;
   int timesVisited;
   int timesTargeted; //used to calculate travelcost.
   int status;
 
 public:
+  double accumulatedDepth; // TODO fixa getter
   Element(){};
   Element(double px, double py, int ix, int iy);
   ~Element();

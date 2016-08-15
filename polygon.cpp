@@ -887,3 +887,62 @@ void Polygon::updateView(double currentX, double currentY)
   	GUI->update();
   }
 }
+
+void Polygon::saveAll(std::string filename)
+{
+  std::cout << "\n\nsave all!" << std::endl;
+
+  std::ofstream *xmlFile = new std::ofstream(filename);
+
+  (*xmlFile) << "<polygon points=" << latitude->size() << ">" << std::endl;
+  for(int i=0;i<latitude->size()-1;i++)
+    (*xmlFile) << latitude->at(i) << ", ";
+  (*xmlFile) << latitude->at(longitude->size()-1) << std::endl;
+  for(int i=0;i<longitude->size()-1;i++)
+    (*xmlFile) << longitude->at(i) << ", ";
+  (*xmlFile) << longitude->at(longitude->size()-1) << std::endl;
+  (*xmlFile) << "</polygon>" << std::endl;
+
+  (*xmlFile) << "<settings>" << std::endl;
+  (*xmlFile) << "delta=" << delta << std::endl;
+  (*xmlFile) << "</settings>" << std::endl;
+
+  (*xmlFile) << "<matrix rows="<< ny << "columns=" << nx << ">" << std::endl;
+
+  (*xmlFile) << "<status>" << std::endl;
+  for(int i=0;i<nx;i++)
+    for(int j=0;j<ny;j++)
+      if(i!=nx-1 && j!=ny-1)
+        (*xmlFile) << matrix[i][j]->getStatus() << ",";
+  (*xmlFile) << matrix[nx-1][ny-1]->getStatus() << std::endl;
+  (*xmlFile) << "</status>" << std::endl;
+
+  (*xmlFile) << "<accumulateddepth>" << std::endl;
+  for(int i=0;i<nx;i++)
+    for(int j=0;j<ny;j++)
+      if(i!=nx-1 && j!=ny-1)
+        (*xmlFile) << matrix[i][j]->accumulatedDepth << ",";
+  (*xmlFile) << matrix[nx-1][ny-1]->accumulatedDepth << std::endl;
+  (*xmlFile) << "</accumulateddepth>" << std::endl;
+
+  (*xmlFile) << "<visited>" << std::endl;
+  for(int i=0;i<nx;i++)
+    for(int j=0;j<ny;j++)
+      if(i!=nx-1 && j!=ny-1)
+        (*xmlFile) << matrix[i][j]->getTimesVisited() << ",";
+  (*xmlFile) << matrix[nx-1][ny-1]->getTimesVisited() << std::endl;
+  (*xmlFile) << "</visited>" << std::endl;
+
+
+  (*xmlFile) << "</matrix>" << std::endl;
+
+  //(*xmlFile) << matrix[i][j]->getDepth() << ", ";
+
+
+  xmlFile->close();
+  delete xmlFile;
+
+
+
+  std::cout << "Done!\n\n" << std::endl;
+}
