@@ -25,6 +25,9 @@ private:
     int delay;
     bool stop;
 
+    bool makebackup;
+    std::string backupFilename;
+
     double speed_level1;
     double speed_level2;
     double speed_level3;
@@ -70,7 +73,7 @@ private:
 
     public:
     /**Constructor*/
-    SingleBeamScanner(Data* data, Polygon* polygon,int delay, double delta,double tol);
+    SingleBeamScanner(Data* data, Polygon* polygon,int delay, double delta, double tol, bool makebackup, std::string filename);
 
     /**Destructor*/
     ~SingleBeamScanner();

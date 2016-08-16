@@ -3,12 +3,171 @@
 #include "mission.hpp"
 #include "polygon.hpp"
 #include <vector>
+#include <fstream>
+#include <cstring>
 
 Mission::Mission(int arg0)
 {
-    std::cout << "Mission: constructor" << std::endl;
-    //sleep
-    taskQueue.push(new Task(1000000,false));
+  std::cout << "Mission: constructor" << std::endl;
+  //sleep
+  taskQueue.push(new Task(1000000,false));
+}
+
+Mission::Mission(std::string filename)
+{
+  std::cout << "Mission: constructor creating from: " << filename << std::endl;
+  //sleep
+  taskQueue.push(new Task(1000000,false));
+
+  std::vector<std::string> boatpos;
+  std::vector<std::string> settings;
+  std::vector<std::string> polygon;
+  std::vector<std::string> matrix;
+
+
+  int c = -1;
+
+  std::string line;
+  std::ifstream infile;
+  infile.open (filename);
+  while(!infile.eof())
+  {
+    getline(infile,line); // Saves the line in STRING.
+    std::cout << line << std::endl; // Prints our STRING.
+
+    if(line == "<boat>")
+      c = 0;
+    if(line.substr(0,8) == "<polygon")
+      c = 1 ;
+    if(line.substr(0,9) == "<settings")
+      c = 2;
+    if(line.substr(0,7) == "<matrix")
+      c = 3;
+
+    if(line == "</boat>")
+      c = -1;
+    if(line == "</polygon>")
+      c = -1;
+    if(line == "</settings>")
+      c = -1;
+    if(line == "</matrix>")
+      c = -1;
+
+    if(c == 0)
+      boatpos.push_back(line);
+    if(c == 1)
+      polygon.push_back(line);
+    if(c == 2)
+      settings.push_back(line);
+    if(c == 3)
+      matrix.push_back(line);
+    std::cout << "c: " << c << std::endl;
+  }
+	infile.close();
+
+  //look for boat tag and make a goto-task to that position
+  std::cout << "boatpos : " << boatpos.size() << std::endl;
+  std::cout << "polygon : " << polygon.size() << std::endl;
+  std::cout << "settings: " << settings.size() << std::endl;
+  std::cout << "matrix  : " << matrix.size() << std::endl;
+
+  if(boatpos.size()==3)
+  {
+    double lat = std::stod(boatpos.at(1));
+    double lon = std::stod(boatpos.at(2));
+    taskQueue.push(new Task(lat,lon));
+  }
+
+  //find settings tag and save delta
+  double delta = -1;
+  std::vector<double>* polygon_lat = new std::vector<double>();
+  std::vector<double>* polygon_lon = new std::vector<double>();
+
+  if(settings.size()==2)
+    delta = std::stod(settings.at(1).substr(6));
+
+  if(polygon.size()==3)
+  {
+    std::string s = "";
+    line = polygon.at(1);
+    for(int i=0; i<line.length();i++)
+    {
+      char c = line[i];
+      if(i == line.length()-1 || c == ',')
+      {
+        if(c != ',')
+          s += c;
+        if(s.length() == 0)
+          continue;
+        double latitude = std::stod(s);
+        polygon_lat->push_back(latitude);
+        s = "";
+        std::cout << "latitude saved: " << latitude << std::endl;
+      }
+      else
+        s +=c;
+    }
+
+    s = "";
+    line = polygon.at(2);
+    for(int i=0; i<line.length();i++)
+    {
+      char c = line[i];
+      if(i == line.length()-1 || c == ',')
+      {
+        if(c != ',')
+          s += c;
+        if(s.length() == 0)
+          continue;
+        double longitude = std::stod(s);
+        polygon_lon->push_back(longitude);
+        s = "";
+        std::cout << "longitude saved: " << longitude << std::endl;
+      }
+      else
+        s +=c;
+    }
+  }
+
+  //matrix
+  std::string status = "";
+  std::string depth = "";
+  std::string visited = "";
+  int rows = -1;
+  int cols = -1;
+  if(matrix.size() == 10)
+  {
+    int r_index = matrix.at(0).find("rows=") + 5;
+    int c_index = matrix.at(0).find("columns=") + 8;
+    int end_index = matrix.at(0).find(">");
+
+    std::cout << matrix.at(0) << std::endl;
+    std::cout << "r_index: " << r_index << std::endl;
+    std::cout << "c_index: " << c_index << std::endl;
+    std::cout << "end_index: " << end_index << std::endl;
+
+    rows = atoi(matrix.at(0).substr(r_index,c_index-r_index-8).c_str());
+    cols = atoi(matrix.at(0).substr(c_index,end_index-c_index).c_str());
+  }
+  std::cout << "Rows: " << rows << std::endl;
+  std::cout << "Cols: " << cols << std::endl;
+
+  if(rows != -1 && cols != -1)
+  {
+    status = matrix.at(2);
+    depth = matrix.at(5);
+    visited = matrix.at(8);
+  }
+
+  std::cout << "Status:\n" << status << std::endl;
+  std::cout << "depth:\n" << depth << std::endl;
+  std::cout << "Visited:\n" << visited << std::endl;
+  std::cout << "lat: " << polygon_lat->size() << std::endl;
+  std::cout << "lon: " << polygon_lon->size() << std::endl;
+
+  taskQueue.push(new Task(new Polygon(polygon_lat,polygon_lon)));
+
+
 }
 
 

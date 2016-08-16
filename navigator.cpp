@@ -8,7 +8,8 @@
 #include "singlebeamscanner.hpp"
 #include <string>
 
-Navigator::Navigator(Transmitter* transmitter,int data_delay, int scanner_delay, double d, double t)
+Navigator::Navigator(Transmitter* transmitter,int data_delay, int scanner_delay, double d, double t,
+                      bool backup_data, std::string filename)
 {
     tr_ptr = transmitter;
     std::cout << "Navigator: constructor" << std::endl;
@@ -16,6 +17,9 @@ Navigator::Navigator(Transmitter* transmitter,int data_delay, int scanner_delay,
     delta = d;
     tol = t;
     update_delay = scanner_delay;
+
+    backup = backup_data;
+    backup_filename = filename;
 }
 
 Navigator::~Navigator()
@@ -108,7 +112,7 @@ void Navigator::scanPolygon(Task* task)
 {
     std::cout << "Navigator: execute scan polygon task" << std::endl;
     data->setLocalCoordinateSystem(task->getPolygon(),delta);
-    SingleBeamScanner scanner = SingleBeamScanner(data, task->getPolygon(),update_delay,delta, tol);
+    SingleBeamScanner scanner = SingleBeamScanner(data, task->getPolygon(),update_delay,delta, tol, backup, backup_filename);
     std::cout << "start scanning" << std::endl;
     scanner.startScan();
     //usleep(2000000);

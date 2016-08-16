@@ -90,7 +90,7 @@ public:
     std::vector<double>* getYBoundaries();
 
 		/**Save all data so the scan can be restarted from this moment*/
-		void saveAll(std::string filename);
+		void saveAll(std::string filename, double currentLat, double currentLon);
 
     /**Save the element matrix for debuging*/
     void saveMatrix();

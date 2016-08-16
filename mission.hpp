@@ -21,7 +21,10 @@ public:
     Mission(int arg0);
 
     /**Constructor 2*/
-    Mission(std::vector<std::string> plan);  
+    Mission(std::vector<std::string> plan);
+
+    /**Constructor 3*/
+    Mission(std::string filename);
 
     /**Destructor*/
     ~Mission();

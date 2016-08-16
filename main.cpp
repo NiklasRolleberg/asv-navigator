@@ -8,19 +8,34 @@
 
 int main(int argc, char* argv[])
 {
-  /*
+
   bool createFromFile = false;
+  std::string create_filename = "nothing";
+  bool backup = false;
+  std::string backup_filename = "no_backup";
   for(int i=0;i<argc;i++)
   {
+    if(strcmp("-B",argv[i]) == 0 || strcmp("-b",argv[i]) == 0)
+    {
+      std::cout << "make continuous backups" << std::endl;
+      if(i+1 < argc)
+      {
+        backup_filename = std::string(argv[i+1]);
+        backup = true;
+      }
+    }
+
     if(strcmp("-F",argv[i]) == 0 || strcmp("-f",argv[i]) == 0)
     {
       std::cout << "Contruct from saved data" << std::endl;
-      std::string filename = "data/backup.xml";
-      createFromFile = true;
-
+      if(i+1 < argc)
+      {
+        create_filename = std::string(argv[i+1]);
+        createFromFile = true;
+      }
     }
   }
-  */
+
   std::cout << "------------------------------------"<< std::endl;
   std::cout << "---------------START----------------"<< std::endl;
   std::cout << "------------------------------------"<< std::endl;
@@ -28,17 +43,23 @@ int main(int argc, char* argv[])
   std::cout << "Main: program started" << std::endl;
 
   // (1) Create a  mission and a transmitter
+  Mission* mission;
 
-  std::vector<std::string> missionPlan;
-  for(std::string line; std::getline(std::cin,line);)
+  if(!createFromFile)
   {
-    //std::cout << "READING: " << line << std::endl;
-    if(line[0] != '#')
-      missionPlan.push_back(line);
+    std::vector<std::string> missionPlan;
+    for(std::string line; std::getline(std::cin,line);)
+    {
+      //std::cout << "READING: " << line << std::endl;
+      if(line[0] != '#')
+        missionPlan.push_back(line);
+    }
+    //std::cout << missionPlan.size() << std::endl;
+    mission = new Mission(missionPlan);
   }
-  //std::cout << missionPlan.size() << std::endl;
-
-  Mission* mission = new Mission(missionPlan);
+  else{
+    mission = new Mission(create_filename);
+  }
 
   //return 0;
 
@@ -57,7 +78,7 @@ int main(int argc, char* argv[])
   int delay_data = 50000;
   int delay_scanner = 500000; //+0:a
 
-  Navigator* navigator = new Navigator(transmitter,delay_data,delay_scanner,delta,tol);
+  Navigator* navigator = new Navigator(transmitter,delay_data,delay_scanner,delta,tol, backup, backup_filename);
 
   // (3) give the navigator a mission
   navigator->setMission(mission);

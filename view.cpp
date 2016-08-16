@@ -126,15 +126,16 @@ void PathView::drawPolygon(std::vector<double>* x, std::vector<double>* y)
   }
 }
 
-void PathView::drawPath(double posx, double posy)
+void PathView::drawPath(double posx, double posy,int max)
 {
   if(lastPosx == 0 && lastPosy == 0)
   {
     lastPosx = posx;
     lastPosy = posy;
+    maxXY = max;
     return;
   }
-
+  pathDrawPane->setBoatPos(posx,posy,max);
   drawLine((int) lastPosx, (int) lastPosy, (int) posx,(int) posy, 3, 255,0,0);
   lastPosx = posx;
   lastPosy = posy;
@@ -188,6 +189,7 @@ BasicDrawPane::BasicDrawPane(wxFrame* parent, int ws) : wxPanel(parent)
   regions = NULL;
 }
 
+
 BasicDrawPane::~BasicDrawPane()
 {
   std::cout << "DrawPane destructor" << std::endl;
@@ -197,6 +199,13 @@ BasicDrawPane::~BasicDrawPane()
     wxString test(_T("logs/bild.png"));
     bmp.SaveFile(test, wxBITMAP_TYPE_PNG);
   }
+}
+
+void BasicDrawPane::setBoatPos(double x,double y,int max)
+{
+  boatX = x;
+  boatY = y;
+  maxXY = max;
 }
 
 void BasicDrawPane::drawLine(int startx, int starty, int stopx,int stopy,int width,int r, int g , int b)
@@ -223,8 +232,19 @@ void BasicDrawPane::paintNow()
 void BasicDrawPane::render(wxDC&  dc)
 {
   if(!drawMatrix)
+  {
     dc.DrawBitmap(bmp, 0, 0, false);
 
+    double scale = (double)windowSize / (double)maxXY;
+    int r = 6;
+    int cx = scale*boatX-r/2;
+    int cy = windowSize-(scale*boatY);
+
+    // draw a circle
+    dc.SetBrush(*wxBLUE_BRUSH); // green filling
+    dc.SetPen( wxPen( wxColor(0,0,255), 5 ) ); // 5-pixels-thick red outline
+    dc.DrawCircle( wxPoint(cx,cy), 5 /* radius */ );
+  }
   if(drawMatrix)
   {
     double dx = windowSize/nx;

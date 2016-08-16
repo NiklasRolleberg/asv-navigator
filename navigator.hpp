@@ -16,11 +16,15 @@ private:
     double tol;
     int update_delay; //delay for scanner and goto algotithms
 
+    bool backup;
+    std::string backup_filename;
+
 public:
     Navigator(){};
 
     /**Constructor*/
-    Navigator(Transmitter* transmitter, int data_delay,int scanner_delay, double d,double tol);
+    Navigator(Transmitter* transmitter, int data_delay,int scanner_delay, double d,double tol
+              ,bool backup, std::string backup_filename);
 
     /**Destructor*/
     ~Navigator();

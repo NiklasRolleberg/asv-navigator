@@ -883,16 +883,21 @@ void Polygon::updateView(double currentX, double currentY)
   //std::cout << "polygon::update view" << std::endl;
   if(showGUI && GUI != NULL)
   {
-    GUI->drawPath(currentX,currentY);
+    GUI->drawPath(currentX,currentY,std::max(maxX,maxY));
   	GUI->update();
   }
 }
 
-void Polygon::saveAll(std::string filename)
+void Polygon::saveAll(std::string filename, double currentLat, double currentLon)
 {
   std::cout << "\n\nsave all!" << std::endl;
 
   std::ofstream *xmlFile = new std::ofstream(filename);
+
+  (*xmlFile) << "<boat>" << std::endl;
+  (*xmlFile) << currentLat << std::endl;
+  (*xmlFile) << currentLon << std::endl;
+  (*xmlFile) << "</boat>" << std::endl;
 
   (*xmlFile) << "<polygon points=" << latitude->size() << ">" << std::endl;
   for(int i=0;i<latitude->size()-1;i++)
@@ -907,7 +912,7 @@ void Polygon::saveAll(std::string filename)
   (*xmlFile) << "delta=" << delta << std::endl;
   (*xmlFile) << "</settings>" << std::endl;
 
-  (*xmlFile) << "<matrix rows="<< ny << "columns=" << nx << ">" << std::endl;
+  (*xmlFile) << "<matrix rows="<< ny << " columns=" << nx << ">" << std::endl;
 
   (*xmlFile) << "<status>" << std::endl;
   for(int i=0;i<nx;i++)
@@ -935,6 +940,7 @@ void Polygon::saveAll(std::string filename)
 
 
   (*xmlFile) << "</matrix>" << std::endl;
+
 
   //(*xmlFile) << matrix[i][j]->getDepth() << ", ";
 

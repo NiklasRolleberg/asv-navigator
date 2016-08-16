@@ -10,7 +10,8 @@
 #include <iomanip>
 #include <vector>
 
-SingleBeamScanner::SingleBeamScanner(Data* dataptr, Polygon* polygonptr,int inputdelay, double d, double t)
+SingleBeamScanner::SingleBeamScanner(Data* dataptr, Polygon* polygonptr,int inputdelay,
+                                     double d, double t, bool backup, std::string fname)
 {
   std::cout << "scanner:SingleBeamScanner constructor" << std::endl;
   data = dataptr;
@@ -24,6 +25,11 @@ SingleBeamScanner::SingleBeamScanner(Data* dataptr, Polygon* polygonptr,int inpu
   speed_level2 = 0.7;
   speed_level3 = 0.5;
 */
+
+  //std::cout << fname <<  std::endl;
+
+  makebackup = backup;
+  backupFilename = fname;
 
   depthThreshold = -3;
   targetSpeed = 1;
@@ -74,8 +80,14 @@ void SingleBeamScanner::startScan()
   //polygon->saveAll("backup/polygondata.xml");
   //return;
 
+  int save = 1;
+
   while(!stop)
   {
+    save++;
+    save=save%10; //save every 10:th loop
+    if(save == 0 && makebackup)
+      polygon->saveAll(backupFilename, data->getLat(), data->getLon());
     //(1)
     double Xpos = data->getX();
     double Ypos = data->getY();
