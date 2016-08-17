@@ -29,20 +29,24 @@ private:
   int timesVisited;
   int timesTargeted; //used to calculate travelcost.
   int status;
+  double accumulatedDepth;
 
 public:
-  double accumulatedDepth; // TODO fixa getter
   Element(){};
   Element(double px, double py, int ix, int iy);
   ~Element();
 
   int getStatus();
-  void setStatus(int newStatus);
   void updateDepth(double newDepth);
   double getDepth();
   void targeted();
   int getTimesVisited();
   int getTimesTargeted();
+  double getAccumulatedDepth();
+
+  void setStatus(int newStatus);
+  void setAccumulatedDepth(double depth);
+  void setTimesVisited(int vis);
 
   int getIndexX();
   int getIndexY();

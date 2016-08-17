@@ -39,8 +39,31 @@ Task::Task(Polygon* polygon)
     for(int i=0;i<polygon->getLatBoundaries()->size();i++)
     {
       std::cout << "("<< polygon->getLatBoundaries()->at(i) << "," << polygon->getLonBoundaries()->at(i) <<")" << std::endl;
-
     }
+}
+
+Task::Task(Polygon* polygon, int rows, int cols, int* status, double* depth, int*visited)
+{
+  old_nx = 0 + cols;
+  old_ny = 0 + rows;
+  old_status = status;
+  old_depth = depth;
+  old_visited = visited;
+
+
+  //old_nx = rows;
+  //old_ny = cols;
+  std::cout << "Task: scan polygon constructor" << std::endl;
+  type = 5;
+  polygon_ptr = polygon;
+  for(int i=0;i<polygon->getLatBoundaries()->size();i++)
+  {
+    std::cout << "("<< polygon->getLatBoundaries()->at(i) << "," << polygon->getLonBoundaries()->at(i) <<")" << std::endl;
+
+  }
+  std::cout << "Oldscan rows: " << rows << std::endl;
+  std::cout << "Oldscan cols: " << cols << std::endl;
+
 }
 
 Task::Task(std::string incMessage)

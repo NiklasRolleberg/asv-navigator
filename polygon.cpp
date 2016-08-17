@@ -8,6 +8,7 @@
 #include <algorithm>
 #include "element.hpp"
 #include "segment.hpp"
+#include <iomanip>
 
 //FOR GUI
 #include "view.hpp"
@@ -23,6 +24,8 @@ Polygon::Polygon(std::vector<double> *lat, std::vector<double> *lon)
   yPoints = NULL;
   localSet = false;
   matrix = NULL;
+
+
   /*
   for(int i=0;i<latitude->size();i++) {
       std::cout << "Latitude: " << latitude->at(i) << std::endl;
@@ -901,15 +904,15 @@ void Polygon::saveAll(std::string filename, double currentLat, double currentLon
 
   (*xmlFile) << "<polygon points=" << latitude->size() << ">" << std::endl;
   for(int i=0;i<latitude->size()-1;i++)
-    (*xmlFile) << latitude->at(i) << ", ";
-  (*xmlFile) << latitude->at(longitude->size()-1) << std::endl;
+    (*xmlFile) << std::setprecision(10) << latitude->at(i) << ", ";
+  (*xmlFile) << std::setprecision(10) << latitude->at(longitude->size()-1) << std::endl;
   for(int i=0;i<longitude->size()-1;i++)
-    (*xmlFile) << longitude->at(i) << ", ";
-  (*xmlFile) << longitude->at(longitude->size()-1) << std::endl;
+    (*xmlFile) << std::setprecision(10) << longitude->at(i) << ", ";
+  (*xmlFile) << std::setprecision(10) <<longitude->at(longitude->size()-1) << std::endl;
   (*xmlFile) << "</polygon>" << std::endl;
 
   (*xmlFile) << "<settings>" << std::endl;
-  (*xmlFile) << "delta=" << delta << std::endl;
+  (*xmlFile) << "delta=" << std::setprecision(1) << delta << std::endl;
   (*xmlFile) << "</settings>" << std::endl;
 
   (*xmlFile) << "<matrix rows="<< ny << " columns=" << nx << ">" << std::endl;
@@ -917,7 +920,7 @@ void Polygon::saveAll(std::string filename, double currentLat, double currentLon
   (*xmlFile) << "<status>" << std::endl;
   for(int i=0;i<nx;i++)
     for(int j=0;j<ny;j++)
-      if(i!=nx-1 && j!=ny-1)
+      if(!(i==nx-1 && j==ny-1))
         (*xmlFile) << matrix[i][j]->getStatus() << ",";
   (*xmlFile) << matrix[nx-1][ny-1]->getStatus() << std::endl;
   (*xmlFile) << "</status>" << std::endl;
@@ -925,17 +928,20 @@ void Polygon::saveAll(std::string filename, double currentLat, double currentLon
   (*xmlFile) << "<accumulateddepth>" << std::endl;
   for(int i=0;i<nx;i++)
     for(int j=0;j<ny;j++)
-      if(i!=nx-1 && j!=ny-1)
-        (*xmlFile) << matrix[i][j]->accumulatedDepth << ",";
-  (*xmlFile) << matrix[nx-1][ny-1]->accumulatedDepth << std::endl;
+      if(!(i==nx-1 && j==ny-1))
+        {
+          (*xmlFile) << std::setprecision(10) << matrix[i][j]->getAccumulatedDepth() << ",";
+          std::cout << "Saving depth: " << matrix[i][j]->getAccumulatedDepth() << std::endl;
+        }
+  (*xmlFile) << std::setprecision(10) << matrix[nx-1][ny-1]->getAccumulatedDepth() << std::endl;
   (*xmlFile) << "</accumulateddepth>" << std::endl;
 
   (*xmlFile) << "<visited>" << std::endl;
   for(int i=0;i<nx;i++)
     for(int j=0;j<ny;j++)
-      if(i!=nx-1 && j!=ny-1)
-        (*xmlFile) << matrix[i][j]->getTimesVisited() << ",";
-  (*xmlFile) << matrix[nx-1][ny-1]->getTimesVisited() << std::endl;
+      if(!(i==nx-1 && j==ny-1))
+        (*xmlFile) << std::setprecision(1) << matrix[i][j]->getTimesVisited() << ",";
+  (*xmlFile) <<  std::setprecision(1) << matrix[nx-1][ny-1]->getTimesVisited() << std::endl;
   (*xmlFile) << "</visited>" << std::endl;
 
 
@@ -949,6 +955,7 @@ void Polygon::saveAll(std::string filename, double currentLat, double currentLon
   delete xmlFile;
 
 
-
+  std::cout << "nx:" << nx << std::endl;
+  std::cout << "ny:" << ny << std::endl;
   std::cout << "Done!\n\n" << std::endl;
 }

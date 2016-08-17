@@ -158,6 +158,11 @@ Mission::Mission(std::string filename)
     depth = matrix.at(5);
     visited = matrix.at(8);
   }
+  else
+  {
+    std::cout << "Error! nx or ny =-1. somthing is wrong " << std::endl;
+    exit(-1);
+  }
 
   std::cout << "Status:\n" << status << std::endl;
   std::cout << "depth:\n" << depth << std::endl;
@@ -165,7 +170,79 @@ Mission::Mission(std::string filename)
   std::cout << "lat: " << polygon_lat->size() << std::endl;
   std::cout << "lon: " << polygon_lon->size() << std::endl;
 
-  taskQueue.push(new Task(new Polygon(polygon_lat,polygon_lon)));
+  Polygon* poly = new Polygon(polygon_lat,polygon_lon);
+
+  int* arr_status = new int[rows*cols];
+  double* arr_depth = new double[rows*cols];
+  int* arr_visited = new int[rows*cols];
+
+  //find the status values in the status string
+  int str_index = 0;
+  int arr_index = 0;
+  std::string nr = "";
+  while(str_index < status.size() && arr_index < rows*cols)
+  {
+    char c = status[str_index];
+    if(c == ',')
+    {
+      if(nr != "")
+      {
+        std::cout << "status!: " << strtod(nr.c_str(),NULL) << std::endl;
+        arr_status[arr_index] = strtod(nr.c_str(),NULL);
+        arr_index++;
+        nr = "";
+      }
+    }
+    else
+      nr += c;
+    str_index++;
+  }
+
+  //find the depth values in the depth string
+  str_index = 0;
+  arr_index = 0;
+  nr = "";
+  while(str_index < depth.size() && arr_index < rows*cols)
+  {
+    char c = depth[str_index];
+    if(c == ',')
+    {
+      if(nr != "")
+      {
+        std::cout << "Depth!: " << strtod(nr.c_str(),NULL) << std::endl;
+        arr_depth[arr_index] = strtod(nr.c_str(),NULL);
+        arr_index++;
+        nr = "";
+      }
+    }
+    else
+      nr += c;
+    str_index++;
+  }
+
+  //find the visited values in the visited string
+  str_index = 0;
+  arr_index = 0;
+  nr = "";
+  while(str_index < visited.size() && arr_index < rows*cols)
+  {
+    char c = visited[str_index];
+    if(c == ',')
+    {
+      if(nr != "")
+      {
+        std::cout << "Visited!: " << strtod(nr.c_str(),NULL) << std::endl;
+        arr_visited[arr_index] = strtod(nr.c_str(),NULL);
+        arr_index++;
+        nr = "";
+      }
+    }
+    else
+      nr += c;
+    str_index++;
+  }
+
+  taskQueue.push(new Task(poly,rows,cols,arr_status, arr_depth, arr_visited));
 
 
 }
@@ -367,7 +444,7 @@ Task* Mission::getNextTask()
     {
         Task* task = taskQueue.front();
         taskQueue.pop();
-		return task;
+	      return task;
     }
     //std::cout << "Mission: task is a nullptr" << std::endl;
     return nullptr;

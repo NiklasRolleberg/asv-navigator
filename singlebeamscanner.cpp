@@ -124,6 +124,7 @@ void SingleBeamScanner::startScan()
       {
         std::cout << "traveltoElement failed" << std::endl;
         polygon->saveMatrix();
+        usleep(10000000);
         return; //abort scan (the boat is probably stuck somwere)
       }
       continue; //goto (2)
@@ -354,7 +355,7 @@ Target SingleBeamScanner::findClose(int x,int y)
   int index = -1;
 
   double scanweight = 1.0;
-  double nearweight = 1.0;
+  double nearweight = 0;
   double headingweight = 1.0;
 
   for(int i=0;i<neighbours.size();i++)

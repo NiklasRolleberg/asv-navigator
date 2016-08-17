@@ -41,6 +41,16 @@ void Element::setStatus(int newStatus)
   status = newStatus;
 }
 
+void Element::setAccumulatedDepth(double depth)
+{
+  accumulatedDepth = depth;
+}
+
+void Element::setTimesVisited(int v)
+{
+  timesVisited = v;
+}
+
 int Element::getTimesVisited()
 {
   return timesVisited;
@@ -51,6 +61,11 @@ double Element::getDepth()
   if(timesVisited != 0)
     return accumulatedDepth / timesVisited;
   return 0;
+}
+
+double Element::getAccumulatedDepth()
+{
+  return accumulatedDepth;
 }
 
 int Element::getIndexX()

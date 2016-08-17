@@ -16,7 +16,15 @@ private:
     double targetLat;
     double targetLon;
 
+
 public:
+    int old_nx;
+    int old_ny;
+    int* old_status;
+    double* old_depth;
+    int* old_visited;
+
+
     /**Default constructor (type 0)*/
     Task();
 
@@ -28,6 +36,9 @@ public:
 
     /** Constructor for scanning a polygon (type 3)*/
     Task(Polygon* polygon);
+
+    /** Constructor for scanning a polygon and use old data (type 5)*/
+    Task(Polygon* polygon, int rows, int cols, int* arr1, double* arr2, int* arr3);
 
     /** Constructor for sending a message  (type 4)*/
     Task(std::string message);

@@ -64,6 +64,10 @@ void Navigator::start()
                 std::cout << "New task type 4 (send a message)" << std::endl;
 		            sendMessage(t);
 		            break;
+            case 5:
+                std::cout << "New task type = 5 ( continue to scan polygon)" << std::endl;
+                scanPolygon(t);
+                break;
             default:
 				        std::cout << "Unknown task type " << type << std::endl;
         }
@@ -107,11 +111,40 @@ void Navigator::goToCoordinates(Task* task)
     std::cout << "Target reached, task completed" << std::endl;
 }
 
-/**Execute task of type 3*/
+/**Execute task of type 3 or 5*/
 void Navigator::scanPolygon(Task* task)
 {
     std::cout << "Navigator: execute scan polygon task" << std::endl;
     data->setLocalCoordinateSystem(task->getPolygon(),delta);
+    if(task->getType() == 5)
+    {
+      //change values in polygon->matrix if the size is the same as the old data
+      std::cout << "Polygon nx" << task->getPolygon()->nx << " old:" << task->old_nx << std::endl;
+      std::cout << "Polygon ny" << task->getPolygon()->ny << " old:" << task->old_ny << std::endl;
+
+      if(task->getPolygon()->nx == task->old_nx && task->getPolygon()->ny == task->old_ny)
+      {
+        std::cout << "                         Size is the same!" << std::endl;
+        //change the values in polygon->matrix
+        for(int i=0;i<task->getPolygon()->nx;i++)
+        {
+          for(int j=0;j<task->getPolygon()->ny;j++)
+          {
+            int index = i*task->getPolygon()->ny + j;
+            task->getPolygon()->matrix[i][j]->setStatus(task->old_status[index]);
+            task->getPolygon()->matrix[i][j]->setAccumulatedDepth(task->old_depth[index]);
+            task->getPolygon()->matrix[i][j]->setTimesVisited(task->old_visited[index]);
+          }
+        }
+
+        //delete[] task->old_status;
+        //delete[] task->old_depth;
+        //delete[] task->old_visited;
+      }
+      else
+        std::cout << "                         Size is not the same!" << std::endl;
+    }
+
     SingleBeamScanner scanner = SingleBeamScanner(data, task->getPolygon(),update_delay,delta, tol, backup, backup_filename);
     std::cout << "start scanning" << std::endl;
     scanner.startScan();
