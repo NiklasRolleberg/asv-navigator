@@ -148,7 +148,7 @@ void Navigator::scanPolygon(Task* task)
     SingleBeamScanner scanner = SingleBeamScanner(data, task->getPolygon(),update_delay,delta, tol, backup, backup_filename);
     std::cout << "start scanning" << std::endl;
     scanner.startScan();
-    //usleep(2000000);
+    usleep(2000000);
     std::cout << "scanning completed" << std::endl;
     data->removeLocalCoordinateSystem();
 }

@@ -159,9 +159,17 @@ void Polygon::initialize()
     xPoints_copy->push_back(xPoints->at(i));
     yPoints_copy->push_back(yPoints->at(i));
   }
-  polygonSegments.push_back(new PolygonSegment(xPoints_copy,yPoints_copy));
+  //polygonSegments.push_back(new PolygonSegment(xPoints_copy,yPoints_copy));
+  PolygonSegment* poly = new PolygonSegment(xPoints_copy,yPoints_copy);
+  //triangulate
+  std::vector<PolygonSegment*>* tri = triangulateRegion(poly);
+  if(tri != NULL)
+  {
+    for(int i=0;i<tri->size();i++)
+      polygonSegments.push_back(tri->at(i));
+  }
+  delete tri;
 
-  //TODO (2) (check if the segment is convex, if not it should be triangulated) kanske senare iaf
 
   //nx = 3;
   //ny = 2;
@@ -221,9 +229,12 @@ void Polygon::initialize()
     }
   }
 
-  //TODO (add elements-pointers to the polygon segment objects)
-  for(int i=0;i<polygonSegments.size();i++)
-    addBoundaryElements(polygonSegments.at(i));
+
+  removeAllRegions(); //remove all the triangulated regions
+  polygonSegments.push_back(poly);
+  //not used in this version
+  //for(int i=0;i<polygonSegments.size();i++)
+    //addBoundaryElements(polygonSegments.at(i));
 
   /*
   std::vector<PolygonSegment*>* tri = triangulateRegion(polygonSegments.at(0));

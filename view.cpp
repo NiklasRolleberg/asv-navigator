@@ -241,8 +241,8 @@ void BasicDrawPane::render(wxDC&  dc)
     int cy = windowSize-(scale*boatY);
 
     // draw a circle
-    dc.SetBrush(*wxBLUE_BRUSH); // green filling
-    dc.SetPen( wxPen( wxColor(0,0,255), 5 ) ); // 5-pixels-thick red outline
+    dc.SetBrush(*wxYELLOW_BRUSH); // green filling
+    dc.SetPen( wxPen( wxColor(255,255,0), 5 ) ); // 5-pixels-thick red outline
     dc.DrawCircle( wxPoint(cx,cy), 5 /* radius */ );
   }
   if(drawMatrix)

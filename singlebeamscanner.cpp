@@ -161,14 +161,38 @@ bool SingleBeamScanner::gotoElement(int x, int y, bool ignoreDepth)
   double targetX = target->getX();
   double targetY = target->getY();
 
-  /*
-  //DEBUG
-  int cx = polygon->nx/4;
-  int cy = polygon->ny/4;
-  */
 
-  //if(sqrt((x-cx)*(x-cx)+(y-cy)*(y-cy))<2 && !ignoreDepth)
-  //  return false;
+  //DEBUG
+
+  //if(rand() % 5 == 0 && !ignoreDepth && target->getStatus() != 1)
+    //return false;
+
+/*
+  int cx = polygon->nx/3;
+  int cy = polygon->ny/3;
+  if(sqrt((x-cx)*(x-cx)+(y-cy)*(y-cy))<3 && !ignoreDepth)
+    return false;
+
+  cx = 2*polygon->nx/3;
+  cy = 2*polygon->ny/3;
+  if(sqrt((x-cx)*(x-cx)+(y-cy)*(y-cy))<3 && !ignoreDepth)
+    return false;
+
+  if(((polygon->nx-x)*(polygon->nx-x)+(polygon->ny-y)*(polygon->ny-y)) < 100 && !ignoreDepth)
+    return false;
+  if(((x)*(x)+(polygon->ny-y)*(polygon->ny-y)) < 256 && !ignoreDepth)
+    return false;
+  if( x == 20 && y<10 && !ignoreDepth)
+    return false;
+  if( x == 15 && y<10 && !ignoreDepth)
+    return false;
+  if( (polygon->nx-x) < 8 && y==13 && !ignoreDepth)
+    return false;
+  if( (polygon->nx-x) < 5 && y==10 && !ignoreDepth)
+    return false;
+  if( (polygon->nx -x) < 5 && y==7 && !ignoreDepth)
+    return false;
+*/
 
   data->setBoatWaypoint_local(0,0,targetX,targetY,1,true);
 
@@ -354,16 +378,16 @@ Target SingleBeamScanner::findClose(int x,int y)
   bool unscanned = false;
   int index = -1;
 
-  double scanweight = 1.0;
-  double nearweight = 0;
-  double headingweight = 1.0;
+  double scanweight = 1;
+  double nearweight = -0.1;//.07;
+  double headingweight = 0.7;
 
   for(int i=0;i<neighbours.size();i++)
   {
     Element* n = neighbours.at(i);
 
-    double scanVal = scanweight * scanValue(n->getIndexX(),n->getIndexY(),x,y,3);
-    double nearVal = nearweight * nearValue(n->getIndexX(),n->getIndexY(),x,y,3);
+    double scanVal = scanweight * scanValue(n->getIndexX(),n->getIndexY(),x,y,0);
+    double nearVal = nearweight * nearValue(n->getIndexX(),n->getIndexY(),x,y,0);
     double headingVal = headingweight * headingValue(n->getIndexX(),n->getIndexY(),x,y);
 
     std::cout << "\nElement      : (" << n->getIndexX() << "," << n->getIndexY() << ")" << std::endl;
@@ -458,7 +482,7 @@ Target SingleBeamScanner::findFarAway(int currentX,int currentY)
   {
     int ix = targets.at(i)->getIndexX();
     int iy = targets.at(i)->getIndexY();
-    if(cost[ix][iy] < lowestCost && (ix!=currentX && iy!=currentY))
+    if(cost[ix][iy] < lowestCost && !(ix==currentX && iy==currentY))
     {
       lowestCost = cost[ix][iy];
       best = targets.at(i);
@@ -470,6 +494,9 @@ Target SingleBeamScanner::findFarAway(int currentX,int currentY)
   for (int i = polygon->nx-1; i >= 0; --i)
     delete[] cost[i];
   delete[] cost;
+
+  if(best == NULL)
+    std::cout << "Target is NULL" << std::endl;
 
   if(best != NULL)
   {
@@ -533,14 +560,14 @@ double SingleBeamScanner::scanValue(int x,int y,int originX,int originY, int rec
 
   double a = 0;
   if(status == 0)
-    a = 1;//(recursivedepth*recursivedepth+1.0) / ((x-originX)*(x-originX) + (y-originY)*(y-originY));
+    a = 0.5;//(recursivedepth*recursivedepth+1.0) / ((x-originX)*(x-originX) + (y-originY)*(y-originY));
 
   if(status == 0 || status == 1)
     return (a +
       scanValue(x+1,y, originX,originY, recursivedepth-1) +
       scanValue(x-1,y, originX,originY, recursivedepth-1) +
       scanValue(x,y+1, originX,originY, recursivedepth-1) +
-      scanValue(x,y-1, originX,originY, recursivedepth-1))/5;
+      scanValue(x,y-1, originX,originY, recursivedepth-1))/8;
       /*
       scanValue(x+1,y-1, originX,originY, recursivedepth-1) + //diagonalt
       scanValue(x-1,y+1, originX,originY, recursivedepth-1) +
@@ -558,30 +585,46 @@ double SingleBeamScanner::nearValue(int x, int y, int originX, int originY, int 
      return 0;
 
   int status = polygon->matrix[x][y]->getStatus();
-
-  if(recursivedepth == 0)
-  {
-    if(status == 0)
-      return 0; // ((x-originX)*(x-originX) + (y-originY)*(y-originY));
-    if(status == 1)
-      return 1;
-    if(status == 5)
-      return 0;
+  if(status != 0)
     return 0;
+
+  //check number of scanned neighbours (2 is optimal)
+  int xIndex[] = {x+1, x-1, x+0, x+0};
+  int yIndex[] = {y+0, y+0, y+1, y-1};
+
+  int scanned = 0;
+  for(int i=0;i<4;i++)
+  {
+    if(xIndex[i] > 0 &&
+       xIndex[i] < polygon->nx &&
+       yIndex[i] > 0 &&
+       yIndex[i] < polygon->ny)
+    {
+      if(polygon->matrix[xIndex[i]][yIndex[i]]->getStatus() == 1)
+        scanned++;
+    }
   }
 
-  if(status == 1 || status == 0)
-    return (status +
-      scanValue(x+1,y, originX,originY, recursivedepth-1) +
-      scanValue(x-1,y, originX,originY, recursivedepth-1) +
-      scanValue(x,y+1, originX,originY, recursivedepth-1) +
-      scanValue(x,y-1, originX,originY, recursivedepth-1))/5;
-      /*
-      scanValue(x+1,y-1, originX,originY, recursivedepth-1) + //diagonalt
-      scanValue(x-1,y+1, originX,originY, recursivedepth-1) +
-      scanValue(x+1,y+1, originX,originY, recursivedepth-1) +
-      scanValue(x-1,y-1, originX,originY, recursivedepth-1))*/
-  return 0;
+  std::cout << "nearvalue::scanned: " << scanned << std::endl;
+
+  switch (scanned)
+  {
+    case 0:
+      return 0;
+      break;
+    case 1:
+      return 0.3;
+      break;
+    case 2:
+      return 0.6;
+      break;
+    case 3:
+      return 1;
+      break;
+    default:
+      return 0;
+  }
+
 }
 
 double SingleBeamScanner::headingValue(int x,int y, int originX, int originY)
@@ -591,6 +634,10 @@ double SingleBeamScanner::headingValue(int x,int y, int originX, int originY)
   double dx = ((double)x-(double)originX);
   double dy = ((double)y-(double)originY);
   double d = sqrt(dx*dx+dy*dy);
+
+  if(d==0)
+    d=0.001;
+
   double alpha;
   if(dx>0)
     if(dy>0)
