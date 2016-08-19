@@ -633,7 +633,7 @@ void Data::processMessage(std::string m)
 void Data::setBoatWaypoint_real(double lat0, double lon0,double lat1, double lon1, double speed, bool noStartPos)
 {
 
-
+    /*
     //DEBUG - makes it possible to run the full program without the boat
     boat_targetLat = lat1;
     boat_targetLon = lon1;
@@ -656,7 +656,7 @@ void Data::setBoatWaypoint_real(double lat0, double lon0,double lat1, double lon
     boat_xpos = newX;
     boat_ypos = newY;
     boat_heading_local = alpha;
-
+    */
 
     //std::cout << "Data: Set real waypoint, real coordinates: (" << lat0 << "," << lon0 << ") -> ("<< lat1 <<","<< lon1 << ")" << std::endl;
     std::stringstream s;

@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
   double tol = 2;//delta / 3.0;
 
   int delay_data = 50000;
-  int delay_scanner = 200000; //+0:a *5:a
+  int delay_scanner = 500000; 
 
   Navigator* navigator = new Navigator(transmitter,delay_data,delay_scanner,delta,tol, backup, backup_filename);
 
