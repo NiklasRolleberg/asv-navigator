@@ -111,7 +111,7 @@ public:
 		double** createCostMatrix(int cx, int cy);
 
 		/**update the window*/
-		void updateView(double currentX, double currentY);
+		void updateView(double currentX, double currentY,double heading);
 
 };
 

@@ -23,6 +23,7 @@ class BasicDrawPane : public wxPanel
    double scale;
    double boatX;
    double boatY;
+   double boatHeading;
    int maxXY;
 
 public:
@@ -33,7 +34,7 @@ public:
     void paintEvent(wxPaintEvent & evt);
     void paintNow();
 
-    void setBoatPos(double x,double y,int maxXY);
+    void setBoatPos(double x,double y,double heading,int maxXY);
 
     void render(wxDC& dc);
 
@@ -89,7 +90,7 @@ public:
 
   void drawPolygon(std::vector<double>* x, std::vector<double>* y);
 
-  void drawPath(double posx, double posy,int maxXY);
+  void drawPath(double posx, double posy,double heading,int maxXY);
 
   void drawLine(int startx, int starty, int stopx,int stopy,int width, int r, int g , int b);
 };

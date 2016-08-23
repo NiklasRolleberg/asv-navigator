@@ -31,7 +31,7 @@ SingleBeamScanner::SingleBeamScanner(Data* dataptr, Polygon* polygonptr,int inpu
   makebackup = backup;
   backupFilename = fname;
 
-  depthThreshold = -3;
+  depthThreshold = 2;
   targetSpeed = 1;
 
   stop = false;
@@ -87,7 +87,13 @@ void SingleBeamScanner::startScan()
     save++;
     save=save%10; //save every 10:th loop
     if(save == 0 && makebackup)
+    {
+      //fist write a temp file in the backup folder backup
+      //(this is to always have a beckup file if the program kraches during the writing)
+      polygon->saveAll("backup/temp.xml", data->getLat(), data->getLon());
+      //then write the real file
       polygon->saveAll(backupFilename, data->getLat(), data->getLon());
+    }
     //(1)
     double Xpos = data->getX();
     double Ypos = data->getY();
@@ -217,6 +223,7 @@ bool SingleBeamScanner::gotoElement(int x, int y, bool ignoreDepth)
 
     double d = sqrt((targetX-currentX)*(targetX-currentX) + (targetY-currentY)*(targetY-currentY));
     std::cout << "Distance left to target:" << d << "m" << std::endl;
+    std::cout << "Depth: " << data->getDepth();
     if(d<tol)
       return true;
 
@@ -236,7 +243,7 @@ bool SingleBeamScanner::gotoElement(int x, int y, bool ignoreDepth)
 
 
   //target->updateDepth(5);
-  polygon->updateView(data->getX(),data->getY());
+  polygon->updateView(data->getX(),data->getY(),data->getHeading());
   return true;
 }
 
@@ -526,7 +533,7 @@ bool SingleBeamScanner::updateDepth(double x, double y, double depth)
   {
     if(polygon->matrix[ix][iy]->getStatus()!=2) //once a element has been marked as land it will always be land
       polygon->matrix[ix][iy]->updateDepth(depth);
-    polygon->updateView(x,y);
+    polygon->updateView(x,y,data->getHeading());
     if(polygon->matrix[ix][iy]->getTimesVisited() > delta*delta
       && delta*delta > 30 ) //hitta på en bra gräns
     {

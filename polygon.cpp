@@ -892,12 +892,12 @@ void Polygon::saveMatrix()
 }
 
 
-void Polygon::updateView(double currentX, double currentY)
+void Polygon::updateView(double currentX, double currentY,double heading)
 {
   //std::cout << "polygon::update view" << std::endl;
   if(showGUI && GUI != NULL)
   {
-    GUI->drawPath(currentX,currentY,std::max(maxX,maxY));
+    GUI->drawPath(currentX,currentY,heading,std::max(maxX,maxY));
   	GUI->update();
   }
 }

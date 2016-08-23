@@ -126,7 +126,7 @@ void PathView::drawPolygon(std::vector<double>* x, std::vector<double>* y)
   }
 }
 
-void PathView::drawPath(double posx, double posy,int max)
+void PathView::drawPath(double posx, double posy,double heading, int max)
 {
   if(lastPosx == 0 && lastPosy == 0)
   {
@@ -135,7 +135,7 @@ void PathView::drawPath(double posx, double posy,int max)
     maxXY = max;
     return;
   }
-  pathDrawPane->setBoatPos(posx,posy,max);
+  pathDrawPane->setBoatPos(posx,posy,heading,max);
   drawLine((int) lastPosx, (int) lastPosy, (int) posx,(int) posy, 3, 255,0,0);
   lastPosx = posx;
   lastPosy = posy;
@@ -201,10 +201,11 @@ BasicDrawPane::~BasicDrawPane()
   }
 }
 
-void BasicDrawPane::setBoatPos(double x,double y,int max)
+void BasicDrawPane::setBoatPos(double x,double y,double heading,int max)
 {
   boatX = x;
   boatY = y;
+  boatHeading = heading;
   maxXY = max;
 }
 
@@ -242,8 +243,11 @@ void BasicDrawPane::render(wxDC&  dc)
 
     // draw a circle
     dc.SetBrush(*wxYELLOW_BRUSH); // green filling
-    dc.SetPen( wxPen( wxColor(255,255,0), 5 ) ); // 5-pixels-thick red outline
+    dc.SetPen( wxPen( wxColor(255,255,0), 6 ) ); // 5-pixels-thick red outline
     dc.DrawCircle( wxPoint(cx,cy), 5 /* radius */ );
+    
+    dc.DrawLine(cx+(6*sin(boatHeading)),cy+(6*cos(boatHeading)),cx+(10*cos(boatHeading)),cy-(10*sin(boatHeading)));
+    dc.DrawLine(cx-(6*sin(boatHeading)),cy-(6*cos(boatHeading)),cx+(10*cos(boatHeading)),cy-(10*sin(boatHeading)));
   }
   if(drawMatrix)
   {
