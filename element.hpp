@@ -37,7 +37,7 @@ public:
   ~Element();
 
   int getStatus();
-  void updateDepth(double newDepth);
+  void updateDepth(double newDepth,bool changeState);
   double getDepth();
   void targeted();
   int getTimesVisited();

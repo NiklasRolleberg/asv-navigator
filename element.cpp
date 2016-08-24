@@ -23,10 +23,11 @@ Element::~Element()
   //std::cout << "Element Destructor" << std::endl;
 }
 
-void Element::updateDepth(double newDepth)
+void Element::updateDepth(double newDepth,bool changeState)
 {
   //std::cout << "Element updating depth" << std::endl;
-  status = 1;
+  if(changeState)
+    status = 1;
   accumulatedDepth+=newDepth;
   timesVisited++;
 }

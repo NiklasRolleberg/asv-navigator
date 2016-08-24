@@ -65,7 +65,7 @@ private:
      * return: true -> all is good
      *         false-> boat is probably stuck
      */
-    bool updateDepth(double x, double y, double depth);
+    bool updateDepth(double x, double y, double depth, bool changeStatus);
 
     double scanValue(int x,int y,int originX,int originY, int recursivedepth);
     double nearValue(int x,int y,int originX,int originY, int recursivedepth);

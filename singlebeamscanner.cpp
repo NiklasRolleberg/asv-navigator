@@ -173,7 +173,7 @@ bool SingleBeamScanner::gotoElement(int x, int y, bool ignoreDepth)
   //if(rand() % 5 == 0 && !ignoreDepth && target->getStatus() != 1)
     //return false;
 
-/*
+
   int cx = polygon->nx/3;
   int cy = polygon->ny/3;
   if(sqrt((x-cx)*(x-cx)+(y-cy)*(y-cy))<3 && !ignoreDepth)
@@ -198,7 +198,7 @@ bool SingleBeamScanner::gotoElement(int x, int y, bool ignoreDepth)
     return false;
   if( (polygon->nx -x) < 5 && y==7 && !ignoreDepth)
     return false;
-*/
+
 
   data->setBoatWaypoint_local(0,0,targetX,targetY,1,true);
 
@@ -219,13 +219,19 @@ bool SingleBeamScanner::gotoElement(int x, int y, bool ignoreDepth)
     data->setBoatWaypoint_local(0,0,targetX,targetY,targetSpeed,true);
   }
 
-    updateDepth(currentX,currentY,data->getDepth());
 
     double d = sqrt((targetX-currentX)*(targetX-currentX) + (targetY-currentY)*(targetY-currentY));
     std::cout << "Distance left to target:" << d << "m" << std::endl;
-    std::cout << "Depth: " << data->getDepth();
+    std::cout << "Depth: " << data->getDepth() << std::endl;
     if(d<tol)
+    {
+      updateDepth(currentX,currentY,data->getDepth(),true);
       return true;
+    }
+    else
+    {
+      updateDepth(currentX,currentY,data->getDepth(),false);
+    }
 
     //if(0.5*(data->getDepth_Right()+data->getDepth_Left()) < depthThreshold)
     if(data->getDepth() < depthThreshold)
@@ -386,13 +392,12 @@ Target SingleBeamScanner::findClose(int x,int y)
   int index = -1;
 
   double scanweight = 1;
-  double nearweight = -0.1;//.07;
+  double nearweight = 1.2;//.07;
   double headingweight = 0.7;
 
   for(int i=0;i<neighbours.size();i++)
   {
     Element* n = neighbours.at(i);
-
     double scanVal = scanweight * scanValue(n->getIndexX(),n->getIndexY(),x,y,0);
     double nearVal = nearweight * nearValue(n->getIndexX(),n->getIndexY(),x,y,0);
     double headingVal = headingweight * headingValue(n->getIndexX(),n->getIndexY(),x,y);
@@ -516,7 +521,7 @@ Target SingleBeamScanner::findFarAway(int currentX,int currentY)
 }
 
 
-bool SingleBeamScanner::updateDepth(double x, double y, double depth)
+bool SingleBeamScanner::updateDepth(double x, double y, double depth, bool changeState)
 {
   //find index
   int ix = (int) round((x - polygon->minX) / polygon->delta);
@@ -532,7 +537,7 @@ bool SingleBeamScanner::updateDepth(double x, double y, double depth)
   if(polygon->matrix != NULL)
   {
     if(polygon->matrix[ix][iy]->getStatus()!=2) //once a element has been marked as land it will always be land
-      polygon->matrix[ix][iy]->updateDepth(depth);
+      polygon->matrix[ix][iy]->updateDepth(depth,changeState);
     polygon->updateView(x,y,data->getHeading());
     if(polygon->matrix[ix][iy]->getTimesVisited() > delta*delta
       && delta*delta > 30 ) //hitta på en bra gräns
