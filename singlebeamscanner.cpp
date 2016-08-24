@@ -31,7 +31,7 @@ SingleBeamScanner::SingleBeamScanner(Data* dataptr, Polygon* polygonptr,int inpu
   makebackup = backup;
   backupFilename = fname;
 
-  depthThreshold = 2;
+  depthThreshold = 2.1;
   targetSpeed = 1;
 
   stop = false;
@@ -172,7 +172,7 @@ bool SingleBeamScanner::gotoElement(int x, int y, bool ignoreDepth)
 
   //if(rand() % 5 == 0 && !ignoreDepth && target->getStatus() != 1)
     //return false;
-
+/*
 
   int cx = polygon->nx/3;
   int cy = polygon->ny/3;
@@ -198,7 +198,7 @@ bool SingleBeamScanner::gotoElement(int x, int y, bool ignoreDepth)
     return false;
   if( (polygon->nx -x) < 5 && y==7 && !ignoreDepth)
     return false;
-
+*/
 
   data->setBoatWaypoint_local(0,0,targetX,targetY,1,true);
 
