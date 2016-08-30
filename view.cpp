@@ -245,7 +245,7 @@ void BasicDrawPane::render(wxDC&  dc)
     dc.SetBrush(*wxYELLOW_BRUSH); // green filling
     dc.SetPen( wxPen( wxColor(255,255,0), 6 ) ); // 5-pixels-thick red outline
     dc.DrawCircle( wxPoint(cx,cy), 5 /* radius */ );
-    
+
     dc.DrawLine(cx+(6*sin(boatHeading)),cy+(6*cos(boatHeading)),cx+(10*cos(boatHeading)),cy-(10*sin(boatHeading)));
     dc.DrawLine(cx-(6*sin(boatHeading)),cy-(6*cos(boatHeading)),cx+(10*cos(boatHeading)),cy-(10*sin(boatHeading)));
   }
@@ -253,6 +253,12 @@ void BasicDrawPane::render(wxDC&  dc)
   {
     double dx = windowSize/nx;
     double dy = windowSize/ny;
+
+    double maxDepth = 1;
+    //find maximum depth
+    for(int i=0;i<nx;i++)
+      for(int j=0;j<ny;j++)
+        maxDepth = std::max(maxDepth,matrix[i][j]->getDepth());
 
     for(int j=0;j<ny;j++) {
       for(int i=0;i<nx;i++) {
@@ -264,10 +270,15 @@ void BasicDrawPane::render(wxDC&  dc)
         {
             //dc.SetBrush(*wxGREEN_BRUSH); // scanned
             //set color for scanned area
-            int red = 0;
-            int green = 0;
-            int blue = 255;
+            double d = std::min(maxDepth,matrix[i][j]->getDepth());
+            int red   = 0;
+            int green = ((maxDepth-d)/maxDepth)*128;
+            int blue  = green*2;
 
+            red = std::max(0,std::min(255,red));
+            green = std::max(0,std::min(128,green));
+            blue = std::max(0,std::min(255,blue));
+            /*
             if(matrix[i][j]->getDepth() > 10)
             {
               red = 0;
@@ -292,6 +303,7 @@ void BasicDrawPane::render(wxDC&  dc)
               green = 0;
               blue = 200;
             }
+            */
             wxBrush brush(wxColor(red,green,blue),1);
             dc.SetBrush(brush);
         }

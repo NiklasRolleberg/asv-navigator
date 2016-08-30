@@ -145,6 +145,12 @@ public:
     /**change/time*/
     double getDepth_Left_Slope();
 
+    /**Ask for path*/
+    void askForPath();
+
+    /**Ask for operational mode*/
+    void askForMode();
+
     /** true if the distance between the boats path and the coordinates given is less than tol */
     bool hasCorrectPath(double lat0, double lon0, double lat1, double lon1, double tol);
 

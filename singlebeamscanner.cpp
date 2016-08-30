@@ -63,6 +63,31 @@ void SingleBeamScanner::startScan()
 
   std::cout << "scanner:SingleBeamScanner: starting scan" << std::endl;
 
+
+  /*
+  DEBUG
+  for(int i=0;i<polygon->nx;i++)
+  {
+    double depth = -25+(26*((double) i / (double) polygon->nx));
+    for(int j=0;j<polygon->ny;j++)
+    {
+      if(depth>0)
+        polygon->matrix[i][j]->setStatus(2);
+      else
+      {
+        polygon->matrix[i][j]->setTimesVisited(1);
+        polygon->matrix[i][j]->setAccumulatedDepth(-depth);
+        polygon->matrix[i][j]->setStatus(1);
+      }
+    }
+  }
+
+  polygon->updateView(data->getX(),data->getY(),data->getHeading());
+
+  usleep(10000000);
+  exit(0);
+  */
+
   //(1) find the closest element to the boat
   //(2) calculate the values of all surrounding elements
   //(3) go to the element with the highest value
@@ -205,15 +230,20 @@ bool SingleBeamScanner::gotoElement(int x, int y, bool ignoreDepth)
   double currentX;
   double currentY;
 
+  int askforpath = 1;
+
   while(!stop)
   {
     usleep(delay);
+
+    if((askforpath=(++askforpath)%10) == 0)
+      data->askForPath();
 
     currentX = data->getX();
     currentY = data->getY();
 
     //check if path is correct
-  if(!data->hasCorrectPath(0,0,data->yTOlat(targetY),data->xTOlon(targetX),targetSpeed))
+  if(!data->hasCorrectPath(0,0,data->yTOlat(targetY),data->xTOlon(targetX),targetSpeed) && askforpath != 0)
   {
     std::cout << "wrong path, sending path again" << std::endl;
     data->setBoatWaypoint_local(0,0,targetX,targetY,targetSpeed,true);

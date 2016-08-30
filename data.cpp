@@ -629,6 +629,30 @@ void Data::processMessage(std::string m)
   //std::cout << "Unknown message: " << m << std::endl;
 }
 
+/**Ask for path*/
+void Data::askForPath()
+{
+  std::stringstream s;
+  s << "MSGCP";
+  int cs = calculateChecksum(s.str());
+  s << '*' << std::hex << cs;
+  std::string str = "$" + s.str();
+  data_transmitterptr->sendMessage(str); //send message
+  boat_targetLat = 0;
+  boat_targetLon = 0;
+}
+
+/**Ask for operational mode*/
+void Data::askForMode()
+{
+  std::stringstream s;
+  s << "MSGOM";
+  int cs = calculateChecksum(s.str());
+  s << '*' << std::hex << cs;
+  std::string str = "$" + s.str();
+  data_transmitterptr->sendMessage(str); //send message
+}
+
 
 void Data::setBoatWaypoint_real(double lat0, double lon0,double lat1, double lon1, double speed, bool noStartPos)
 {
@@ -651,7 +675,6 @@ void Data::setBoatWaypoint_real(double lat0, double lon0,double lat1, double lon
         alpha = 2*M_PI+asin(dy/sqrt(dx*dx+dy*dy));
     else
       alpha = M_PI-asin(dy/sqrt(dx*dx+dy*dy));
-
 
     boat_xpos = newX;
     boat_ypos = newY;
