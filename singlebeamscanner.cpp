@@ -31,7 +31,7 @@ SingleBeamScanner::SingleBeamScanner(Data* dataptr, Polygon* polygonptr,int inpu
   makebackup = backup;
   backupFilename = fname;
 
-  depthThreshold = 2.1;
+  depthThreshold = 3.0;
   targetSpeed = 1;
 
   stop = false;
@@ -64,11 +64,11 @@ void SingleBeamScanner::startScan()
   std::cout << "scanner:SingleBeamScanner: starting scan" << std::endl;
 
 
-  /*
-  DEBUG
+ /*
+  //DEBUG
   for(int i=0;i<polygon->nx;i++)
   {
-    double depth = -25+(26*((double) i / (double) polygon->nx));
+    double depth = -25+(36*((double) i / (double) polygon->nx));
     for(int j=0;j<polygon->ny;j++)
     {
       if(depth>0)
@@ -86,7 +86,7 @@ void SingleBeamScanner::startScan()
 
   usleep(10000000);
   exit(0);
-  */
+ */
 
   //(1) find the closest element to the boat
   //(2) calculate the values of all surrounding elements

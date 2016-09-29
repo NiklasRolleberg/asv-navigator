@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
   transmitter->start();
 
   // (2) Create the navigator, and pass the transmitter to
-  double delta = 5;
+  double delta = 15;
   double tol = 2;//delta / 3.0;
 
   int delay_data = 50000;

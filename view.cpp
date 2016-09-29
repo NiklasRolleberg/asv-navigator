@@ -270,40 +270,16 @@ void BasicDrawPane::render(wxDC&  dc)
         {
             //dc.SetBrush(*wxGREEN_BRUSH); // scanned
             //set color for scanned area
-            double d = std::min(maxDepth,matrix[i][j]->getDepth());
-            int red   = 0;
-            int green = ((maxDepth-d)/maxDepth)*128;
-            int blue  = green*2;
+            double d = std::min(maxDepth,matrix[i][j]->getDepth()) / maxDepth;
+
+            int red   = (1-d) * 255;
+            int green = (1-d) * 150;
+            int blue  = d * 200;
 
             red = std::max(0,std::min(255,red));
-            green = std::max(0,std::min(128,green));
+            green = std::max(0,std::min(255,green));
             blue = std::max(0,std::min(255,blue));
-            /*
-            if(matrix[i][j]->getDepth() > 10)
-            {
-              red = 0;
-              green = 20;
-              blue = 20;
-            }
-            else if (matrix[i][j]->getDepth() > 6)
-            {
-              red = 0;
-              green = 0;
-              blue = 50;
-            }
-            else if (matrix[i][j]->getDepth() > 4)
-            {
-              red = 0;
-              green = 0;
-              blue = 120;
-            }
-            else if (matrix[i][j]->getDepth() > 2)
-            {
-              red = 0;
-              green = 0;
-              blue = 200;
-            }
-            */
+
             wxBrush brush(wxColor(red,green,blue),1);
             dc.SetBrush(brush);
         }
